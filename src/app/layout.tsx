@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Montserrat } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const montserrat = Montserrat({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,7 +16,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={`${montserrat.className} antialiased`}>
+        <main>{children}</main>
+        <div className="flex justify-center">
+        <footer className="absolute bottom-0 text-nyanza">Copyright © 2024 Juan Ignacio Leiva</footer>
+        </div>
+      </body>
     </html>
   );
 }
