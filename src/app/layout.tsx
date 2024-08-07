@@ -18,9 +18,6 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${montserrat.className} antialiased`}>
         <main>{children}</main>
-        <div className="flex justify-center">
-        <footer className="absolute bottom-0 text-nyanza">Copyright © 2024 Juan Ignacio Leiva</footer>
-        </div>
       </body>
     </html>
   );
