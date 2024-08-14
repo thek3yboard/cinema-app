@@ -7,8 +7,8 @@ export default function LoggedLayout({
     children: React.ReactNode;
   }>) {
     return (
-      <div className="h-screen flex flex-col overflow-y-scroll">
-        <nav className="sticky top-0 p-[6px] h-11 bg-gradient-to-r from-aero-blue to-blueish-gray border-b-2 border-slate-700"><Image className="ml-1" src={logo} alt="Logo" width={125} /></nav>
+      <div className="h-screen flex flex-col overflow-y-auto">
+        <nav className="z-10 sticky top-0 p-[6px] h-11 bg-gradient-to-r from-aero-blue to-blueish-gray border-b-2 border-slate-700"><Image className="ml-1" src={logo} alt="Logo" width={125} /></nav>
         <div className="min-h-full">
           {children}
           <div className="h-6 flex justify-center items-end bg-blueish-gray">
