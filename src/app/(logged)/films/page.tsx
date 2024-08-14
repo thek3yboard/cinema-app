@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Fragment } from 'react';
 import Image from "next/image";
+import { useRouter } from 'next/navigation';
 
 type Movie = {
     id: number,
@@ -33,13 +34,19 @@ export default function Films() {
         fetchMovies();
     }, []);
 
+    const handleClickMovieImage = (movie: Movie) => {
+        router.push(`/film/${movie.id}`);
+    }
+
     return (
         <div className="min-h-full bg-gradient-to-b from-aero-blue to-blueish-gray">
-            <div className="p-16 grid grid-cols-6 gap-4 justify-items-center">
+            <div className="p-16 grid grid-cols-12 gap-4 justify-items-center">
                 {movies.map((m) => {
                     return (
                         <Fragment key={m.id}>
-                            <Image className="border-2 border-blueish-gray" src={`https://image.tmdb.org/t/p/original${m.poster_path}`} alt="Logo" height={100} width={200} />
+                            <div onClick={() => handleClickMovieImage(m)}>
+                                <Image className="border-2 border-blueish-gray hover:border-[3px] hover:border-green-500" src={`https://image.tmdb.org/t/p/original${m.poster_path}`} alt="Logo" height={100} width={200} />
+                            </div>
                         </Fragment>
                     )
                 })}
