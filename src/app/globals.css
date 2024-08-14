@@ -31,3 +31,30 @@ body {
     text-wrap: balance;
   }
 }
+
+/* width */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #2e2e2e;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #bcccbb;
+  border-radius: 5px;
+}
+
+.movie-img {
+  mask: 
+    linear-gradient(to top,  transparent 5%, #fff 30% 80%, transparent 95%),
+    linear-gradient(to left, transparent 5%, #fff 20% 75%, transparent 95%),
+    linear-gradient(to right, transparent 5%, #fff 5% 75%, transparent 95%);
+  mask-size: 110% 110%;
+  mask-position: center;
+  mask-repeat:no-repeat;
+  mask-composite: intersect;
+}
