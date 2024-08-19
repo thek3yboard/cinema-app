@@ -9,7 +9,7 @@ export default function LoggedLayout({
     return (
       <div className="h-screen flex flex-col overflow-y-auto">
         <nav className="z-10 sticky top-0 p-[6px] h-11 bg-gradient-to-r from-aero-blue to-blueish-gray border-b-2 border-slate-700"><Image className="ml-1" src={logo} alt="Logo" width={125} /></nav>
-        <div className="min-h-full">
+        <div className="min-h-[calc(100%-4.25rem)]">
           {children}
           <div className="h-6 flex justify-center items-end bg-blueish-gray">
             <footer className="h-6 text-nyanza">Copyright © 2024 Juan Ignacio Leiva</footer>
