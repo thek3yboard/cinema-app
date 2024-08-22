@@ -1,12 +1,31 @@
 "use client";
 
-import { useState, useEffect } from 'react'; 
-import Image from "next/image";
+import { useState, useEffect, Suspense, lazy } from 'react'; 
+import Loading from '@/app/(logged)/loading';
+const FilmUI = lazy(() => import('@/app/(logged)/film/[id]/ui/FilmUI'));
+
+type MovieData = {
+    id: number,
+    title: string,
+    overview: string,
+    original_title: string,
+    backdrop_path: string,
+    release_date: string,
+    vote_average: number
+    production_companies: Array<ProductionCompanies>
+}
+
+type ProductionCompanies = {
+    id: number,
+    logo_path: string,
+    name: string,
+    origin: string
+}
 
 export default function Film({ params }: { params: { id: number } }) {
-    const [movieData, setMovieData] = useState([]);
+    const [movieData, setMovieData] = useState<MovieData>();
 
-    const fetchMovieData = () => {
+    useEffect(() => {
         fetch(`https://api.themoviedb.org/3/movie/${params.id}language=en-US&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
             method: "GET",
             headers: {
@@ -20,19 +39,11 @@ export default function Film({ params }: { params: { id: number } }) {
             setMovieData(data);
         })
         .catch(err => console.error(err));
-    }
-
-    useEffect(() => {
-        fetchMovieData();
-    }, [fetchMovieData]);
+    }, [params.id]);
 
     return (
-        <div className="h-full bg-gradient-to-b from-blueish-gray via-[#3f577c] to-blueish-gray">
-            <div className="flex flex-col items-start ">
-                <Image className="z-0 movie-img" src={`https://image.tmdb.org/t/p/original${movieData.backdrop_path}`} alt="Backdrop Path Image" width={1300} height={800} />
-                <h1 className="mt-[-5rem] z-20 pl-8 text-white text-6xl font-bold">{movieData.title}</h1>
-
-            </div>
-        </div>
+        <Suspense key={params?.id} fallback={<Loading/>}>
+            <FilmUI movieData={movieData!} />
+        </Suspense>
     );
 }
