@@ -2,25 +2,8 @@
 
 import { useState, useEffect, Suspense, lazy } from 'react'; 
 import Loading from '@/app/(logged)/loading';
+import { MovieData } from "@/types/types";
 const FilmUI = lazy(() => import('@/app/(logged)/film/[id]/ui/FilmUI'));
-
-type MovieData = {
-    id: number,
-    title: string,
-    overview: string,
-    original_title: string,
-    backdrop_path: string,
-    release_date: string,
-    vote_average: number
-    production_companies: Array<ProductionCompanies>
-}
-
-type ProductionCompanies = {
-    id: number,
-    logo_path: string,
-    name: string,
-    origin: string
-}
 
 export default function Film({ params }: { params: { id: number } }) {
     const [movieData, setMovieData] = useState<MovieData>();

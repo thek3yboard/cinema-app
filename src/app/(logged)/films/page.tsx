@@ -3,14 +3,8 @@
 import { useState, useEffect, Suspense, lazy } from 'react';
 import { useRouter } from 'next/navigation';
 import Loading from '@/app/(logged)/loading';
+import { Movie } from "@/types/types";
 const FilmsGrid = lazy(() => import('@/app/(logged)/films/ui/FilmsGrid'));
-
-type Movie = {
-    id: number,
-    title: string,
-    overview: string,
-    poster_path: string
-}
 
 export default function Films() {
     const [movies, setMovies] = useState<Movie[]>([]);

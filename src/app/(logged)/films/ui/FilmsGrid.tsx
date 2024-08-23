@@ -1,12 +1,6 @@
 import { Fragment } from "react";
 import Image from "next/image";
-
-type Movie = {
-    id: number,
-    title: string,
-    overview: string,
-    poster_path: string
-}
+import { Movie } from "@/types/types";
 
 type Props = {
     movies: Movie[],

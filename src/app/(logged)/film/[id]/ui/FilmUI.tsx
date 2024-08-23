@@ -1,24 +1,6 @@
-import { Fragment, Suspense } from 'react';
+import { Fragment } from 'react';
 import Image from "next/image";
-import Loading from '@/app/(logged)/loading';
-
-type MovieData = {
-    id: number,
-    title: string,
-    overview: string,
-    original_title: string,
-    backdrop_path: string,
-    release_date: string,
-    vote_average: number
-    production_companies: Array<ProductionCompanies>
-}
-
-type ProductionCompanies = {
-    id: number,
-    logo_path: string,
-    name: string,
-    origin: string
-}
+import { MovieData, ProductionCompanies } from "@/types/types";
 
 type Props = {
     movieData: MovieData
