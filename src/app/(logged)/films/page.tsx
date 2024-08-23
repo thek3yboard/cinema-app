@@ -11,19 +11,48 @@ export default function Films() {
     const router = useRouter();
 
     useEffect(() => {
-        fetch(`https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=1&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
+        const fetchFirstPage = async () => {
+            try {
+                let res = await fetch(`https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=1&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
+                    }
+                });
+                
+                const data = await res.json();
+                
+                return data.results;
+            } catch (error) {
+                console.error(error)
             }
-        })
-        .then(res => { 
-            return res.json(); 
-        })
-        .then(data => { 
-            setMovies(data.results);
-        })
-        .catch(err => console.error(err));
+        }
+
+        const fetchSecondPage = async () => {
+            try {
+                let res = await fetch(`https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=2&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
+                    }
+                });
+                
+                const data = await res.json();
+                
+                return data.results;
+            } catch (error) {
+                console.error(error)
+            }
+        }
+        
+        const fetchBoth = async () => {
+            const firstBatchMovies = await fetchFirstPage();
+            const secondBatchMovies = await fetchSecondPage();
+            const allMoviesPage = [...firstBatchMovies, ...secondBatchMovies];
+            setMovies(allMoviesPage);
+        };
+        
+        fetchBoth();
     }, []);
 
     const handleClickMovieImage = (movie: Movie): void => {
