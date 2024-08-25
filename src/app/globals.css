@@ -60,5 +60,5 @@ body {
 }
 
 .grid-columns-10-135px {
-  grid-template-columns: repeat(10, 135px);;
+  grid-template-columns: repeat(10, 135px);
 }
