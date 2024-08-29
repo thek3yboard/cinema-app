@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect, Suspense, lazy } from 'react';
+import { useState, useEffect, useContext, Suspense, lazy } from 'react';
 import { useRouter } from 'next/navigation';
-import Loading from '@/app/(logged)/loading';
+import { FilmsContext } from '../layout';
+import Loading from "@/app/ui/loading";
 import { Movie } from "@/types/types";
 const FilmsGrid = lazy(() => import('@/app/(logged)/films/ui/FilmsGrid'));
 
 export default function Films() {
     const [movies, setMovies] = useState<Movie[]>([]);
-    const [currentApiPages, setCurrentApiPages] = useState([1,2]);
-    const [page, setPage] = useState(1);
+    const { page, setPage, currentApiPages, setCurrentApiPages } = useContext(FilmsContext);
     const router = useRouter();
 
     useEffect(() => {
