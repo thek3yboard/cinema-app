@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense, lazy } from 'react'; 
-import Loading from '@/app/(logged)/loading';
+import Loading from '@/app/ui/loading';
 import { MovieData } from "@/types/types";
 const FilmUI = lazy(() => import('@/app/(logged)/film/[id]/ui/FilmUI'));
 
