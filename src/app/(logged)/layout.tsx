@@ -1,24 +1,9 @@
 "use client";
 
-import { useState, createContext } from 'react';
+import { useState } from 'react';
+import { FilmsContext, initalPage, initalCurrentApiPages } from "@/app/(logged)/FilmsContext";
 import Image from "next/image";
 import logo from '@/assets/cinema.png';
-
-export type FilmsContextType = {
-  page: number;
-  setPage: React.Dispatch<React.SetStateAction<number>>;
-  currentApiPages: number[];
-  setCurrentApiPages: React.Dispatch<React.SetStateAction<number[]>>
-};
-
-const initalPage = 1, initalCurrentApiPages = [1,2];
-
-export const FilmsContext = createContext<FilmsContextType>({
-  page: initalPage,
-  setPage: () => void {},
-  currentApiPages: initalCurrentApiPages,
-  setCurrentApiPages: () => void {}
-});
 
 export default function LoggedLayout({
     children,
