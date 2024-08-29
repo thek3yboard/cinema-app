@@ -11,7 +11,7 @@ export default function FilmUI({ movieData }: Props) {
         <div className="min-h-full">
             <div className="flex flex-col items-start">
                 <Image className="z-0 movie-img" src={`https://image.tmdb.org/t/p/original${movieData?.backdrop_path}`} alt="Backdrop Path Image" width={1300} height={800} />
-                <h1 className="mt-[-5rem] z-20 pl-8 text-white text-6xl font-bold">{movieData?.title && `${movieData?.title} (${movieData?.release_date.substring(0,4)})`}</h1>
+                <h1 className="mt-[-5rem] w-[1250px] z-20 pl-8 text-white text-6xl font-bold">{movieData?.title && `${movieData?.title} (${movieData?.release_date.substring(0,4)})`}</h1>
                 <div className="w-2/4 pl-8">
                     <p className="text-white mt-4 text-lg">{movieData?.overview}</p>
                 </div>
