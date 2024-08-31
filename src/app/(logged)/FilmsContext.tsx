@@ -9,12 +9,12 @@ type FilmsContextType = {
     handleClickNextPage: () => void
 };
 
-export const initalPage = 1, initalCurrentApiPages = [1,2];
+export const initialPage = 1, initialCurrentApiPages = [1,2];
 
 export const FilmsContext = createContext<FilmsContextType>({
-    page: initalPage,
+    page: initialPage,
     setPage: () => void {},
-    currentApiPages: initalCurrentApiPages,
+    currentApiPages: initialCurrentApiPages,
     setCurrentApiPages: () => void {},
     handleClickPrevPage: () => void {},
     handleClickNextPage: () => void {}
