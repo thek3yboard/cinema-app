@@ -59,6 +59,22 @@ body {
   mask-composite: intersect;
 }
 
-.grid-columns-10-135px {
-  grid-template-columns: repeat(10, 135px);
+.films-grid-columns {
+  grid-template-columns: repeat(2, 135px);
+
+  @screen sm  {
+    grid-template-columns: repeat(4, 135px);
+  }
+
+  @screen md  {
+    grid-template-columns: repeat(5, 135px);
+  }
+
+  @screen xl  {
+    grid-template-columns: repeat(8, 135px);
+  }
+
+  @screen 2xl  {
+    grid-template-columns: repeat(10, 135px);
+  }
 }

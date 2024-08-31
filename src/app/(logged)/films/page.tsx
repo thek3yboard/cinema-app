@@ -63,7 +63,7 @@ export default function Films() {
 
     return (
         <div className="min-h-full">
-            <div className="px-8 pt-4 grid grid-columns-10-135px gap-3 justify-items-center justify-center">
+            <div className="lg:px-8 pt-4 grid films-grid-columns gap-5 xl:gap-3 justify-items-center justify-center">
                 <Suspense key={currentApiPages[0]} fallback={<Loading />}>
                     <FilmsGrid movies={movies} handleClickMovieImage={handleClickMovieImage} />
                 </Suspense>
