@@ -14,7 +14,7 @@ export default function FilmUI({ movieData }: Props) {
         <div>
             <div className="flex flex-col items-start">
                 <div className="relative w-[100vw] h-[35vh] sm:h-[50vh] lg:w-[1300px] lg:h-[731px]">
-                    <Image onLoad={() => setIsImageLoaded(true)} className="z-0 movie-img" priority={true} src={`https://image.tmdb.org/t/p/original${movieData?.backdrop_path}`} alt="Backdrop Path Image" layout="fill" />
+                    <Image onLoad={() => setIsImageLoaded(true)} className="z-0 movie-img" priority={true} src={`https://image.tmdb.org/t/p/original${movieData?.backdrop_path}`} alt="" layout="fill" />
                 </div>
                 { isImageLoaded ? 
                     <>
