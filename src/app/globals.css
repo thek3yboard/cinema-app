@@ -32,20 +32,26 @@ body {
   }
 }
 
-/* width */
-::-webkit-scrollbar {
-  width: 12px;
-}
+@screen md  {
+  /* width */
+  ::-webkit-scrollbar {
+    width: 12px;
+  }
 
-/* Track */
-::-webkit-scrollbar-track {
-  background: #2e2e2e;
-}
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #2e2e2e;
+  }
 
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #bcccbb;
-  border-radius: 5px;
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #bcccbb;
+    border-radius: 5px;
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: #2e2e2e;
+  }
 }
 
 .movie-img {
