@@ -56,8 +56,7 @@ body {
 
 .movie-img {
   mask: 
-    linear-gradient(to top,  transparent 5%, #fff 30%),
-    linear-gradient(to left, transparent 2%, #fff 10% 90%, transparent 98%);
+    linear-gradient(to top,  transparent 5%, #fff 30%);
   mask-size: 110% 110%;
   mask-position: center;
   mask-repeat:no-repeat;
