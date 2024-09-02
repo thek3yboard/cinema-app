@@ -1,5 +1,6 @@
-import { Fragment } from "react";
+import { Fragment, useState, useRef } from "react";
 import Image from "next/image";
+import Loading from "@/app/ui/loading";
 import { Movie } from "@/types/types";
 
 type Props = {
@@ -8,17 +9,32 @@ type Props = {
 }
 
 export default function FilmsGrid({ movies, handleClickMovieImage }: Props) {
+    const [isImageLoaded, setIsImageLoaded] = useState(false);
+    const countLoadedImages = useRef(0);
+
+    const handleSumLoadedImages = () => {
+        setTimeout(() => {
+            countLoadedImages.current ++;
+
+            if(countLoadedImages.current === 40) {
+                setIsImageLoaded(true);
+                countLoadedImages.current = 0;
+            }
+        }, 500);
+    }
+
     return (
         <>
             {movies.map((m) => {
                 return (
                     <Fragment key={m.id}>
                         <div onClick={() => handleClickMovieImage(m)}>
-                            <Image className="border-2 border-blueish-gray hover:border-[3px] hover:border-green-500" priority={true} src={`https://image.tmdb.org/t/p/original${m.poster_path}`} alt="Logo" height={200} width={130} />
+                            <Image onLoad={() => handleSumLoadedImages()} className={`border-2 border-blueish-gray hover:border-[3px] hover:border-green-500 ${isImageLoaded === false && `hidden` }`} priority={true} src={`https://image.tmdb.org/t/p/original${m.poster_path}`} alt="Logo" height={200} width={130} />
                         </div>
                     </Fragment>
                 )
             })}
+            { !isImageLoaded && <Loading /> }
         </>
     )
 }
