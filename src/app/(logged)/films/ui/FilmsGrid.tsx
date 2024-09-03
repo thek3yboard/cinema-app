@@ -20,7 +20,7 @@ export default function FilmsGrid({ movies, handleClickMovieImage }: Props) {
                 setIsImageLoaded(true);
                 countLoadedImages.current = 0;
             }
-        }, 1000);
+        }, 800);
     }
 
     return (
