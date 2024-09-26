@@ -3,7 +3,7 @@
 import { useState, useEffect, useContext, Suspense, lazy } from 'react';
 import { useRouter } from 'next/navigation';
 import { FilmsContext } from "@/app/(logged)/FilmsContext";
-import Loading from "@/app/ui/loading";
+import Loading from "@/app/ui/Loading";
 import { Movie } from "@/types/types";
 const FilmsGrid = lazy(() => import('@/app/(logged)/films/ui/FilmsGrid'));
 
