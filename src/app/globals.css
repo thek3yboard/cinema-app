@@ -90,6 +90,6 @@ body {
   }
 
   @screen 2xl  {
-    grid-template-columns: repeat(10, 135px);
+    grid-template-columns: repeat(10, 125px);
   }
 }

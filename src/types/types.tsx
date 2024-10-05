@@ -22,3 +22,8 @@ export type ProductionCompanies = {
     name: string,
     origin: string
 }
+
+export type SortType = {
+    key: string,
+    label: string
+}

@@ -5,17 +5,22 @@ import { useRouter } from 'next/navigation';
 import { FilmsContext } from "@/app/(logged)/FilmsContext";
 import Loading from "@/app/ui/Loading";
 import { Movie } from "@/types/types";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 const FilmsGrid = lazy(() => import('@/app/(logged)/films/ui/FilmsGrid'));
 
 export default function Films() {
     const [movies, setMovies] = useState<Movie[]>([]);
-    const { currentApiPages } = useContext(FilmsContext);
+    const [isLoading, setIsLoading] = useState(true);
+    const { page, currentApiPages, sort, handleClickPrevPage, handleClickNextPage } = useContext(FilmsContext);
     const router = useRouter();
 
     useEffect(() => {
+        setIsLoading(true);
+
         const fetchFirstPage = async () => {
             try {
-                let res = await fetch(`https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=${currentApiPages[0]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
+                let res = await fetch(`https://api.themoviedb.org/3/movie/${sort.key}?language=en-US&page=${currentApiPages[0]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
@@ -32,7 +37,7 @@ export default function Films() {
 
         const fetchSecondPage = async () => {
             try {
-                let res = await fetch(`https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=${currentApiPages[1]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
+                let res = await fetch(`https://api.themoviedb.org/3/movie/${sort.key}?language=en-US&page=${currentApiPages[1]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
@@ -52,22 +57,35 @@ export default function Films() {
             const secondBatchMovies = await fetchSecondPage();
             const allMoviesPage = [...firstBatchMovies, ...secondBatchMovies];
             setMovies(allMoviesPage);
+            setIsLoading(false);
         };
         
         fetchBoth();
-    }, [currentApiPages]);
+    }, [currentApiPages, sort]);
 
     const handleClickMovieImage = (movie: Movie): void => {
         router.push(`/film/${movie.id}`);
     }
 
     return (
-        <div>
-            <div className="lg:px-8 pt-4 grid films-grid-columns gap-5 xl:gap-3 justify-items-center justify-center">
-                <Suspense key={currentApiPages[0]} fallback={<Loading />}>
-                    <FilmsGrid movies={movies} handleClickMovieImage={handleClickMovieImage} />
-                </Suspense>
-            </div>
+        <div className="flex items-center justify-center">
+            { isLoading ?
+                <Loading />
+            :
+                <>
+                    <div className='flex grow justify-end items-center'>
+                        <FontAwesomeIcon onClick={handleClickPrevPage} icon={faChevronLeft} color='white' size='4x' opacity='60%' className={`${currentApiPages[0] === 1 ? `opacity-25` : `hover:opacity-100`}`} />
+                        <label>{(page > 1) && page - 1}</label>
+                    </div>
+                    <div className="lg:px-8 pt-8 grid films-grid-columns gap-5 xl:gap-3 justify-items-center justify-center">
+                        <FilmsGrid movies={movies} handleClickMovieImage={handleClickMovieImage} />
+                    </div>
+                    <div className='flex grow justify-start items-center'>
+                        <label>{page + 1}</label>
+                        <FontAwesomeIcon onClick={handleClickNextPage} icon={faChevronRight} color='white' size='4x' opacity='60%' className='hover:opacity-100' />
+                    </div>
+                </>
+            }
         </div>
     );
 }
