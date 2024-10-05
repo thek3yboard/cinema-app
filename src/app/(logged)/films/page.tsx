@@ -73,14 +73,22 @@ export default function Films() {
                 <Loading />
             :
                 <>
-                    <div className='flex grow justify-end items-center'>
+                    <div className='hidden md:flex md:grow md:justify-end md:items-center'>
                         <FontAwesomeIcon onClick={handleClickPrevPage} icon={faChevronLeft} color='white' size='4x' opacity='60%' className={`${currentApiPages[0] === 1 ? `opacity-25` : `hover:opacity-100`}`} />
                         <label>{(page > 1) && page - 1}</label>
                     </div>
                     <div className="lg:px-8 pt-8 grid films-grid-columns gap-5 xl:gap-3 justify-items-center justify-center">
                         <FilmsGrid movies={movies} handleClickMovieImage={handleClickMovieImage} />
+                        <div className='md:hidden mb-5 flex items-center'>
+                            <FontAwesomeIcon onClick={handleClickPrevPage} icon={faChevronLeft} color='white' size='4x' opacity='60%' className={`${currentApiPages[0] === 1 ? `opacity-25` : `hover:opacity-100`}`} />
+                            <label>{(page > 1) && page - 1}</label>
+                        </div>
+                        <div className='md:hidden mb-5 flex items-center'>
+                            <label>{page + 1}</label>
+                            <FontAwesomeIcon onClick={handleClickNextPage} icon={faChevronRight} color='white' size='4x' opacity='60%' className='hover:opacity-100' />
+                        </div>
                     </div>
-                    <div className='flex grow justify-start items-center'>
+                    <div className='hidden md:flex md:grow md:justify-start md:items-center'>
                         <label>{page + 1}</label>
                         <FontAwesomeIcon onClick={handleClickNextPage} icon={faChevronRight} color='white' size='4x' opacity='60%' className='hover:opacity-100' />
                     </div>
