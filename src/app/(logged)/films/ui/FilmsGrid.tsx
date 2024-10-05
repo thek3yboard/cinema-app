@@ -1,6 +1,6 @@
 import { Fragment, useState, useRef } from "react";
 import Image from "next/image";
-import Loading from "@/app/ui/Loading";
+import Loading from "@/app/ui/loading";
 import { Movie } from "@/types/types";
 
 type Props = {
