@@ -8,10 +8,8 @@ import { usePathname } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSliders } from '@fortawesome/free-solid-svg-icons';
 import { Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
-
 import Image from "next/image";
 import logo from '@/assets/cinema.png';
-import { Key } from '@react-types/shared';
 
 export default function LoggedLayout({
     children,
@@ -80,7 +78,7 @@ export default function LoggedLayout({
             <nav className="p-[6px] h-auto bg-gradient-to-r from-aero-blue to-blueish-gray border-b-2 border-slate-700">
               <Image className="ml-1" src={logo} alt="Logo" width={125} />
             </nav>
-            <Button className="w-full bg-lapis-lazuli border-l-1 border-b-2 border-blueish-gray rounded-none" key="full" onPress={handleOpen}><FontAwesomeIcon icon={faSliders} size="xl" color="white" /></Button>
+            <Button className="w-full bg-lapis-lazuli border-l-1 border-b-2 border-blueish-gray rounded-none" key="full" onClick={handleOpen}><FontAwesomeIcon icon={faSliders} size="xl" color="white" /></Button>
           </div>
           { pathname === "/films" ?
             <>
