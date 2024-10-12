@@ -86,7 +86,7 @@ body {
   }
 
   @screen xl  {
-    grid-template-columns: repeat(8, 135px);
+    grid-template-columns: repeat(8, 120px);
   }
 
   @screen 2xl  {

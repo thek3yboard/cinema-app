@@ -3,7 +3,7 @@
 import { useState, useEffect, useContext, Suspense, lazy } from 'react';
 import { useRouter } from 'next/navigation';
 import { FilmsContext } from "@/app/(logged)/FilmsContext";
-import Loading from "@/app/ui/loading";
+import Loading from "@/app/ui/Loading";
 import { Movie } from "@/types/types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
@@ -12,15 +12,17 @@ const FilmsGrid = lazy(() => import('@/app/(logged)/films/ui/FilmsGrid'));
 export default function Films() {
     const [movies, setMovies] = useState<Movie[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [imagesLoaded, setImagesLoaded] = useState(false);
     const { page, currentApiPages, sort, handleClickPrevPage, handleClickNextPage } = useContext(FilmsContext);
     const router = useRouter();
 
     useEffect(() => {
         setIsLoading(true);
+        setImagesLoaded(false);
 
         const fetchFirstPage = async () => {
             try {
-                let res = await fetch(`https://api.themoviedb.org/3/movie/${sort.key}?language=en-US&page=${currentApiPages[0]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
+                let res = await fetch(`https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
@@ -37,7 +39,7 @@ export default function Films() {
 
         const fetchSecondPage = async () => {
             try {
-                let res = await fetch(`https://api.themoviedb.org/3/movie/${sort.key}?language=en-US&page=${currentApiPages[1]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
+                let res = await fetch(`https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
@@ -68,31 +70,39 @@ export default function Films() {
     }
 
     return (
-        <div className="flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center">
             { isLoading ?
                 <Loading />
             :
-                <>
-                    <div className='hidden md:flex md:grow md:justify-end md:items-center'>
-                        <FontAwesomeIcon onClick={handleClickPrevPage} icon={faChevronLeft} color='white' size='4x' opacity='60%' className={`${currentApiPages[0] === 1 ? `opacity-25` : `hover:opacity-100`}`} />
-                        <label>{(page > 1) && page - 1}</label>
-                    </div>
-                    <div className="lg:px-8 pt-8 grid films-grid-columns gap-5 xl:gap-3 justify-items-center justify-center">
-                        <FilmsGrid movies={movies} handleClickMovieImage={handleClickMovieImage} />
-                        <div className='md:hidden mb-5 flex items-center'>
-                            <FontAwesomeIcon onClick={handleClickPrevPage} icon={faChevronLeft} color='white' size='4x' opacity='60%' className={`${currentApiPages[0] === 1 ? `opacity-25` : `hover:opacity-100`}`} />
-                            <label>{(page > 1) && page - 1}</label>
+                <div>
+                    <div className='flex flex-row'>
+                        <div className='max-xl:hidden flex items-center'>
+                            { imagesLoaded && <><FontAwesomeIcon onClick={handleClickPrevPage} icon={faChevronLeft} color='white' size='4x' opacity='60%' className={`${currentApiPages[0] === 1 ? `opacity-25` : `hover:opacity-100`}`} />
+                            <label>{(page > 1) && page - 1}</label></> }
                         </div>
-                        <div className='md:hidden mb-5 flex items-center'>
-                            <label>{page + 1}</label>
-                            <FontAwesomeIcon onClick={handleClickNextPage} icon={faChevronRight} color='white' size='4x' opacity='60%' className='hover:opacity-100' />
+                        <div className="mx-4 grid films-grid-columns gap-5 xl:gap-3 justify-items-center justify-center">
+                            <FilmsGrid movies={movies} handleClickMovieImage={handleClickMovieImage} imagesLoaded={imagesLoaded} setImagesLoaded={setImagesLoaded} />
+                        </div>
+                        <div className='max-xl:hidden flex items-center'>
+                            { imagesLoaded && <><label>{page + 1}</label>
+                            <FontAwesomeIcon onClick={handleClickNextPage} icon={faChevronRight} color='white' size='4x' opacity='60%' className='hover:opacity-100' /></> }
                         </div>
                     </div>
-                    <div className='hidden md:flex md:grow md:justify-start md:items-center'>
-                        <label>{page + 1}</label>
-                        <FontAwesomeIcon onClick={handleClickNextPage} icon={faChevronRight} color='white' size='4x' opacity='60%' className='hover:opacity-100' />
+                    <div className='flex xl:hidden mt-4 justify-center'>
+                        { imagesLoaded && 
+                            <>
+                                <div className='w-full flex items-center mx-8'>
+                                    <FontAwesomeIcon onClick={handleClickPrevPage} icon={faChevronLeft} color='white' size='4x' opacity='60%' className={`${currentApiPages[0] === 1 ? `opacity-25` : `hover:opacity-100`}`} />
+                                    <label>{(page > 1) && page - 1}</label>
+                                </div>
+                                <div className='w-full flex items-center justify-end mx-8'>
+                                    <label>{page + 1}</label>
+                                    <FontAwesomeIcon onClick={handleClickNextPage} icon={faChevronRight} color='white' size='4x' opacity='60%' className='hover:opacity-100' />
+                                </div>
+                            </>   
+                        }
                     </div>
-                </>
+                </div>
             }
         </div>
     );
