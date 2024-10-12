@@ -1,11 +1,23 @@
 export const sortByOptions = [
     {
-        key: 'upcoming', label: 'Upcoming'
+        key: 'popularity', label: 'Popularity'
     },
     {
-        key: 'popular', label: 'Popularity'
+        key: 'vote_average', label: 'Top Rated'
     },
     {
-        key: 'top_rated', label: 'Top Rated'
+        key: 'now_playing', label: 'Now Playing'
+    },
+    {
+        key: 'revenue', label: 'Revenue'
+    },
+]
+
+export const orderOptions = [
+    {
+        key: 'desc', label: 'Descending'
+    },
+    {
+        key: 'asc', label: 'Ascending'
     }
 ]

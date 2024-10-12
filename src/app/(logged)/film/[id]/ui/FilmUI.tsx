@@ -17,7 +17,7 @@ export default function FilmUI({ movieData }: Props) {
             <div className='flex flex-row'>
                 <div className="flex flex-col items-start">
                     <div className="relative w-[100vw] h-[215px] sm:h-[360px] md:h-[450px] lg:h-[575px] xl:w-[1000px] xl:h-[560px] 2xl:w-[1300px] 2xl:h-[731px]">
-                        <Image onLoad={() => setIsImageLoaded(true)} className={`z-0 movie-img ${isImageLoaded === false && `hidden` }`} priority={true} src={`https://image.tmdb.org/t/p/original${movieData?.backdrop_path}`} alt="Backdrop Image" layout="fill" />
+                        <Image onLoad={() => setIsImageLoaded(true)} className={`z-0 movie-img ${isImageLoaded === false && `hidden` }`} priority={true} src={`${movieData?.backdrop_path !== null ? `https://image.tmdb.org/t/p/original${movieData?.backdrop_path}` : `https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-38-picture-grey-c2ebdbb057f2a7614185931650f8cee23fa137b93812ccb132b9df511df1cfac.svg`}`} alt="Backdrop Image" layout="fill" />
                     </div>
                     { isImageLoaded ? 
                         <>
