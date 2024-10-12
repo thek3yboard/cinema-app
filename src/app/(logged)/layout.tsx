@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, createRef, ChangeEvent } from 'react';
+import { useState, useRef, createRef, ChangeEvent } from 'react';
 import { FilmsContext, initialPage, initialCurrentApiPages, initialSort } from "@/app/(logged)/FilmsContext";
 import { SortType } from '@/types/types';
-import { sortByOptions } from '@/assets/filtersData';
+import { orderOptions, sortByOptions } from '@/assets/filtersData';
 import { usePathname } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSliders } from '@fortawesome/free-solid-svg-icons';
@@ -19,6 +19,8 @@ export default function LoggedLayout({
     const [page, setPage] = useState(initialPage);
     const [currentApiPages, setCurrentApiPages] = useState(initialCurrentApiPages);
     const [sort, setSort] = useState<SortType>(initialSort);
+    const sortRef = useRef(sort.key);
+    const orderRef = useRef(sort.order_key);
     const screenRef = createRef<HTMLDivElement>();
     const pathname = usePathname();
     const {isOpen, onOpen, onClose} = useDisclosure();
@@ -59,8 +61,19 @@ export default function LoggedLayout({
     }
 
     const handleChangeSort = (e: ChangeEvent<HTMLSelectElement>) => {
-      let option = sortByOptions.find((option) => option.key === e.target.value)!;
-      setSort({ key: option.key, label: option.label });
+      sortRef.current = e.target.value;
+    }
+
+    const handleChangeOrder = (e: ChangeEvent<HTMLSelectElement>) => {
+      orderRef.current = e.target.value;
+    }
+
+    const handleSetFilters = () => {
+      const selectedOrder = orderOptions.find((option) => option.key === orderRef.current)!;
+      const selectedSort = sortByOptions.find((option) => option.key === sortRef.current)!;
+      setSort({ ...sort, key: selectedSort.key, label: selectedSort.label,
+        order_key: selectedOrder.key, order_label: selectedOrder.label
+      });
       setCurrentApiPages(initialCurrentApiPages);
       setPage(initialPage);
       onClose();
@@ -78,11 +91,11 @@ export default function LoggedLayout({
             <nav className="p-[6px] h-auto bg-gradient-to-r from-aero-blue to-blueish-gray border-b-2 border-slate-700">
               <Image className="ml-1" src={logo} alt="Logo" width={125} />
             </nav>
-            <Button className="w-full bg-lapis-lazuli border-l-1 border-b-2 border-blueish-gray rounded-none" key="full" onClick={handleOpen}><FontAwesomeIcon icon={faSliders} size="xl" color="white" /></Button>
+            { pathname === "/films" && <Button className="w-full bg-lapis-lazuli border-l-1 border-b-2 border-blueish-gray rounded-none" key="full" onClick={handleOpen}><FontAwesomeIcon icon={faSliders} size="xl" color="white" /></Button> }
           </div>
           { pathname === "/films" ?
             <>
-              <div className="grow 2xl:overflow-hidden">
+              <div className="grow content-center my-4 2xl:overflow-hidden">
                 {children}
               </div>
               <div className="h-6 flex justify-center">
@@ -112,14 +125,12 @@ export default function LoggedLayout({
                 <ModalHeader className="flex flex-col gap-1">Filter</ModalHeader>
                 <ModalBody>
                   <Select
-                    key="primary"
+                    key="sort"
                     color="default"
                     label="Sort by"
                     placeholder={sort.label}
-                    defaultSelectedKeys={sort.key}
                     className="sm:w-1/12"
                     onChange={handleChangeSort}
-                    selectedKeys={sort.key}
                   >
                     {sortByOptions.map((option) => (
                       <SelectItem key={option.key}>
@@ -127,8 +138,25 @@ export default function LoggedLayout({
                       </SelectItem>
                     ))}
                   </Select>
+                  <Select
+                    key="order"
+                    color="default"
+                    label="Order by"
+                    placeholder={sort.order_label}
+                    className="sm:w-1/12"
+                    onChange={handleChangeOrder}
+                  >
+                    {orderOptions.map((option) => (
+                      <SelectItem key={option.key}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </Select>
                 </ModalBody>
                 <ModalFooter>
+                  <Button color="success" onPress={handleSetFilters}>
+                    Apply
+                  </Button>
                   <Button color="danger" onPress={onClose}>
                     Close
                   </Button>
