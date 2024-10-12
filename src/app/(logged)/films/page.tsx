@@ -88,34 +88,47 @@ export default function Films() {
         router.push(`/film/${movie.id}`);
     }
 
+    function PrevPageButton() {
+        return (
+            <button className='flex items-center' disabled={page === 1}>
+                <FontAwesomeIcon onClick={handleClickPrevPage} icon={faChevronLeft} color='white' size='4x' opacity='60%' className={`${currentApiPages[0] === 1 ? `opacity-25` : `hover:opacity-100`}`} />
+                <label>{(page > 1) && page - 1}</label>
+            </button>
+        );
+    }
+
+    function NextPageButton() {
+        return (
+            <button className='flex items-center' disabled={movies.length !== 40}>
+                <label>{(movies.length === 40) && page + 1}</label>
+                <FontAwesomeIcon onClick={handleClickNextPage} icon={faChevronRight} color='white' size='4x' opacity='60%' className={`${movies.length !== 40 ? `opacity-25` : `hover:opacity-100`}`} />
+            </button>
+        );
+    }
+
     return (
         <div className="flex flex-col items-center justify-center">
             <div>
                 <div className='flex flex-row'>
-                    <div className='max-xl:hidden flex items-center'>
-                        { imagesLoaded && <>
-                        <button disabled={page === 1}><FontAwesomeIcon onClick={handleClickPrevPage} icon={faChevronLeft} color='white' size='4x' opacity='60%' className={`${currentApiPages[0] === 1 ? `opacity-25` : `hover:opacity-100`}`} />
-                        <label>{(page > 1) && page - 1}</label></button></> }
+                    <div className='max-xl:hidden content-center'>
+                        { imagesLoaded && <PrevPageButton /> }
                     </div>
                     <div className="mx-4 grid films-grid-columns gap-5 xl:gap-3 justify-items-center justify-center">
                         <FilmsGrid movies={movies} handleClickMovieImage={handleClickMovieImage} imagesLoaded={imagesLoaded} setImagesLoaded={setImagesLoaded} 
                         countLoadedImages={countLoadedImages} />
                     </div>
-                    <div className='max-xl:hidden flex items-center'>
-                        { imagesLoaded && <><label>{(movies.length === 40) && page + 1}</label>
-                        <button disabled={movies.length !== 40}><FontAwesomeIcon onClick={handleClickNextPage} icon={faChevronRight} color='white' size='4x' opacity='60%' className={`${movies.length !== 40 ? `opacity-25` : `hover:opacity-100`}`} /></button></> }
+                    <div className='max-xl:hidden content-center'>
+                        { imagesLoaded && <NextPageButton /> }
                     </div>
                 </div>
                 <div className='flex xl:hidden mt-4 justify-center'>
                     { imagesLoaded && 
                         <>
                             <div className='w-full flex items-center mx-8'>
-                                <FontAwesomeIcon onClick={handleClickPrevPage} icon={faChevronLeft} color='white' size='4x' opacity='60%' className={`${currentApiPages[0] === 1 ? `opacity-25` : `hover:opacity-100`}`} />
-                                <label>{(page > 1) && page - 1}</label>
+                                <PrevPageButton />
                             </div>
                             <div className='w-full flex items-center justify-end mx-8'>
-                                <label>{page + 1}</label>
-                                <FontAwesomeIcon onClick={handleClickNextPage} icon={faChevronRight} color='white' size='4x' opacity='60%' className='hover:opacity-100' />
+                                <NextPageButton />
                             </div>
                         </>   
                     }
