@@ -1,6 +1,6 @@
 import { Fragment, useState, useEffect } from 'react';
 import Image from "next/image";
-import Loading from "@/app/ui/Loading";
+import Loading from "@/app/ui/loading";
 import { MovieData, ProductionCompanies } from "@/types/types";
 import LiteYouTubeEmbed from "react-lite-youtube-embed"
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css"
