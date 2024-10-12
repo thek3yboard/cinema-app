@@ -12,8 +12,9 @@ export type MovieData = {
     original_title: string,
     backdrop_path: string,
     release_date: string,
-    vote_average: number
-    production_companies: Array<ProductionCompanies>
+    vote_average: number,
+    production_companies: Array<ProductionCompanies>,
+    video_id: string
 }
 
 export type ProductionCompanies = {
@@ -25,5 +26,7 @@ export type ProductionCompanies = {
 
 export type SortType = {
     key: string,
-    label: string
+    label: string,
+    order_key: string,
+    order_label: string
 }
