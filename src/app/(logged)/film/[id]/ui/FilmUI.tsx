@@ -23,14 +23,14 @@ export default function FilmUI({ movieData }: Props) {
                         <>
                             <h1 className="mt-[-2rem] md:mt-[-3rem] xl:mt-[-5rem] xl:w-[1000px] 2xl:w-[1250px] z-10 px-3 xl:pl-8 text-white text-3xl sm:text-5xl 2xl:text-6xl font-bold">{movieData?.title && `${movieData?.title} (${movieData?.release_date.substring(0,4)})`}</h1>
                             <div className="w-screen xl:w-[1000px] 2xl:w-[1250px] px-3 xl:pl-8">
-                                <p className="text-white mt-4 sm:text-lg">{movieData?.overview}</p>
+                                <p className="text-white mt-4 sm:text-lg">{movieData!.overview}</p>
                             </div>
                             <div className='w-full p-5 lg:hidden md:w-2/3'>
                                 <div className='border-3 border-blueish-gray'>
                                     <LiteYouTubeEmbed
                                         aspectHeight={9}
                                         aspectWidth={16}
-                                        id={`${movieData.video_id}`}
+                                        id={`${movieData?.video_id}`}
                                         title="Trailer"
                                     />
                                 </div>
@@ -57,7 +57,7 @@ export default function FilmUI({ movieData }: Props) {
                         <LiteYouTubeEmbed
                             aspectHeight={9}
                             aspectWidth={16}
-                            id={`${movieData.video_id}`}
+                            id={`${movieData?.video_id}`}
                             title="Trailer"
                         />
                     </div>
