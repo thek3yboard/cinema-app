@@ -1,5 +1,6 @@
 import { createContext } from "react";
 import { SortType } from "@/types/types";
+import { sortByOptions, orderOptions } from "@/assets/filtersData";
 
 type FilmsContextType = {
     page: number;
@@ -14,8 +15,10 @@ type FilmsContextType = {
 export const initialPage = 1, initialCurrentApiPages = [1,2];
 
 export const initialSort = {
-    key: "upcoming",
-    label: "Upcoming"
+    key: sortByOptions[1].key,
+    label: sortByOptions[1].label,
+    order_key: orderOptions[0].key,
+    order_label: orderOptions[0].label
 };
 
 export const FilmsContext = createContext<FilmsContextType>({
