@@ -86,7 +86,7 @@ export default function LoggedLayout({
     return (
       <FilmsContext.Provider value={{ page, setPage, currentApiPages, setCurrentApiPages, handleClickPrevPage, handleClickNextPage, sort }}>
         <>
-        <div ref={screenRef} className="h-screen flex flex-col overflow-y-auto bg-gradient-to-b from-blueish-gray via-[#3f577c] to-blueish-gray">
+        <div ref={screenRef} className="h-screen flex flex-col overflow-y-auto bg-gradient-to-r from-[#192a49] from-1% via-[#3f577c] via-50% to-[#192a49] to-99%">
           <div className="z-20 sticky top-0">
             <nav className="p-[6px] h-auto bg-gradient-to-r from-aero-blue to-blueish-gray border-b-2 border-slate-700">
               <Image className="ml-1" src={logo} alt="Logo" width={125} />
