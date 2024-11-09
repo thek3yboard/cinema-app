@@ -140,12 +140,12 @@ export default function FilmUI({ movieData }: Props) {
                                     })}
                                 </div>
                             </div>
-                            <div className="md:hidden pl-5">
+                            <div className="md:hidden px-5 flex flex-wrap justify-center items-center">
                                 {movieData?.production_companies.map((pc: ProductionCompanies) => {
                                     return (
                                         pc.logo_path !== null && 
                                         <Fragment key={pc.id}>
-                                            <Image className="m-4 inline-block" priority={true} src={`https://image.tmdb.org/t/p/original${pc.logo_path}`} alt="Production Company" width={90} height={90} />
+                                            <Image className="m-4 inline-block h-fit" priority={true} src={`https://image.tmdb.org/t/p/original${pc.logo_path}`} alt="Production Company" width={70} height={70} />
                                         </Fragment>
                                     )
                                 })}
