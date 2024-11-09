@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react'
 import { Star } from 'lucide-react'
 
@@ -20,15 +19,15 @@ export default function StarRating({ rating, maxRating = 10, onChange }: StarRat
     // Create an array of 5 elements to represent the stars
     const stars = Array(5).fill(0)
 
-    const handleStarClick = (index: number, isHalf: boolean) => {
+    const handleRating = (index: number, isHalf: boolean) => {
         if (onChange) {
-            // Convert the clicked star index (0-4) back to the original scale
+            // Convert the star index (0-4) back to the original scale
             const newRating = ((index + (isHalf ? 0.5 : 1)) / 5) * maxRating
             onChange(newRating)
         }
     }
 
-    const handleStarHover = (index: number, isHalf: boolean) => {
+    const handleMouseEnter = (index: number, isHalf: boolean) => {
         if (onChange) {
             setHoverRating(index + (isHalf ? 0.5 : 1))
         }
@@ -46,40 +45,41 @@ export default function StarRating({ rating, maxRating = 10, onChange }: StarRat
             aria-label={`Rating: ${rating.toFixed(1)} out of ${maxRating}`}
             onMouseLeave={handleMouseLeave}
         >
-            {stars.map((_, index) => {
-                const starValue = index + 1
-                const isHovered = starValue <= hoverRating
-                const isHalfHovered = starValue === Math.ceil(hoverRating) && !Number.isInteger(hoverRating)
-                const isFilled = starValue <= scaledRating
-                const isHalfFilled = starValue === Math.ceil(scaledRating) && !Number.isInteger(scaledRating)
+        {stars.map((_, index) => {
+            const starValue = index + 1
+            const fillPercentage = Math.min(100, Math.max(0, ((hoverRating || scaledRating) - index) * 100))
 
-                return (
+            return (
                 <span 
                     key={index} 
-                    className={`relative inline-block ${onChange !== undefined && 'cursor-pointer'}`}
+                    className="relative inline-block cursor-pointer"
+                    onClick={() => handleRating(index, false)}
+                    onMouseEnter={() => handleMouseEnter(index, false)}
                 >
-                    <Star 
-                    className="md:w-8 md:h-8 w-6 h-6 text-gray-300" 
-                    onClick={() => handleStarClick(index, false)}
-                    onMouseEnter={() => handleStarHover(index, false)}
-                    />
-                    <span 
+                <Star className="md:w-8 md:h-8 w-6 h-6 text-gray-300" />
+                <span 
                     className="absolute top-0 left-0 overflow-hidden"
                     style={{ 
-                        width: isHovered ? '100%' : isHalfHovered ? '50%' : isFilled ? '100%' : isHalfFilled ? '50%' : '0%',
+                        width: `${fillPercentage}%`,
                         transition: 'width 0.2s ease-in-out'
                     }}
-                    >
+                >
                     <Star className="md:w-8 md:h-8 w-6 h-6 text-yellow-400" />
-                    </span>
-                    <span 
-                    className={`absolute top-0 left-0 w-1/2 h-full ${onChange !== undefined && 'cursor-pointer'}`}
-                    onClick={() => handleStarClick(index, true)}
-                    onMouseEnter={() => handleStarHover(index, true)}
-                    />
                 </span>
-                )
-            })}
+                <span 
+                    className="absolute top-0 left-0 w-1/2 h-full"
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        handleRating(index, true)
+                    }}
+                    onMouseEnter={(e) => {
+                        e.stopPropagation()
+                        handleMouseEnter(index, true)
+                    }}
+                />
+                </span>
+            )
+        })}
             <span className="ml-2 md:text-md text-white">
                 {rating.toFixed(1)} / {maxRating}
             </span>
