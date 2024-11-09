@@ -119,7 +119,7 @@ export default function FilmUI({ movieData }: Props) {
                                 <p className="text-white mt-2 max-md:mt-4 sm:text-lg">{movieData!.overview}</p>
                             </div>
                             <div className='w-full p-5 flex justify-evenly'>
-                                <div className='w-3/4'>
+                                <div className='w-3/4 max-md:w-full'>
                                     <div className='border-3 border-blueish-gray'>
                                         <LiteYouTubeEmbed
                                             aspectHeight={9}
@@ -129,7 +129,7 @@ export default function FilmUI({ movieData }: Props) {
                                         />
                                     </div>
                                 </div>
-                                <div className="flex flex-col justify-center w-fit">
+                                <div className="flex flex-col max-md:hidden justify-center w-fit">
                                     {movieData?.production_companies.map((pc: ProductionCompanies) => {
                                         return (
                                             pc.logo_path !== null && 
@@ -139,6 +139,16 @@ export default function FilmUI({ movieData }: Props) {
                                         )
                                     })}
                                 </div>
+                            </div>
+                            <div className="md:hidden pl-5">
+                                {movieData?.production_companies.map((pc: ProductionCompanies) => {
+                                    return (
+                                        pc.logo_path !== null && 
+                                        <Fragment key={pc.id}>
+                                            <Image className="m-4 inline-block" priority={true} src={`https://image.tmdb.org/t/p/original${pc.logo_path}`} alt="Production Company" width={90} height={90} />
+                                        </Fragment>
+                                    )
+                                })}
                             </div>
                         </>
                     :
