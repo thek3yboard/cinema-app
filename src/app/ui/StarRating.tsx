@@ -52,7 +52,7 @@ export default function StarRating({ rating, maxRating = 10, onChange }: StarRat
             return (
                 <span 
                     key={index} 
-                    className="relative inline-block cursor-pointer"
+                    className={`relative inline-block ${onChange !== undefined && 'cursor-pointer'}`}
                     onClick={() => handleRating(index, false)}
                     onMouseEnter={() => handleMouseEnter(index, false)}
                 >
