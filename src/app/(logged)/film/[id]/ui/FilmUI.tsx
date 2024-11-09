@@ -56,7 +56,7 @@ export default function FilmUI({ movieData }: Props) {
     return (
         <div className='flex flex-col items-center'>
             <div className='flex flex-row justify-center'>
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col lg:items-center">
                     <div className="relative w-[100vw] h-[215px] sm:h-[360px] md:h-[450px] lg:h-[575px] xl:w-[1000px] xl:h-[560px] 2xl:w-[1300px] 2xl:h-[731px]">
                         <Image 
                             onLoad={() => setIsImageLoaded(true)}
@@ -71,13 +71,13 @@ export default function FilmUI({ movieData }: Props) {
                         <>
                             <h1 className="mt-[-2rem] md:mt-[-3rem] xl:mt-[-5rem] xl:w-[1000px] 2xl:w-[1250px] z-10 px-3 xl:pl-8 text-white text-3xl sm:text-5xl 2xl:text-6xl font-bold">{movieData?.title && `${movieData?.title} (${movieData?.release_date.substring(0,4)})`} {/* <StarRating rating={movieData?.vote_average} maxRating={10} /> */}</h1>
                             <div className="w-screen xl:w-[1000px] 2xl:w-[1250px] px-3 xl:pl-8">
-                                <div className='mt-4 flex justify-between items-center'>
+                                <div className='mt-4 flex max-md:flex-col md:justify-between md:items-center'>
                                     <StarRating rating={movieData?.vote_average} maxRating={10} />
-                                    <div className="flex items-center justify-end gap-4">
-                                        <div className='w-fit flex items-center gap-4 bg-slate-500 p-2 rounded-md'>
-                                            <p className="text-sm font-medium text-white">Your Rating:</p>
+                                    <div className="flex items-center justify-end max-md:justify-start md:gap-4 max-md:w-full">
+                                        <div className='w-fit flex items-center md:gap-4 bg-slate-500 p-2 rounded-md max-md:mt-4'>
+                                            <p className="text-sm w-min max-md:hidden font-medium text-white">Your Rating:</p>
                                             <StarRating rating={userRating} maxRating={10} onChange={handleRating} />
-                                            <div className="relative group">
+                                            <div className="relative group max-md:ml-2 max-md:mr-2">
                                                 <button 
                                                 className={`p-2 rounded-full ${inWatchlist ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
                                                 onClick={toggleWatchlist}
@@ -89,7 +89,7 @@ export default function FilmUI({ movieData }: Props) {
                                                 {inWatchlist ? "Remove from watchlist" : "Add to watchlist"}
                                                 </span>
                                             </div>
-                                            <div className="relative group">
+                                            <div className="relative group max-md:mr-2">
                                                 <button 
                                                 className={`p-2 rounded-full ${isWatched ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}
                                                 onClick={toggleWatched}
@@ -101,7 +101,7 @@ export default function FilmUI({ movieData }: Props) {
                                                 {isWatched ? "Mark as unwatched" : "Mark as watched"}
                                                 </span>
                                             </div>
-                                            <div className="relative group">
+                                            <div className="relative group max-md:mr-2">
                                                 <button 
                                                 className={`p-2 rounded-full ${isFavorite ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'}`}
                                                 onClick={toggleFavorite}
@@ -116,7 +116,7 @@ export default function FilmUI({ movieData }: Props) {
                                         </div>
                                     </div>
                                 </div>
-                                <p className="text-white mt-2 sm:text-lg">{movieData!.overview}</p>
+                                <p className="text-white mt-2 max-md:mt-4 sm:text-lg">{movieData!.overview}</p>
                             </div>
                             <div className='w-full p-5 flex justify-evenly'>
                                 <div className='w-3/4'>
