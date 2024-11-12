@@ -126,6 +126,7 @@ export default function FilmUI({ movieData }: Props) {
                                             aspectWidth={16}
                                             id={movieData?.video_id ?? ''}
                                             title="Trailer"
+                                            poster="maxresdefault"
                                         />
                                     </div>
                                 </div>
