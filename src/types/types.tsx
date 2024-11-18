@@ -2,7 +2,8 @@ export type Movie = {
     id: number,
     title: string,
     overview: string,
-    poster_path: string
+    poster_path: string,
+    vote_count: number
 }
 
 export type MovieData = {
