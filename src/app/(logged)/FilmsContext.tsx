@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { SortType } from "@/types/types";
+import { SortType, Movie } from "@/types/types";
 import { sortByOptions, orderOptions } from "@/assets/filtersData";
 
 type FilmsContextType = {
@@ -9,7 +9,9 @@ type FilmsContextType = {
     setCurrentApiPages: React.Dispatch<React.SetStateAction<number[]>>
     handleClickPrevPage: () => void
     handleClickNextPage: () => void
-    sort: SortType
+    sort: SortType,
+    movies: Movie[],
+    setMovies: React.Dispatch<React.SetStateAction<Movie[]>>
 };
 
 export const initialPage = 1, initialCurrentApiPages = [1,2];
@@ -28,5 +30,7 @@ export const FilmsContext = createContext<FilmsContextType>({
     setCurrentApiPages: () => void {},
     handleClickPrevPage: () => void {},
     handleClickNextPage: () => void {},
-    sort: initialSort
+    sort: initialSort,
+    movies: [],
+    setMovies: () => void {},
 });
