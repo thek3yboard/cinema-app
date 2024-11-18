@@ -10,10 +10,9 @@ import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons
 const FilmsGrid = lazy(() => import('@/app/(logged)/films/ui/FilmsGrid'));
 
 export default function Films() {
-    const [movies, setMovies] = useState<Movie[]>([]);
     const [imagesLoaded, setImagesLoaded] = useState(false);
     const countLoadedImages = useRef(0);
-    const { page, currentApiPages, sort, handleClickPrevPage, handleClickNextPage } = useContext(FilmsContext);
+    const { page, currentApiPages, sort, handleClickPrevPage, handleClickNextPage, movies, setMovies } = useContext(FilmsContext);
     const router = useRouter();
 
     useEffect(() => {
@@ -111,18 +110,18 @@ export default function Films() {
             <div>
                 <div className='flex flex-row'>
                     <div className='max-xl:hidden content-center'>
-                        { imagesLoaded && <PrevPageButton /> }
+                        { (imagesLoaded && movies.length === 40) && <PrevPageButton /> }
                     </div>
-                    <div className="mx-4 grid films-grid-columns gap-5 xl:gap-3 justify-items-center justify-center">
+                    <div className={`mx-4 grid ${movies.length !== 1 ? `films-grid-columns` : `grid-cols-1`} gap-5 xl:gap-3 justify-items-center justify-center`}>
                         <FilmsGrid movies={movies} handleClickMovieImage={handleClickMovieImage} imagesLoaded={imagesLoaded} setImagesLoaded={setImagesLoaded} 
                         countLoadedImages={countLoadedImages} />
                     </div>
                     <div className='max-xl:hidden content-center'>
-                        { imagesLoaded && <NextPageButton /> }
+                        { (imagesLoaded && movies.length === 40) && <NextPageButton /> }
                     </div>
                 </div>
                 <div className='flex xl:hidden mt-4 justify-center'>
-                    { imagesLoaded && 
+                    { (imagesLoaded && movies.length === 40) && 
                         <>
                             <div className='w-full flex items-center mx-8'>
                                 <PrevPageButton />
