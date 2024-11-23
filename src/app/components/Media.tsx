@@ -139,21 +139,32 @@ export default function Media({ type }: Media) {
             <div>
                 <div className='flex flex-row'>
                     <div className='max-xl:hidden content-center'>
-                        { (imagesLoaded && movies.length === 40) && <PrevPageButton /> }
-                    </div>
-                    <div className={`mx-4 grid ${movies.length !== 1 ? `media-grid-columns` : `grid-cols-1`} gap-5 xl:gap-3 justify-items-center justify-center`}>
                         { pathname === '/movies' ?
-                            <MediaGrid media={movies} handleClickMediaImage={handleClickMediaImage} imagesLoaded={imagesLoaded} setImagesLoaded={setImagesLoaded} countLoadedImages={countLoadedImages} />
+                            (imagesLoaded && movies.length === 40) && <PrevPageButton />
                         :
-                            <MediaGrid media={shows} handleClickMediaImage={handleClickMediaImage} imagesLoaded={imagesLoaded} setImagesLoaded={setImagesLoaded} countLoadedImages={countLoadedImages} />
+                            (imagesLoaded && shows.length === 40) && <PrevPageButton />
                         }
                     </div>
+                    { pathname === '/movies' ?
+                        <div className={`mx-4 grid ${movies.length !== 1 ? `media-grid-columns` : `grid-cols-1`} gap-5 xl:gap-3 justify-items-center justify-center`}>
+                            <MediaGrid media={movies} handleClickMediaImage={handleClickMediaImage} imagesLoaded={imagesLoaded} setImagesLoaded={setImagesLoaded} countLoadedImages={countLoadedImages} />
+                        </div>
+                    :
+                        <div className={`mx-4 grid ${shows.length !== 1 ? `media-grid-columns` : `grid-cols-1`} gap-5 xl:gap-3 justify-items-center justify-center`}>
+                            <MediaGrid media={shows} handleClickMediaImage={handleClickMediaImage} imagesLoaded={imagesLoaded} setImagesLoaded={setImagesLoaded} countLoadedImages={countLoadedImages} />
+                        </div>
+                    }
                     <div className='max-xl:hidden content-center'>
-                        { (imagesLoaded && movies.length === 40) && <NextPageButton /> }
+                        { pathname === '/movies' ?
+                            (imagesLoaded && movies.length === 40) && <NextPageButton />
+                        :
+                            (imagesLoaded && shows.length === 40) && <NextPageButton />
+                        }
                     </div>
                 </div>
                 <div className='flex xl:hidden mt-4 justify-center'>
-                    { (imagesLoaded && movies.length === 40) && 
+                    { pathname === '/movies' ?
+                        (imagesLoaded && movies.length === 40) && 
                         <>
                             <div className='w-full flex items-center mx-8'>
                                 <PrevPageButton />
@@ -162,6 +173,16 @@ export default function Media({ type }: Media) {
                                 <NextPageButton />
                             </div>
                         </>   
+                    :
+                        (imagesLoaded && shows.length === 40) && 
+                        <>
+                            <div className='w-full flex items-center mx-8'>
+                                <PrevPageButton />
+                            </div>
+                            <div className='w-full flex items-center justify-end mx-8'>
+                                <NextPageButton />
+                            </div>
+                        </> 
                     }
                 </div>
             </div>
