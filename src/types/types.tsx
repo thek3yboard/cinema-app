@@ -18,6 +18,25 @@ export type MovieData = {
     video_id: string
 }
 
+export type Show = {
+    id: number,
+    title: string,
+    overview: string,
+    poster_path: string,
+    vote_count: number
+}
+
+export type ShowData = {
+    id: number,
+    name: string,
+    overview: string,
+    backdrop_path: string,
+    first_air_date: string,
+    vote_average: number,
+    production_companies: Array<ProductionCompanies>,
+    video_id: string
+}
+
 export type ProductionCompanies = {
     id: number,
     logo_path: string,

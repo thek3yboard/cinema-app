@@ -1,18 +1,18 @@
 import { Fragment, useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Image from "next/image";
-import Loading from "@/app/ui/Loading";
-import StarRating from "@/app/ui/StarRating";
-import { MovieData, ProductionCompanies } from "@/types/types";
+import Loading from "@/app/components/ui/loading";
+import StarRating from "@/app/components/ui/StarRating";
+import { MovieData, ShowData, ProductionCompanies } from "@/types/types";
 import LiteYouTubeEmbed from "react-lite-youtube-embed"
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css"
 import { Heart, List, Eye, Star } from 'lucide-react';
 
 type Props = {
-    movieData: MovieData
+    mediaData: MovieData | ShowData
 }
 
-export default function FilmUI({ movieData }: Props) {
+export default function MediaUI({ mediaData }: Props) {
     const [isImageLoaded, setIsImageLoaded] = useState(false)
     const [inWatchlist, setInWatchlist] = useState(false)
     const [isWatched, setIsWatched] = useState(false)
@@ -21,38 +21,66 @@ export default function FilmUI({ movieData }: Props) {
     const pathname = usePathname();
 
     useEffect(() => {
-        const storedWatchlist = localStorage.getItem(`watchlist_${movieData?.id}`)
-        const storedWatched = localStorage.getItem(`watched_${movieData?.id}`)
-        const storedFavorite = localStorage.getItem(`favorite_${movieData?.id}`)
-        const storedRating = localStorage.getItem(`rating_${movieData?.id}`)
+        if(pathname.includes('/movie')) {
+            const storedWatchlist = localStorage.getItem(`movie_watchlist_${mediaData?.id}`)
+            const storedWatched = localStorage.getItem(`movie_watched_${mediaData?.id}`)
+            const storedFavorite = localStorage.getItem(`movie_favorite_${mediaData?.id}`)
+            const storedRating = localStorage.getItem(`movie_rating_${mediaData?.id}`)
 
-        setInWatchlist(storedWatchlist === 'true')
-        setIsWatched(storedWatched === 'true')
-        setIsFavorite(storedFavorite === 'true')
-        setUserRating(storedRating ? parseInt(storedRating) : 0)
-    }, [movieData?.id])
+            setInWatchlist(storedWatchlist === 'true')
+            setIsWatched(storedWatched === 'true')
+            setIsFavorite(storedFavorite === 'true')
+            setUserRating(storedRating ? parseInt(storedRating) : 0)
+        } else {
+            const storedWatchlist = localStorage.getItem(`show_watchlist_${mediaData?.id}`)
+            const storedWatched = localStorage.getItem(`show_watched_${mediaData?.id}`)
+            const storedFavorite = localStorage.getItem(`show_favorite_${mediaData?.id}`)
+            const storedRating = localStorage.getItem(`show_rating_${mediaData?.id}`)
+
+            setInWatchlist(storedWatchlist === 'true')
+            setIsWatched(storedWatched === 'true')
+            setIsFavorite(storedFavorite === 'true')
+            setUserRating(storedRating ? parseInt(storedRating) : 0)
+        }
+    }, [mediaData?.id, pathname])
 
     const toggleWatchlist = () => {
         const newState = !inWatchlist
         setInWatchlist(newState)
-        localStorage.setItem(`watchlist_${movieData?.id}`, newState.toString())
+        if(pathname.includes('/movie')) {
+            localStorage.setItem(`movie_watchlist_${mediaData?.id}`, newState.toString())
+        } else {
+            localStorage.setItem(`show_watchlist_${mediaData?.id}`, newState.toString())
+        }
     }
 
     const toggleWatched = () => {
         const newState = !isWatched
         setIsWatched(newState)
-        localStorage.setItem(`watched_${movieData?.id}`, newState.toString())
+        if(pathname.includes('/movie')) {
+            localStorage.setItem(`movie_watched_${mediaData?.id}`, newState.toString())
+        } else {
+            localStorage.setItem(`show_watched_${mediaData?.id}`, newState.toString())
+        }
     }
 
     const toggleFavorite = () => {
         const newState = !isFavorite
         setIsFavorite(newState)
-        localStorage.setItem(`favorite_${movieData?.id}`, newState.toString())
+        if(pathname.includes('/movie')) {
+            localStorage.setItem(`movie_favorite_${mediaData?.id}`, newState.toString())
+        } else {
+            localStorage.setItem(`show_favorite_${mediaData?.id}`, newState.toString())
+        }
     }
 
     const handleRating = (rating: number) => {
         setUserRating(rating)
-        localStorage.setItem(`rating_${movieData?.id}`, rating.toString())
+        if(pathname.includes('/movie')) {
+            localStorage.setItem(`movie_rating_${mediaData?.id}`, rating.toString())
+        } else {
+            localStorage.setItem(`show_rating_${mediaData?.id}`, rating.toString())
+        }
     }
 
     return (
@@ -62,23 +90,23 @@ export default function FilmUI({ movieData }: Props) {
                     <div className="relative w-[100vw] h-[215px] sm:h-[360px] md:h-[450px] lg:h-[575px] xl:w-[1000px] xl:h-[560px] 2xl:w-[1300px] 2xl:h-[731px]">
                         <Image 
                             onLoad={() => setIsImageLoaded(true)}
-                            className={`z-0 movie-img ${isImageLoaded === false && `hidden` }`}
+                            className={`z-0 media-img ${isImageLoaded === false && `hidden` }`}
                             priority={true}
-                            src={`${movieData?.backdrop_path !== null ? `https://image.tmdb.org/t/p/original${movieData?.backdrop_path}` : `https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-38-picture-grey-c2ebdbb057f2a7614185931650f8cee23fa137b93812ccb132b9df511df1cfac.svg`}`}
+                            src={`${mediaData?.backdrop_path !== null ? `https://image.tmdb.org/t/p/original${mediaData?.backdrop_path}` : `https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-38-picture-grey-c2ebdbb057f2a7614185931650f8cee23fa137b93812ccb132b9df511df1cfac.svg`}`}
                             alt="Backdrop Image"
                             layout="fill" 
                         />
                     </div>
                     { isImageLoaded ? 
                         <>
-                            { pathname === '/film' ?
-                                <h1 className="mt-[-2rem] md:mt-[-3rem] xl:mt-[-5rem] xl:w-[1000px] 2xl:w-[1250px] z-10 px-3 xl:pl-8 text-white text-3xl sm:text-5xl 2xl:text-6xl font-bold">{movieData?.title && `${movieData?.title} (${movieData?.release_date.substring(0,4)})`}</h1>
-                            :
-                                <h1 className="mt-[-2rem] md:mt-[-3rem] xl:mt-[-5rem] xl:w-[1000px] 2xl:w-[1250px] z-10 px-3 xl:pl-8 text-white text-3xl sm:text-5xl 2xl:text-6xl font-bold">{movieData?.name && `${movieData?.name} (${movieData?.first_air_date.substring(0,4)})`}</h1>
+                            { pathname.includes('/movie') && ('title' in mediaData && 'release_date' in mediaData) ?
+                                <h1 className="mt-[-2rem] md:mt-[-3rem] xl:mt-[-5rem] xl:w-[1000px] 2xl:w-[1250px] z-10 px-3 xl:pl-8 text-white text-3xl sm:text-5xl 2xl:text-6xl font-bold">{mediaData?.title && `${mediaData?.title} (${mediaData?.release_date.substring(0,4)})`}</h1>
+                            : pathname.includes('/show') && ('name' in mediaData && 'first_air_date' in mediaData) &&
+                                <h1 className="mt-[-2rem] md:mt-[-3rem] xl:mt-[-5rem] xl:w-[1000px] 2xl:w-[1250px] z-10 px-3 xl:pl-8 text-white text-3xl sm:text-5xl 2xl:text-6xl font-bold">{mediaData?.name && `${mediaData?.name} (${mediaData?.first_air_date.substring(0,4)})`}</h1>
                             }
                             <div className="w-screen xl:w-[1000px] 2xl:w-[1250px] px-3 xl:pl-8">
                                 <div className='mt-4 flex max-md:flex-col md:justify-between md:items-center'>
-                                    <StarRating rating={movieData?.vote_average} maxRating={10} />
+                                    <StarRating rating={mediaData?.vote_average} maxRating={10} />
                                     <div className="flex items-center justify-end max-md:justify-start md:gap-4 max-md:w-full">
                                         <div className='w-fit flex items-center md:gap-4 bg-slate-500 p-2 rounded-md max-md:mt-4'>
                                             <p className="text-sm w-min max-md:hidden font-medium text-white">Your Rating:</p>
@@ -122,7 +150,7 @@ export default function FilmUI({ movieData }: Props) {
                                         </div>
                                     </div>
                                 </div>
-                                <p className="text-white mt-2 max-md:mt-4 sm:text-lg">{movieData!.overview}</p>
+                                <p className="text-white mt-2 max-md:mt-4 sm:text-lg">{mediaData!.overview}</p>
                             </div>
                             <div className='w-full p-5 flex justify-evenly'>
                                 <div className='w-3/4 max-md:w-full'>
@@ -130,14 +158,14 @@ export default function FilmUI({ movieData }: Props) {
                                         <LiteYouTubeEmbed
                                             aspectHeight={9}
                                             aspectWidth={16}
-                                            id={movieData?.video_id ?? ''}
+                                            id={mediaData?.video_id ?? ''}
                                             title="Trailer"
                                             poster="maxresdefault"
                                         />
                                     </div>
                                 </div>
                                 <div className="flex flex-col max-md:hidden justify-center w-fit">
-                                    {movieData?.production_companies.map((pc: ProductionCompanies) => {
+                                    {mediaData?.production_companies.map((pc: ProductionCompanies) => {
                                         return (
                                             pc.logo_path !== null && 
                                             <Fragment key={pc.id}>
@@ -148,7 +176,7 @@ export default function FilmUI({ movieData }: Props) {
                                 </div>
                             </div>
                             <div className="md:hidden px-5 flex flex-wrap justify-center items-center">
-                                {movieData?.production_companies.map((pc: ProductionCompanies) => {
+                                {mediaData?.production_companies.map((pc: ProductionCompanies) => {
                                     return (
                                         pc.logo_path !== null && 
                                         <Fragment key={pc.id}>

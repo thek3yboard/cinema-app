@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useRef, createRef, ChangeEvent, ChangeEventHandler } from 'react';
-import { FilmsContext, initialPage, initialCurrentApiPages, initialSort } from "@/app/(logged)/FilmsContext";
-import { SortType, Movie } from '@/types/types';
+import { MediaContext, initialPage, initialCurrentApiPages, initialSort } from "@/app/(logged)/MediaContext";
+import { SortType, Movie, Show } from '@/types/types';
 import { orderOptions, sortByOptions } from '@/assets/filtersData';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Search, Sliders, AlignJustify } from 'lucide-react'
 import { Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, 
     Navbar, NavbarBrand, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, NavbarContent, NavbarItem, Link, useDisclosure } from "@nextui-org/react";
@@ -18,6 +18,7 @@ export default function LoggedLayout({
   }>) {
     const [page, setPage] = useState(initialPage);
     const [movies, setMovies] = useState<Movie[]>([]);
+    const [shows, setShows] = useState<Movie[]>([]);
     const [currentApiPages, setCurrentApiPages] = useState(initialCurrentApiPages);
     const [sort, setSort] = useState<SortType>(initialSort);
     const [search, setSearch] = useState<string>('');
@@ -25,10 +26,11 @@ export default function LoggedLayout({
     const orderRef = useRef(sort.order_key);
     const screenRef = createRef<HTMLDivElement>();
     const pathname = usePathname();
+    const router = useRouter();
     const {isOpen, onOpen, onClose} = useDisclosure();
 
     const navbarItems = [
-        "Films",
+        "Movies",
         "Shows",
     ];
 
@@ -105,13 +107,20 @@ export default function LoggedLayout({
             let URL = '';
 
             switch(pathname) {
-                case '/films':
+                case '/movies':
                     URL = `https://api.themoviedb.org/3/search/movie?include_adult=false&include_video=false&language=en-US&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                     break;
                 case '/shows':
                     URL = `https://api.themoviedb.org/3/search/tv?include_adult=false&include_video=false&language=en-US&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                     break;
                 default:
+                    if(pathname.includes('/movie')) {
+                        URL = `https://api.themoviedb.org/3/search/movie?include_adult=false&include_video=false&language=en-US&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                        break;
+                    } else {
+                        URL = `https://api.themoviedb.org/3/search/tv?include_adult=false&include_video=false&language=en-US&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                        break;
+                    }
                     break;
             }
 
@@ -124,20 +133,30 @@ export default function LoggedLayout({
             
             const data = await response.json();
 
-            const movies = data.results;
+            if(pathname.includes('/movie')) {
+                const movies = data.results;
 
-            let filteredMovies = movies.filter((movie: Movie) => movie.vote_count > 1000);
+                let filteredMovies = movies.filter((movie: Movie) => movie.vote_count > 1000);
 
-            filteredMovies = filteredMovies.sort((a: any, b: any) => a.release_date.substring(0, 4) - b.release_date.substring(0, 4));
-            
-            setMovies(filteredMovies);
+                filteredMovies = filteredMovies.sort((a: any, b: any) => a.release_date.substring(0, 4) - b.release_date.substring(0, 4));
+                
+                setMovies(filteredMovies);
+            } else {
+                const shows = data.results;
+
+                let filteredShows = shows.filter((show: Show) => show.vote_count > 1000);
+
+                filteredShows = filteredShows.sort((a: any, b: any) => a.first_air_date.substring(0, 4) - b.first_air_date.substring(0, 4));
+                
+                setShows(filteredShows);
+            }
         } catch (error) {
             console.error(error)
         }
     }
 
     return (
-        <FilmsContext.Provider value={{ page, setPage, currentApiPages, setCurrentApiPages, handleClickPrevPage, handleClickNextPage, sort, movies, setMovies }}>
+        <MediaContext.Provider value={{ page, setPage, currentApiPages, setCurrentApiPages, handleClickPrevPage, handleClickNextPage, sort, movies, setMovies, shows, setShows }}>
         <>
             <div ref={screenRef} className="h-screen flex flex-col overflow-y-auto bg-gradient-to-r from-[#192a49] from-1% via-[#3f577c] via-50% to-[#192a49] to-99%">
                 <div className="z-20 sticky top-0">
@@ -183,17 +202,27 @@ export default function LoggedLayout({
                             ))}
                         </NavbarMenu>
                         <span className="max-md:hidden flex items-center w-2/3 h-10 bg-blueish-gray rounded-[3px]">
-                            <input type='text' onChange={(e) => handleChangeSearch(e)} onKeyDown={(e) => handleKeydownSearch(e)} className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray' />
-                            <button onClick={handleClickSearch}>
-                                <Search className='mx-2 max-h-6' />
-                            </button>
-                            
+                        { pathname.includes('/movie/') || pathname.includes('/show/') ?
+                            <>
+                                <input type='text' disabled={true} onChange={(e) => handleChangeSearch(e)} onKeyDown={(e) => handleKeydownSearch(e)} className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray opacity-50' />
+                                <button disabled={true} onClick={handleClickSearch}>
+                                    <Search className='mx-2 max-h-6 opacity-30' />
+                                </button>
+                            </>
+                        :
+                            <>
+                                <input type='text' onChange={(e) => handleChangeSearch(e)} onKeyDown={(e) => handleKeydownSearch(e)} className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray' />
+                                <button onClick={handleClickSearch}>
+                                    <Search className='mx-2 max-h-6' />
+                                </button>
+                            </>
+                        }
                         </span>
                         <button className='max-md:hidden' key="full" onClick={handleOpen}>
                             <Sliders className='max-h-6' />
                         </button>
                     </Navbar>
-                { (pathname === "/films" || pathname === "/shows") && 
+                { (pathname === "/movies" || pathname === "/shows") && 
                     <div className='md:hidden w-full flex items-start'>
                         <span className="flex items-center w-2/3 h-10 bg-blueish-gray">
                             <input type='text' onChange={(e) => handleChangeSearch(e)} onKeyDown={(e) => handleKeydownSearch(e)} className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray' />
@@ -207,7 +236,7 @@ export default function LoggedLayout({
                     </div>
                 }
             </div>
-            { (pathname === "/films" || pathname === "/shows") ?
+            { (pathname === "/movies" || pathname === "/shows") ?
                 <>
                 <div className="grow content-center my-4 2xl:overflow-hidden">
                     {children}
@@ -280,6 +309,6 @@ export default function LoggedLayout({
                 </ModalContent>
             </Modal>
         </>
-        </FilmsContext.Provider>
+        </MediaContext.Provider>
     );
 }

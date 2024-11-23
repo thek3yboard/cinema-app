@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect, Suspense, lazy } from 'react';
-import Loading from '@/app/ui/loading';
-import { MovieData } from "@/types/types";
-const FilmUI = lazy(() => import('@/app/(logged)/film/[id]/ui/FilmUI'));
+import Loading from '@/app/components/ui/loading';
+import { ShowData } from "@/types/types";
+const MediaUI = lazy(() => import('@/app/components/MediaUI'));
 
 export default function Show({ params }: { params: { id: number } }) {
-    const [movieData, setMovieData] = useState<MovieData>();
+    const [showData, setShowData] = useState<ShowData>();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -40,7 +40,7 @@ export default function Show({ params }: { params: { id: number } }) {
                     data = { ...data, video_id: video.results[0].key }
                 }
 
-                setMovieData(data);
+                setShowData(data);
             } catch (error) {
                 console.error(error)
             }
@@ -51,7 +51,7 @@ export default function Show({ params }: { params: { id: number } }) {
 
     return (
         <Suspense key={params!.id} fallback={<Loading/>}>
-            <FilmUI movieData={movieData!} />
+            <MediaUI mediaData={showData!} />
         </Suspense>
     );
 }

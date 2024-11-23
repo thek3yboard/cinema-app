@@ -2,11 +2,11 @@
 
 import { useState, useEffect, Suspense, lazy } from 'react'; 
 import { usePathname } from 'next/navigation';
-import Loading from '@/app/ui/loading';
+import Loading from '@/app/components/ui/loading';
 import { MovieData } from "@/types/types";
-const FilmUI = lazy(() => import('@/app/(logged)/film/[id]/ui/FilmUI'));
+const MediaUI = lazy(() => import('@/app/components/MediaUI'));
 
-export default function Film({ params }: { params: { id: number } }) {
+export default function Movie({ params }: { params: { id: number } }) {
     const [movieData, setMovieData] = useState<MovieData>();
 
     useEffect(() => {
@@ -52,7 +52,7 @@ export default function Film({ params }: { params: { id: number } }) {
 
     return (
         <Suspense key={params!.id} fallback={<Loading/>}>
-            <FilmUI movieData={movieData!} />
+            <MediaUI mediaData={movieData!} />
         </Suspense>
     );
 }

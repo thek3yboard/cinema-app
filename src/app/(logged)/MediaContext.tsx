@@ -1,8 +1,8 @@
 import { createContext } from "react";
-import { SortType, Movie } from "@/types/types";
+import { SortType, Movie, Show } from "@/types/types";
 import { sortByOptions, orderOptions } from "@/assets/filtersData";
 
-type FilmsContextType = {
+type MediaContextType = {
     page: number;
     setPage: React.Dispatch<React.SetStateAction<number>>;
     currentApiPages: number[];
@@ -11,7 +11,9 @@ type FilmsContextType = {
     handleClickNextPage: () => void
     sort: SortType,
     movies: Movie[],
-    setMovies: React.Dispatch<React.SetStateAction<Movie[]>>
+    setMovies: React.Dispatch<React.SetStateAction<Movie[]>>,
+    shows: Show[],
+    setShows: React.Dispatch<React.SetStateAction<Show[]>>,
 };
 
 export const initialPage = 1, initialCurrentApiPages = [1,2];
@@ -23,7 +25,7 @@ export const initialSort = {
     order_label: orderOptions[0].label
 };
 
-export const FilmsContext = createContext<FilmsContextType>({
+export const MediaContext = createContext<MediaContextType>({
     page: initialPage,
     setPage: () => void {},
     currentApiPages: initialCurrentApiPages,
@@ -33,4 +35,6 @@ export const FilmsContext = createContext<FilmsContextType>({
     sort: initialSort,
     movies: [],
     setMovies: () => void {},
+    shows: [],
+    setShows: () => void {}
 });

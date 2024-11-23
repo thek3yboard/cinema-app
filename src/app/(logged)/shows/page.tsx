@@ -1,7 +1,7 @@
-import Films from "../films/page";
+import Media from "@/app/components/Media";
 
 export default function Shows() {
     return (
-        <Films shows={true} />
+        <Media type={'shows'} />
     );
 }

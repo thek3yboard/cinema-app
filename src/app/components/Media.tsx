@@ -2,17 +2,22 @@
 
 import { useState, useEffect, useContext, useRef, Suspense, lazy } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { FilmsContext } from "@/app/(logged)/FilmsContext";
-import Loading from "@/app/ui/loading";
-import { Movie } from "@/types/types";
+import { MediaContext } from "@/app/(logged)/MediaContext";
+import Loading from "@/app/components/ui/loading";
+import { Movie, Show } from "@/types/types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-const FilmsGrid = lazy(() => import('@/app/(logged)/films/ui/FilmsGrid'));
+const MediaGrid = lazy(() => import('@/app/components/MediaGrid'));
 
-export default function Films({ shows = false }) {
+type Media = {
+    type: string
+}
+
+export default function Media({ type }: Media) {
     const [imagesLoaded, setImagesLoaded] = useState(false);
     const countLoadedImages = useRef(0);
-    const { page, currentApiPages, sort, handleClickPrevPage, handleClickNextPage, movies, setMovies } = useContext(FilmsContext);
+    const { page, currentApiPages, sort, handleClickPrevPage, handleClickNextPage, movies, setMovies,
+    shows, setShows } = useContext(MediaContext);
     const router = useRouter();
     const pathname = usePathname();
 
@@ -24,7 +29,7 @@ export default function Films({ shows = false }) {
 
         switch(sort.key) {
             case 'vote_average':
-                if(shows) {
+                if(type === 'shows') {
                     firstAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=en-US&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&without_genres=99,10755&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
                     secondAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=en-US&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&without_genres=99,10755&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
                 } else {
@@ -36,7 +41,7 @@ export default function Films({ shows = false }) {
                 const endDate = new Date();
                 let startDate = new Date();
                 startDate.setDate(endDate.getDate() - 21);
-                if(shows) {
+                if(type === 'shows') {
                     firstAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=en-US&page=${currentApiPages[0]}&sort_by=popularity.${sort.order_key}&with_release_type=2|3&release_date.gte=${startDate}&release_date.lte=${endDate}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
                     secondAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=en-US&page=${currentApiPages[1]}&sort_by=popularity.${sort.order_key}&with_release_type=2|3&release_date.gte=${startDate}&release_date.lte=${endDate}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
                 } else {
@@ -45,7 +50,7 @@ export default function Films({ shows = false }) {
                 }
                 break;
             default:
-                if(shows) {
+                if(type === 'shows') {
                     firstAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=en-US&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
                     secondAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=en-US&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
                 } else {
@@ -90,20 +95,25 @@ export default function Films({ shows = false }) {
         }
         
         const fetchBoth = async () => {
-            const firstBatchMovies = await fetchFirstPage();
-            const secondBatchMovies = await fetchSecondPage();
-            const allMoviesPage = [...firstBatchMovies, ...secondBatchMovies];
-            setMovies(allMoviesPage);
+            const firstBatchMedia = await fetchFirstPage();
+            const secondBatchMedia = await fetchSecondPage();
+            const allMediaPage = [...firstBatchMedia, ...secondBatchMedia];
+
+            if(type === 'movies')
+                setMovies(allMediaPage);
+            else {
+                setShows(allMediaPage);
+            }
         };
         
         fetchBoth();
-    }, [currentApiPages, sort]);
+    }, [currentApiPages, setMovies, setShows, sort, type]);
 
-    const handleClickMovieImage = (movie: Movie): void => {
-        if(pathname === '/films') {
-            router.push(`/film/${movie.id}`);
+    const handleClickMediaImage = (media: Movie | Show): void => {
+        if(pathname === '/movies') {
+            router.push(`/movie/${media.id}`);
         } else {
-            router.push(`/show/${movie.id}`);
+            router.push(`/show/${media.id}`);
         }
     }
 
@@ -132,9 +142,12 @@ export default function Films({ shows = false }) {
                     <div className='max-xl:hidden content-center'>
                         { (imagesLoaded && movies.length === 40) && <PrevPageButton /> }
                     </div>
-                    <div className={`mx-4 grid ${movies.length !== 1 ? `films-grid-columns` : `grid-cols-1`} gap-5 xl:gap-3 justify-items-center justify-center`}>
-                        <FilmsGrid movies={movies} handleClickMovieImage={handleClickMovieImage} imagesLoaded={imagesLoaded} setImagesLoaded={setImagesLoaded} 
-                        countLoadedImages={countLoadedImages} />
+                    <div className={`mx-4 grid ${movies.length !== 1 ? `media-grid-columns` : `grid-cols-1`} gap-5 xl:gap-3 justify-items-center justify-center`}>
+                        { pathname === '/movies' ?
+                            <MediaGrid media={movies} handleClickMediaImage={handleClickMediaImage} imagesLoaded={imagesLoaded} setImagesLoaded={setImagesLoaded} countLoadedImages={countLoadedImages} />
+                        :
+                            <MediaGrid media={shows} handleClickMediaImage={handleClickMediaImage} imagesLoaded={imagesLoaded} setImagesLoaded={setImagesLoaded} countLoadedImages={countLoadedImages} />
+                        }
                     </div>
                     <div className='max-xl:hidden content-center'>
                         { (imagesLoaded && movies.length === 40) && <NextPageButton /> }

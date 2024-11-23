@@ -54,7 +54,7 @@ body {
   }
 }
 
-.movie-img {
+.media-img {
   mask: 
     linear-gradient(to top,  transparent 5%, #fff 30%);
   mask-size: 110% 110%;
@@ -74,7 +74,7 @@ body {
   }
 }
 
-.films-grid-columns {
+.media-grid-columns {
   grid-template-columns: repeat(2, 135px);
 
   @screen sm  {
