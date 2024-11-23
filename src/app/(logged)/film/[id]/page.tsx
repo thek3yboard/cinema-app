@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense, lazy } from 'react'; 
+import { usePathname } from 'next/navigation';
 import Loading from '@/app/ui/loading';
 import { MovieData } from "@/types/types";
 const FilmUI = lazy(() => import('@/app/(logged)/film/[id]/ui/FilmUI'));
@@ -32,7 +33,12 @@ export default function Film({ params }: { params: { id: number } }) {
                 for (const v of video.results) {
                     if(v.type === 'Trailer') {
                         data = { ...data, video_id: v.key };
+                        break;
                     }
+                }
+
+                if(data.video_id === undefined) {
+                    data = { ...data, video_id: video.results[0].key }
                 }
 
                 setMovieData(data);
