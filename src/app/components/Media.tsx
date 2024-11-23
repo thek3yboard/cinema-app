@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect, useContext, useRef, Suspense, lazy } from 'react';
+import { useState, useEffect, useContext, useRef, lazy } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { MediaContext } from "@/app/(logged)/MediaContext";
-import Loading from "@/app/components/ui/loading";
 import { Movie, Show } from "@/types/types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';

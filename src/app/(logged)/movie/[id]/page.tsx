@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense, lazy } from 'react'; 
 import { usePathname } from 'next/navigation';
-import Loading from '@/app/components/ui/loading';
+import Loading from '@/app/components/ui/Loading';
 import { MovieData } from "@/types/types";
 const MediaUI = lazy(() => import('@/app/components/MediaUI'));
 

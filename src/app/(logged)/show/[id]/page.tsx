@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense, lazy } from 'react';
-import Loading from '@/app/components/ui/loading';
+import Loading from '@/app/components/ui/Loading';
 import { ShowData } from "@/types/types";
 const MediaUI = lazy(() => import('@/app/components/MediaUI'));
 
