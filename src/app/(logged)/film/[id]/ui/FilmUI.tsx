@@ -1,6 +1,7 @@
 import { Fragment, useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import Image from "next/image";
-import Loading from "@/app/ui/loading";
+import Loading from "@/app/ui/Loading";
 import StarRating from "@/app/ui/StarRating";
 import { MovieData, ProductionCompanies } from "@/types/types";
 import LiteYouTubeEmbed from "react-lite-youtube-embed"
@@ -17,6 +18,7 @@ export default function FilmUI({ movieData }: Props) {
     const [isWatched, setIsWatched] = useState(false)
     const [isFavorite, setIsFavorite] = useState(false)
     const [userRating, setUserRating] = useState(0)
+    const pathname = usePathname();
 
     useEffect(() => {
         const storedWatchlist = localStorage.getItem(`watchlist_${movieData?.id}`)
@@ -69,7 +71,11 @@ export default function FilmUI({ movieData }: Props) {
                     </div>
                     { isImageLoaded ? 
                         <>
-                            <h1 className="mt-[-2rem] md:mt-[-3rem] xl:mt-[-5rem] xl:w-[1000px] 2xl:w-[1250px] z-10 px-3 xl:pl-8 text-white text-3xl sm:text-5xl 2xl:text-6xl font-bold">{movieData?.title && `${movieData?.title} (${movieData?.release_date.substring(0,4)})`} {/* <StarRating rating={movieData?.vote_average} maxRating={10} /> */}</h1>
+                            { pathname === '/film' ?
+                                <h1 className="mt-[-2rem] md:mt-[-3rem] xl:mt-[-5rem] xl:w-[1000px] 2xl:w-[1250px] z-10 px-3 xl:pl-8 text-white text-3xl sm:text-5xl 2xl:text-6xl font-bold">{movieData?.title && `${movieData?.title} (${movieData?.release_date.substring(0,4)})`}</h1>
+                            :
+                                <h1 className="mt-[-2rem] md:mt-[-3rem] xl:mt-[-5rem] xl:w-[1000px] 2xl:w-[1250px] z-10 px-3 xl:pl-8 text-white text-3xl sm:text-5xl 2xl:text-6xl font-bold">{movieData?.name && `${movieData?.name} (${movieData?.first_air_date.substring(0,4)})`}</h1>
+                            }
                             <div className="w-screen xl:w-[1000px] 2xl:w-[1250px] px-3 xl:pl-8">
                                 <div className='mt-4 flex max-md:flex-col md:justify-between md:items-center'>
                                     <StarRating rating={movieData?.vote_average} maxRating={10} />
