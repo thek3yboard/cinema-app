@@ -9,10 +9,12 @@ import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons
 const MediaGrid = lazy(() => import('@/app/components/MediaGrid'));
 
 type Media = {
-    type: string
+    type: string,
+    preloadedMovies: Movie[] | [],
+    preloadedShows: Show[] | []
 }
 
-export default function Media({ type }: Media) {
+export default function Media({ type, preloadedMovies = [], preloadedShows = [] }: Media) {
     const [imagesLoaded, setImagesLoaded] = useState(false);
     const countLoadedImages = useRef(0);
     const { page, currentApiPages, sort, handleClickPrevPage, handleClickNextPage, movies, setMovies,
@@ -23,6 +25,16 @@ export default function Media({ type }: Media) {
     useEffect(() => {
         setImagesLoaded(false);
         countLoadedImages.current = 0;
+
+        if(preloadedMovies.length !== 0) {
+            setMovies(preloadedMovies);
+            return;
+        }
+
+        if(preloadedShows.length !== 0) {
+            setShows(preloadedShows);
+            return;
+        }
 
         let firstAPIURL = '', secondAPIURL = '';
 
@@ -110,9 +122,9 @@ export default function Media({ type }: Media) {
 
     const handleClickMediaImage = (media: Movie | Show): void => {
         if(pathname === '/movies') {
-            router.push(`/movie/${media.id}`);
+            router.push(`/movies/${media.id}`);
         } else {
-            router.push(`/show/${media.id}`);
+            router.push(`/shows/${media.id}`);
         }
     }
 

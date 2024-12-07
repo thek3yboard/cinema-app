@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense, lazy } from 'react'; 
-import { usePathname } from 'next/navigation';
+import { useState, useEffect, Suspense, lazy } from 'react';
 import Loading from '@/app/components/ui/Loading';
 import { MovieData } from "@/types/types";
 const MediaUI = lazy(() => import('@/app/components/MediaUI'));

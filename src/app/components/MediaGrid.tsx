@@ -18,8 +18,14 @@ export default function MediaGrid({ media, handleClickMediaImage, imagesLoaded, 
             countLoadedImages.current++;
             console.log(countLoadedImages.current);
             
-            if(countLoadedImages.current === 10) {
-                setImagesLoaded(true);
+            if(media.length >= 10) {
+                if(countLoadedImages.current === 10) {
+                    setImagesLoaded(true);
+                }
+            } else {
+                if(countLoadedImages.current === 1) {
+                    setImagesLoaded(true);
+                }
             }
         }, 2000);
     }

@@ -25,8 +25,8 @@ export default function LoggedLayout({
     const sortRef = useRef(sort.key);
     const orderRef = useRef(sort.order_key);
     const screenRef = createRef<HTMLDivElement>();
-    const pathname = usePathname();
     const router = useRouter();
+    const pathname = usePathname();
     const {isOpen, onOpen, onClose} = useDisclosure();
 
     const navbarItems = [
@@ -35,38 +35,42 @@ export default function LoggedLayout({
     ];
 
     const handleClickPrevPage = () => {
-      if(currentApiPages[0] === 1) {
-        return;
-      }
-      screenRef.current!.scroll({
-        top: 0,
-        behavior: "smooth"
-      });
-      if(screenRef.current!.scrollTop !== 0) {
-        setTimeout(() => {
-          setCurrentApiPages([currentApiPages[0]-2, currentApiPages[1]-2]);
-          setPage(p => p - 1);
-        }, 1000);
-      } else {
-        setCurrentApiPages([currentApiPages[0]-2, currentApiPages[1]-2]);
-        setPage(p => p - 1);
-      }
+        setMovies([]);
+        setShows([]);
+        if(currentApiPages[0] === 1) {
+            return;
+        }
+        screenRef.current!.scroll({
+            top: 0,
+            behavior: "smooth"
+        });
+        if(screenRef.current!.scrollTop !== 0) {
+            setTimeout(() => {
+            setCurrentApiPages([currentApiPages[0]-2, currentApiPages[1]-2]);
+            setPage(p => p - 1);
+            }, 1000);
+        } else {
+            setCurrentApiPages([currentApiPages[0]-2, currentApiPages[1]-2]);
+            setPage(p => p - 1);
+        }
     }
 
     const handleClickNextPage = () => {
-      screenRef.current!.scroll({
-        top: 0,
-        behavior: "smooth"
-      });
-      if(screenRef.current!.scrollTop !== 0) {
-        setTimeout(() => {
-          setCurrentApiPages([currentApiPages[0]+2, currentApiPages[1]+2]);
-          setPage(p => p + 1);
-        }, 1000);
-      } else {
-        setCurrentApiPages([currentApiPages[0]+2, currentApiPages[1]+2]);
-        setPage(p => p + 1);
-      }
+        setMovies([]);
+        setShows([]);
+        screenRef.current!.scroll({
+            top: 0,
+            behavior: "smooth"
+        });
+        if(screenRef.current!.scrollTop !== 0) {
+            setTimeout(() => {
+            setCurrentApiPages([currentApiPages[0]+2, currentApiPages[1]+2]);
+            setPage(p => p + 1);
+            }, 1000);
+        } else {
+            setCurrentApiPages([currentApiPages[0]+2, currentApiPages[1]+2]);
+            setPage(p => p + 1);
+        }
     }
 
     const handleChangeSort = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -114,14 +118,13 @@ export default function LoggedLayout({
                     URL = `https://api.themoviedb.org/3/search/tv?include_adult=false&include_video=false&language=en-US&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                     break;
                 default:
-                    if(pathname.includes('/movie')) {
+                    if(pathname.includes('/movies')) {
                         URL = `https://api.themoviedb.org/3/search/movie?include_adult=false&include_video=false&language=en-US&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                         break;
                     } else {
                         URL = `https://api.themoviedb.org/3/search/tv?include_adult=false&include_video=false&language=en-US&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                         break;
                     }
-                    break;
             }
 
             let response = await fetch(URL, {
@@ -133,7 +136,7 @@ export default function LoggedLayout({
             
             const data = await response.json();
 
-            if(pathname.includes('/movie')) {
+            if(pathname.includes('/movies')) {
                 const movies = data.results;
 
                 let filteredMovies = movies.filter((movie: Movie) => movie.vote_count > 1000);
@@ -141,6 +144,8 @@ export default function LoggedLayout({
                 filteredMovies = filteredMovies.sort((a: any, b: any) => a.release_date.substring(0, 4) - b.release_date.substring(0, 4));
                 
                 setMovies(filteredMovies);
+
+                router.push('/movies');
             } else {
                 const shows = data.results;
 
@@ -149,6 +154,8 @@ export default function LoggedLayout({
                 filteredShows = filteredShows.sort((a: any, b: any) => a.first_air_date.substring(0, 4) - b.first_air_date.substring(0, 4));
                 
                 setShows(filteredShows);
+
+                router.push('/shows');
             }
         } catch (error) {
             console.error(error)
@@ -166,63 +173,67 @@ export default function LoggedLayout({
                                 <Image className='min-w-32 mb-2' src={logo} alt="Logo" width={128} />
                             </NavbarBrand>
                         </NavbarContent>
-
                         <NavbarContent className="md:hidden" justify="end">
                             <NavbarMenuToggle icon={<AlignJustify />} />
                         </NavbarContent>
-
                         <NavbarContent className="hidden md:flex gap-6" justify="center">
                             <NavbarBrand>
                                 <Image className='min-w-36 mb-2' src={logo} alt="Logo" width={144} />
                             </NavbarBrand>
                             {navbarItems.map((item, index) => (
                                 <NavbarItem key={`${item}-${index}`}>
-                                    <Link
-                                        className={`/${item.toLowerCase()}` === pathname ? "text-orange-400 text-xl font-semibold" : "text-nyanza text-xl font-semibold"}
-                                        href={`/${item.toLowerCase()}`}
-                                    >
-                                        {item}
-                                    </Link>
+                                    {pathname.includes(item.toLowerCase()) ?
+                                        <Link
+                                            className="text-orange-400 text-xl font-semibold"
+                                            href={`/${item.toLowerCase()}`}
+                                        >
+                                            {item}
+                                        </Link>
+                                        :
+                                        <Link
+                                            className="text-nyanza text-xl font-semibold"
+                                            href={`/${item.toLowerCase()}`}
+                                        >
+                                            {item}
+                                        </Link>
+                                    }
                                 </NavbarItem>
                             ))}
                         </NavbarContent>
-
                         <NavbarMenu className='p-5'>
                             {navbarItems.map((item, index) => (
                                 <NavbarMenuItem key={`${item}-${index}`}>
-                                    <Link
-                                        className={`/${item.toLowerCase()}` === pathname ? "text-orange-400 w-full font-semibold" : "text-nyanza w-full font-semibold"}
-                                        href={`/${item.toLowerCase()}`}
-                                        size="lg"
-                                    >
-                                        {item}
-                                    </Link>
+                                    {pathname.includes(item.toLowerCase()) ?
+                                        <Link
+                                            className="text-orange-400 w-full font-semibold"
+                                            href={`/${item.toLowerCase()}`}
+                                            size="lg"
+                                        >
+                                            {item}
+                                        </Link>
+                                        :
+                                        <Link
+                                            className="text-nyanza text-xl font-semibold"
+                                            href={`/${item.toLowerCase()}`}
+                                            size="lg"
+                                        >
+                                            {item}
+                                        </Link>
+                                    }
                                 </NavbarMenuItem>
                                 
                             ))}
                         </NavbarMenu>
                         <span className="max-md:hidden flex items-center w-2/3 h-10 bg-blueish-gray rounded-[3px]">
-                        { pathname.includes('/movie/') || pathname.includes('/show/') ?
-                            <>
-                                <input type='text' disabled={true} onChange={(e) => handleChangeSearch(e)} onKeyDown={(e) => handleKeydownSearch(e)} className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray opacity-50' />
-                                <button disabled={true} onClick={handleClickSearch}>
-                                    <Search className='mx-2 max-h-6 opacity-30' />
-                                </button>
-                            </>
-                        :
-                            <>
-                                <input type='text' onChange={(e) => handleChangeSearch(e)} onKeyDown={(e) => handleKeydownSearch(e)} className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray' />
-                                <button onClick={handleClickSearch}>
-                                    <Search className='mx-2 max-h-6' />
-                                </button>
-                            </>
-                        }
+                            <input type='text' onChange={(e) => handleChangeSearch(e)} onKeyDown={(e) => handleKeydownSearch(e)} className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray' />
+                            <button onClick={handleClickSearch}>
+                                <Search className='mx-2 max-h-6' />
+                            </button>
                         </span>
                         <button className='max-md:hidden' key="full" onClick={handleOpen}>
                             <Sliders className='max-h-6' />
                         </button>
                     </Navbar>
-                { (pathname === "/movies" || pathname === "/shows") && 
                     <div className='md:hidden w-full flex items-start'>
                         <span className="flex items-center w-2/3 h-10 bg-blueish-gray">
                             <input type='text' onChange={(e) => handleChangeSearch(e)} onKeyDown={(e) => handleKeydownSearch(e)} className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray' />
@@ -234,27 +245,26 @@ export default function LoggedLayout({
                             <Sliders className='max-h-6' />
                         </Button>
                     </div>
+                </div>
+                { (pathname === "/movies" || pathname === "/shows") ?
+                    <>
+                    <div className="grow content-center my-4 2xl:overflow-hidden">
+                        {children}
+                    </div>
+                    <div className="h-6 flex justify-center">
+                        <footer className="h-6 text-nyanza">Copyright © 2024 Juan Ignacio Leiva</footer>
+                    </div>
+                    </>
+                :
+                    <>
+                    <div className="grow">
+                        {children}
+                    </div>
+                    <div className="flex h-6 justify-center">
+                        <footer className="h-6 text-nyanza">Copyright © 2024 Juan Ignacio Leiva</footer>
+                    </div> 
+                    </>
                 }
-            </div>
-            { (pathname === "/movies" || pathname === "/shows") ?
-                <>
-                <div className="grow content-center my-4 2xl:overflow-hidden">
-                    {children}
-                </div>
-                <div className="h-6 flex justify-center">
-                    <footer className="h-6 text-nyanza">Copyright © 2024 Juan Ignacio Leiva</footer>
-                </div>
-                </>
-            :
-                <>
-                <div className="grow">
-                    {children}
-                </div>
-                <div className="flex h-6 justify-center">
-                    <footer className="h-6 text-nyanza">Copyright © 2024 Juan Ignacio Leiva</footer>
-                </div> 
-                </>
-            }
             </div>
             <Modal 
             size="full"

@@ -21,7 +21,7 @@ export default function MediaUI({ mediaData }: Props) {
     const pathname = usePathname();
 
     useEffect(() => {
-        if(pathname.includes('/movie')) {
+        if(pathname.includes('/movies')) {
             const storedWatchlist = localStorage.getItem(`movie_watchlist_${mediaData?.id}`)
             const storedWatched = localStorage.getItem(`movie_watched_${mediaData?.id}`)
             const storedFavorite = localStorage.getItem(`movie_favorite_${mediaData?.id}`)
@@ -47,7 +47,7 @@ export default function MediaUI({ mediaData }: Props) {
     const toggleWatchlist = () => {
         const newState = !inWatchlist
         setInWatchlist(newState)
-        if(pathname.includes('/movie')) {
+        if(pathname.includes('/movies')) {
             localStorage.setItem(`movie_watchlist_${mediaData?.id}`, newState.toString())
         } else {
             localStorage.setItem(`show_watchlist_${mediaData?.id}`, newState.toString())
@@ -57,7 +57,7 @@ export default function MediaUI({ mediaData }: Props) {
     const toggleWatched = () => {
         const newState = !isWatched
         setIsWatched(newState)
-        if(pathname.includes('/movie')) {
+        if(pathname.includes('/movies')) {
             localStorage.setItem(`movie_watched_${mediaData?.id}`, newState.toString())
         } else {
             localStorage.setItem(`show_watched_${mediaData?.id}`, newState.toString())
@@ -67,7 +67,7 @@ export default function MediaUI({ mediaData }: Props) {
     const toggleFavorite = () => {
         const newState = !isFavorite
         setIsFavorite(newState)
-        if(pathname.includes('/movie')) {
+        if(pathname.includes('/movies')) {
             localStorage.setItem(`movie_favorite_${mediaData?.id}`, newState.toString())
         } else {
             localStorage.setItem(`show_favorite_${mediaData?.id}`, newState.toString())
@@ -76,7 +76,7 @@ export default function MediaUI({ mediaData }: Props) {
 
     const handleRating = (rating: number) => {
         setUserRating(rating)
-        if(pathname.includes('/movie')) {
+        if(pathname.includes('/movies')) {
             localStorage.setItem(`movie_rating_${mediaData?.id}`, rating.toString())
         } else {
             localStorage.setItem(`show_rating_${mediaData?.id}`, rating.toString())
@@ -99,9 +99,9 @@ export default function MediaUI({ mediaData }: Props) {
                     </div>
                     { isImageLoaded ? 
                         <>
-                            { pathname.includes('/movie') && ('title' in mediaData && 'release_date' in mediaData) ?
+                            { pathname.includes('/movies') && ('title' in mediaData && 'release_date' in mediaData) ?
                                 <h1 className="mt-[-2rem] md:mt-[-3rem] xl:mt-[-5rem] xl:w-[1000px] 2xl:w-[1250px] z-10 px-3 xl:pl-8 text-white text-3xl sm:text-5xl 2xl:text-6xl font-bold">{mediaData?.title && `${mediaData?.title} (${mediaData?.release_date.substring(0,4)})`}</h1>
-                            : pathname.includes('/show') && ('name' in mediaData && 'first_air_date' in mediaData) &&
+                            : pathname.includes('/shows') && ('name' in mediaData && 'first_air_date' in mediaData) &&
                                 <h1 className="mt-[-2rem] md:mt-[-3rem] xl:mt-[-5rem] xl:w-[1000px] 2xl:w-[1250px] z-10 px-3 xl:pl-8 text-white text-3xl sm:text-5xl 2xl:text-6xl font-bold">{mediaData?.name && `${mediaData?.name} (${mediaData?.first_air_date.substring(0,4)})`}</h1>
                             }
                             <div className="w-screen xl:w-[1000px] 2xl:w-[1250px] px-3 xl:pl-8">
