@@ -108,6 +108,14 @@ export default function LoggedLayout({
         setCurrentApiPages(initialCurrentApiPages);
         setPage(initialPage);
         onClose();
+
+        if(pathname.includes('/movies')) {
+            setMovies([]);
+            router.push('/movies');
+        } else {
+            setShows([]);
+            router.push('/shows');
+        }
     }
 
     const handleOpen = () => {
