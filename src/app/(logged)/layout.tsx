@@ -87,7 +87,7 @@ export default function LoggedLayout({
     }
 
     const handleSetFilters = () => {
-        handleMenuToggle();
+        setIsMenuOpen(false);
 
         const selectedOrder = orderOptions.find((option) => option.key === orderRef.current)!;
         const selectedSort = sortByOptions.find((option) => option.key === sortRef.current)!;
@@ -123,7 +123,7 @@ export default function LoggedLayout({
 
     const handleClickSearch = async () => {
         try {
-            handleMenuToggle();
+            setIsMenuOpen(false);
 
             let URL = '';
 
