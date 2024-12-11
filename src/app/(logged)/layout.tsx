@@ -29,25 +29,15 @@ export default function LoggedLayout({
     const pathname = usePathname();
     const {isOpen, onOpen, onClose} = useDisclosure();
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-    const [isParametersMenuOpen, setIsParametersMenuOpen] = useState<boolean>(false);
-    const [isPagesMenuOpen, setIsPagesMenuOpen] = useState<boolean>(false);
 
     const navbarItems = [
         "Movies",
         "Shows",
     ];
 
-    const handleMenuToggle = (open: boolean) => {
-        setIsMenuOpen(open);
+    const handleMenuToggle = () => {
+        setIsMenuOpen(!isMenuOpen);
     }
-
-    const handleParametersMenuToggle = (open: boolean) => {
-        setIsParametersMenuOpen(open);
-    };
-
-    const handlePagesMenuToggle = (open: boolean) => {
-        setIsPagesMenuOpen(open);
-    };
 
     const handleClickPrevPage = () => {
         setMovies([]);
@@ -97,8 +87,7 @@ export default function LoggedLayout({
     }
 
     const handleSetFilters = () => {
-        setIsMenuOpen(false);
-        handleParametersMenuToggle(false);
+        handleMenuToggle();
 
         const selectedOrder = orderOptions.find((option) => option.key === orderRef.current)!;
         const selectedSort = sortByOptions.find((option) => option.key === sortRef.current)!;
@@ -134,8 +123,7 @@ export default function LoggedLayout({
 
     const handleClickSearch = async () => {
         try {
-            setIsMenuOpen(false);
-            handleParametersMenuToggle(false);
+            handleMenuToggle();
 
             let URL = '';
 
@@ -204,20 +192,8 @@ export default function LoggedLayout({
                         </NavbarContent>
                         <NavbarContent className="md:hidden" justify="end">
                             <NavbarMenuToggle 
-                                isDisabled={isPagesMenuOpen}
-                                isSelected={isParametersMenuOpen}
-                                onChange={handleParametersMenuToggle}
-                                icon={isParametersMenuOpen ? 
-                                    <button style={{ color: '#192a49' }} className='p-2 rounded-md bg-slate-200'><ChevronUp /></button> 
-                                    : 
-                                    <ChevronDown />
-                                }
-                            />
-                            <NavbarMenuToggle 
-                                isDisabled={isParametersMenuOpen}
-                                isSelected={isPagesMenuOpen}
-                                onChange={handlePagesMenuToggle}
-                                icon={isPagesMenuOpen ? 
+                                isSelected={isMenuOpen}
+                                icon={isMenuOpen ? 
                                     <button style={{ color: '#192a49' }} className='p-2 rounded-md bg-slate-200'><AlignJustify /></button> 
                                     : 
                                     <AlignJustify />
@@ -248,42 +224,39 @@ export default function LoggedLayout({
                                 </NavbarItem>
                             ))}
                         </NavbarContent>
-                        <NavbarMenu className='max-h-fit mt-[1.5px] p-5'>
-                            { isPagesMenuOpen ?
-                                navbarItems.map((item, index) => (
-                                    <NavbarMenuItem key={`${item}-${index}`}>
-                                        {pathname.includes(item.toLowerCase()) ?
-                                            <Link
-                                                className="text-orange-400 text-xl font-semibold"
-                                                href={`/${item.toLowerCase()}`}
-                                            >
-                                                {item}
-                                            </Link>
-                                            :
-                                            <Link
-                                                className="text-nyanza text-xl font-semibold"
-                                                href={`/${item.toLowerCase()}`}
-                                            >
-                                                {item}
-                                            </Link>
-                                        }
-                                    </NavbarMenuItem>
-                                ))
-                            : isParametersMenuOpen &&
-                                <NavbarMenuItem>
-                                    <div className='md:hidden w-full flex justify-between'>
-                                        <span className="flex items-center rounded-l-sm w-full h-10 bg-blueish-gray">
-                                            <input type='text' onChange={(e) => handleChangeSearch(e)} onKeyDown={(e) => handleKeydownSearch(e)} className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray' />
-                                            <button className='bg-lapis-lazuli ml-[1px] h-full rounded-r-sm' onClick={handleClickSearch}>
-                                                <Search className='mx-2 max-h-6' />
-                                            </button>
-                                        </span>
-                                        <Button disabled={pathname.includes('/shows') === true} className={`max-w-fit bg-lapis-lazuli ml-2 rounded-sm ${pathname.includes('/shows') && 'opacity-50'}`} key="full" onClick={handleOpen}>
-                                            <Sliders />
-                                        </Button>
-                                    </div>
+                        <NavbarMenu className='max-h-fit mt-[1.5px] gap-3 p-5'>
+                            <NavbarMenuItem>
+                                <div className='md:hidden w-full flex justify-between'>
+                                    <span className="flex items-center rounded-l-sm w-full h-10 bg-blueish-gray">
+                                        <input type='text' onChange={(e) => handleChangeSearch(e)} onKeyDown={(e) => handleKeydownSearch(e)} className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray' />
+                                        <button className='bg-lapis-lazuli ml-[1px] h-full rounded-r-sm' onClick={handleClickSearch}>
+                                            <Search className='mx-2 max-h-6' />
+                                        </button>
+                                    </span>
+                                    <Button disabled={pathname.includes('/shows') === true} className={`max-w-fit bg-lapis-lazuli ml-2 rounded-sm ${pathname.includes('/shows') && 'opacity-50'}`} key="full" onClick={handleOpen}>
+                                        <Sliders />
+                                    </Button>
+                                </div>
+                            </NavbarMenuItem>
+                            {navbarItems.map((item, index) => (
+                                <NavbarMenuItem key={`${item}-${index}`}>
+                                    {pathname.includes(item.toLowerCase()) ?
+                                        <Link
+                                            className="text-orange-400 text-xl font-semibold"
+                                            href={`/${item.toLowerCase()}`}
+                                        >
+                                            {item}
+                                        </Link>
+                                        :
+                                        <Link
+                                            className="text-nyanza text-xl font-semibold"
+                                            href={`/${item.toLowerCase()}`}
+                                        >
+                                            {item}
+                                        </Link>
+                                    }
                                 </NavbarMenuItem>
-                            }
+                            ))}
                         </NavbarMenu>
                         <span className="max-md:hidden flex items-center w-2/3 h-10 bg-blueish-gray rounded-[3px]">
                             <input type='text' onChange={(e) => handleChangeSearch(e)} onKeyDown={(e) => handleKeydownSearch(e)} className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray' />
