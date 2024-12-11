@@ -7,6 +7,15 @@ const nextConfig = {
     env: {
         NEXT_PUBLIC_TMDB_API_KEY: process.env.NEXT_PUBLIC_TMDB_API_KEY,
         NEXT_PUBLIC_TMDB_BEARER_TOKEN: process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN
+    },
+    async redirects() {
+        return [
+          {
+            source: '/',
+            destination: '/movies',
+            permanent: true,
+          },
+        ]
     }
 };
 
