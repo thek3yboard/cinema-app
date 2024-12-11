@@ -248,7 +248,7 @@ export default function LoggedLayout({
                                 </NavbarItem>
                             ))}
                         </NavbarContent>
-                        <NavbarMenu className='max-h-fit mt-[2px] p-5'>
+                        <NavbarMenu className='max-h-fit mt-[1.5px] p-5'>
                             { isPagesMenuOpen ?
                                 navbarItems.map((item, index) => (
                                     <NavbarMenuItem key={`${item}-${index}`}>
