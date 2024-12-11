@@ -1,0 +1,21 @@
+{
+    "name": "Cinema",
+    "short_name": "Cinema",
+    "description": "Movies, shows app where you can rate them, add your favorites, mark the ones you watched and much more",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#3f577c",
+    "theme_color": "#3f577c",
+    "icons": [
+      {
+        "src": "/logo192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/logo512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+}
