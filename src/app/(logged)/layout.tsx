@@ -5,7 +5,7 @@ import { MediaContext, initialPage, initialCurrentApiPages, initialSort } from "
 import { SortType, Movie, Show } from '@/types/types';
 import { orderOptions, sortByOptions } from '@/assets/filtersData';
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, Sliders, AlignJustify, ChevronDown, ChevronUp } from 'lucide-react'
+import { Search, Sliders, AlignJustify, X } from 'lucide-react'
 import { Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, 
     Navbar, NavbarBrand, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, NavbarContent, NavbarItem, Link, useDisclosure } from "@nextui-org/react";
 import Image from "next/image";
@@ -299,12 +299,15 @@ export default function LoggedLayout({
                         size="md"
                         isOpen={isOpen} 
                         onClose={onClose}
-                        className="bg-gradient-to-b from-blueish-gray via-[#3f577c] to-blueish-gray"
+                        closeButton={
+                            <button style={{ right: '-100px' }} className='hidden'></button>
+                        }
+                        className="bg-gradient-to-b from-blueish-gray via-[#3f577c] to-blueish-gray overflow-x-hidden"
                     >
                         <ModalContent>
                         {(onClose) => (
                             <>
-                                <ModalHeader className="flex flex-col gap-1">Filter</ModalHeader>
+                                <ModalHeader className="flex flex-col gap-1 text-xl">Filter</ModalHeader>
                                 <ModalBody>
                                     <Select
                                         key="sort"
@@ -349,15 +352,19 @@ export default function LoggedLayout({
                     </Modal>
                 :
                     <Modal 
-                        size="full"
+                        size="md"
                         isOpen={isOpen} 
                         onClose={onClose}
-                        className="bg-gradient-to-b from-blueish-gray via-[#3f577c] to-blueish-gray"
+                        placement="top-center"
+                        closeButton={
+                            <button style={{ right: '-100px' }} className='hidden'></button>
+                        }
+                        className="bg-gradient-to-b from-blueish-gray via-[#3f577c] to-blueish-gray overflow-x-hidden"
                     >
                         <ModalContent>
                         {(onClose) => (
                             <>
-                                <ModalHeader className="flex flex-col gap-1">Filter</ModalHeader>
+                                <ModalHeader className="flex flex-col gap-1 text-xl">Filter</ModalHeader>
                                 <ModalBody>
                                     <Select
                                         key="sort"
