@@ -179,6 +179,10 @@ export default function LoggedLayout({
         }
     }
 
+    const handleClickChildren = () => {
+        setIsMenuOpen(false);
+    }
+
     return (
         <MediaContext.Provider value={{ page, setPage, currentApiPages, setCurrentApiPages, handleClickPrevPage, handleClickNextPage, sort, movies, setMovies, shows, setShows }}>
         <>
@@ -271,7 +275,7 @@ export default function LoggedLayout({
                 </div>
                 { (pathname === "/movies" || pathname === "/shows") ?
                     <>
-                        <div className="grow content-center my-4 2xl:overflow-hidden">
+                        <div onClick={handleClickChildren} className="grow content-center my-4 2xl:overflow-hidden">
                             {children}
                         </div>
                         <div className="h-6 flex justify-center">
