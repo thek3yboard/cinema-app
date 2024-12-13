@@ -293,58 +293,114 @@ export default function LoggedLayout({
                     </>
                 }
             </div>
-            <Modal 
-                size="full"
-                isOpen={isOpen} 
-                onClose={onClose}
-                className="bg-gradient-to-b from-blueish-gray via-[#3f577c] to-blueish-gray"
-            >
-                <ModalContent>
-                {(onClose) => (
-                    <>
-                        <ModalHeader className="flex flex-col gap-1">Filter</ModalHeader>
-                        <ModalBody>
-                            <Select
-                                key="sort"
-                                color="default"
-                                label="Sort by"
-                                placeholder={sort.label}
-                                className="sm:w-1/12"
-                                onChange={handleChangeSort}
-                            >
-                                {sortByOptions.map((option) => (
-                                <SelectItem key={option.key}>
-                                    {option.label}
-                                </SelectItem>
-                                ))}
-                            </Select>
-                            <Select
-                                key="order"
-                                color="default"
-                                label="Order by"
-                                placeholder={sort.order_label}
-                                className="sm:w-1/12"
-                                onChange={handleChangeOrder}
-                            >
-                                {orderOptions.map((option) => (
-                                <SelectItem key={option.key}>
-                                    {option.label}
-                                </SelectItem>
-                                ))}
-                            </Select>
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button color="success" onPress={handleSetFilters}>
-                                Apply
-                            </Button>
-                            <Button color="danger" onPress={onClose}>
-                                Close
-                            </Button>
-                        </ModalFooter>
-                    </>
-                )}
-                </ModalContent>
-            </Modal>
+            {(typeof window !== "undefined") && 
+                window.innerWidth >= 640 ?
+                    <Modal 
+                        size="md"
+                        isOpen={isOpen} 
+                        onClose={onClose}
+                        className="bg-gradient-to-b from-blueish-gray via-[#3f577c] to-blueish-gray"
+                    >
+                        <ModalContent>
+                        {(onClose) => (
+                            <>
+                                <ModalHeader className="flex flex-col gap-1">Filter</ModalHeader>
+                                <ModalBody>
+                                    <Select
+                                        key="sort"
+                                        color="default"
+                                        label="Sort by"
+                                        placeholder={sort.label}
+                                        className="w-full"
+                                        onChange={handleChangeSort}
+                                    >
+                                        {sortByOptions.map((option) => (
+                                        <SelectItem key={option.key}>
+                                            {option.label}
+                                        </SelectItem>
+                                        ))}
+                                    </Select>
+                                    <Select
+                                        key="order"
+                                        color="default"
+                                        label="Order by"
+                                        placeholder={sort.order_label}
+                                        className="w-full"
+                                        onChange={handleChangeOrder}
+                                    >
+                                        {orderOptions.map((option) => (
+                                        <SelectItem key={option.key}>
+                                            {option.label}
+                                        </SelectItem>
+                                        ))}
+                                    </Select>
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button color="success" onPress={handleSetFilters}>
+                                        Apply
+                                    </Button>
+                                    <Button color="danger" onPress={onClose}>
+                                        Close
+                                    </Button>
+                                </ModalFooter>
+                            </>
+                        )}
+                        </ModalContent>
+                    </Modal>
+                :
+                    <Modal 
+                        size="full"
+                        isOpen={isOpen} 
+                        onClose={onClose}
+                        className="bg-gradient-to-b from-blueish-gray via-[#3f577c] to-blueish-gray"
+                    >
+                        <ModalContent>
+                        {(onClose) => (
+                            <>
+                                <ModalHeader className="flex flex-col gap-1">Filter</ModalHeader>
+                                <ModalBody>
+                                    <Select
+                                        key="sort"
+                                        color="default"
+                                        label="Sort by"
+                                        placeholder={sort.label}
+                                        className="sm:w-1/12"
+                                        onChange={handleChangeSort}
+                                    >
+                                        {sortByOptions.map((option) => (
+                                        <SelectItem key={option.key}>
+                                            {option.label}
+                                        </SelectItem>
+                                        ))}
+                                    </Select>
+                                    <Select
+                                        key="order"
+                                        color="default"
+                                        label="Order by"
+                                        placeholder={sort.order_label}
+                                        className="sm:w-1/12"
+                                        onChange={handleChangeOrder}
+                                    >
+                                        {orderOptions.map((option) => (
+                                        <SelectItem key={option.key}>
+                                            {option.label}
+                                        </SelectItem>
+                                        ))}
+                                    </Select>
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button color="success" onPress={handleSetFilters}>
+                                        Apply
+                                    </Button>
+                                    <Button color="danger" onPress={onClose}>
+                                        Close
+                                    </Button>
+                                </ModalFooter>
+                            </>
+                        )}
+                        </ModalContent>
+                    </Modal>
+            }
         </>
         </MediaContext.Provider>
     );
