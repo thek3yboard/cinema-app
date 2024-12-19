@@ -13,11 +13,11 @@ type Props = {
 }
 
 export default function MediaUI({ mediaData }: Props) {
-    const [isImageLoaded, setIsImageLoaded] = useState(false)
-    const [inWatchlist, setInWatchlist] = useState(false)
-    const [isWatched, setIsWatched] = useState(false)
-    const [isFavorite, setIsFavorite] = useState(false)
-    const [userRating, setUserRating] = useState(0)
+    const [isImageLoaded, setIsImageLoaded] = useState<boolean>(false)
+    const [inWatchlist, setInWatchlist] = useState<boolean>(false)
+    const [isWatched, setIsWatched] = useState<boolean>(false)
+    const [isFavorite, setIsFavorite] = useState<boolean>(false)
+    const [userRating, setUserRating] = useState<number>(0)
     const pathname = usePathname();
 
     useEffect(() => {
