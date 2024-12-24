@@ -1,12 +1,12 @@
 import { Fragment, useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import Image from "next/image";
+import NextImage from "next/image";
 import Loading from "@/app/components/ui/Loading";
 import StarRating from "@/app/components/ui/StarRating";
 import { MovieData, ShowData, ProductionCompanies } from "@/types/types";
 import LiteYouTubeEmbed from "react-lite-youtube-embed"
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css"
-import { Heart, List, Eye, Star } from 'lucide-react';
+import { Heart, List, Eye } from 'lucide-react';
 
 type Props = {
     mediaData: MovieData | ShowData
@@ -19,6 +19,20 @@ export default function MediaUI({ mediaData }: Props) {
     const [isFavorite, setIsFavorite] = useState<boolean>(false)
     const [userRating, setUserRating] = useState<number>(0)
     const pathname = usePathname();
+    const [thumbnailHeight, setThumbnailHeight] = useState<number>(0);
+
+    const checkThumbnail = async () => {
+        const img = new Image();
+        img.src = `https://img.youtube.com/vi/${mediaData?.video_id}/maxresdefault.jpg`;
+    
+        img.onload = () => {
+            setThumbnailHeight(img.height);
+        };
+    };
+
+    useEffect(() => {
+        checkThumbnail();
+    }, []);
 
     useEffect(() => {
         if(pathname.includes('/movies')) {
@@ -88,7 +102,7 @@ export default function MediaUI({ mediaData }: Props) {
             <div className='flex flex-row justify-center'>
                 <div className="flex flex-col lg:items-center">
                     <div className="relative w-[100vw] h-[215px] sm:h-[360px] md:h-[450px] lg:h-[575px] xl:w-[1000px] xl:h-[560px] 2xl:w-[1300px] 2xl:h-[731px]">
-                        <Image 
+                        <NextImage 
                             onLoad={() => setIsImageLoaded(true)}
                             className={`z-0 media-img ${isImageLoaded === false && `hidden` }`}
                             priority={true}
@@ -160,7 +174,7 @@ export default function MediaUI({ mediaData }: Props) {
                                             aspectWidth={16}
                                             id={mediaData?.video_id ?? ''}
                                             title="Trailer"
-                                            poster="maxresdefault"
+                                            poster={thumbnailHeight <= 90 ? 'hqdefault' : 'maxresdefault'}
                                         />
                                     </div>
                                 </div>
@@ -169,7 +183,7 @@ export default function MediaUI({ mediaData }: Props) {
                                         return (
                                             pc.logo_path !== null && 
                                             <Fragment key={pc.id}>
-                                                <Image className="m-4 inline-block" priority={true} src={`https://image.tmdb.org/t/p/original${pc.logo_path}`} alt="Production Company" width={90} height={90} />
+                                                <NextImage className="m-4 inline-block" priority={true} src={`https://image.tmdb.org/t/p/original${pc.logo_path}`} alt="Production Company" width={90} height={90} />
                                             </Fragment>
                                         )
                                     })}
@@ -180,7 +194,7 @@ export default function MediaUI({ mediaData }: Props) {
                                     return (
                                         pc.logo_path !== null && 
                                         <Fragment key={pc.id}>
-                                            <Image className="m-4 inline-block h-fit" priority={true} src={`https://image.tmdb.org/t/p/original${pc.logo_path}`} alt="Production Company" width={70} height={70} />
+                                            <NextImage className="m-4 inline-block h-fit" priority={true} src={`https://image.tmdb.org/t/p/original${pc.logo_path}`} alt="Production Company" width={70} height={70} />
                                         </Fragment>
                                     )
                                 })}
