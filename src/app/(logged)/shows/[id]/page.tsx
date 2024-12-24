@@ -1,17 +1,19 @@
 "use client";
 
-import { useState, useEffect, Suspense, lazy } from 'react';
+import { useState, useEffect, Suspense, lazy, useContext } from 'react';
 import Loading from '@/app/components/ui/Loading';
 import { ShowData } from "@/types/types";
+import { MediaContext } from "@/app/(logged)/MediaContext";
 const MediaUI = lazy(() => import('@/app/components/MediaUI'));
 
 export default function Show({ params }: { params: { id: number } }) {
+    const { language } = useContext(MediaContext);
     const [showData, setShowData] = useState<ShowData>();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                let res = await fetch(`https://api.themoviedb.org/3/tv/${params.id}language=en-US&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
+                let res = await fetch(`https://api.themoviedb.org/3/tv/${params.id}?language=${language.key}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`

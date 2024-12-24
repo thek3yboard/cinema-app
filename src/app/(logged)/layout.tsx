@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useRef, createRef, ChangeEvent, ChangeEventHandler } from 'react';
-import { MediaContext, initialPage, initialCurrentApiPages, initialSort } from "@/app/(logged)/MediaContext";
-import { SortType, Movie, Show } from '@/types/types';
+import { useState, useRef, createRef, ChangeEvent, useEffect } from 'react';
+import { MediaContext, initialPage, initialCurrentApiPages, initialSort, initialLanguage } from "@/app/(logged)/MediaContext";
+import { SortType, Movie, Show, LanguageType } from '@/types/types';
 import { orderOptions, sortByOptions } from '@/assets/filtersData';
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, Sliders, AlignJustify, X } from 'lucide-react'
+/* import { US, ES } from 'country-flag-icons/react/3x2' */
+import { Search, Sliders, AlignJustify } from 'lucide-react'
 import { Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, 
     Navbar, NavbarBrand, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, NavbarContent, NavbarItem, Link, useDisclosure } from "@nextui-org/react";
+import LanguageSelect, { languageOptions } from '@/app/components/ui/LanguageSelect';
 import Image from "next/image";
 import logo from '@/assets/cinema.png';
 
@@ -21,6 +23,8 @@ export default function LoggedLayout({
     const [shows, setShows] = useState<Movie[]>([]);
     const [currentApiPages, setCurrentApiPages] = useState(initialCurrentApiPages);
     const [sort, setSort] = useState<SortType>(initialSort);
+    const [language, setLanguage] = useState(initialLanguage);
+    const [loading, setLoading] = useState<boolean>(true);
     const [search, setSearch] = useState<string>('');
     const sortRef = useRef(sort.key);
     const orderRef = useRef(sort.order_key);
@@ -29,6 +33,17 @@ export default function LoggedLayout({
     const pathname = usePathname();
     const {isOpen, onOpen, onClose} = useDisclosure();
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+
+    useEffect(() => {
+        const storedLanguageKey = localStorage.getItem('language_key');
+        const storedLanguageLabel = localStorage.getItem('language_label');
+
+        if (storedLanguageKey && storedLanguageLabel) {
+            setLanguage({ key: storedLanguageKey, label: storedLanguageLabel });
+        }
+
+        setLoading(false);
+    }, []);
 
     const navbarItems = [
         "Movies",
@@ -76,6 +91,23 @@ export default function LoggedLayout({
             setCurrentApiPages([currentApiPages[0]+2, currentApiPages[1]+2]);
             setPage(p => p + 1);
         }
+    }
+
+    const handleChangeLanguage = (e: ChangeEvent<HTMLSelectElement>) => {
+        const newLanguage = languageOptions.find(language => language.key === e.target.value)
+        setLanguage({ key: newLanguage!.key, label: newLanguage!.label })
+        localStorage.setItem('language_key', newLanguage!.key)
+        localStorage.setItem('language_label', newLanguage!.label)
+        
+        if(pathname.includes('/movies')) {
+            setMovies([]);
+            router.push('/movies');
+        } else {
+            setShows([]);
+            router.push('/shows');
+        }
+
+        setIsMenuOpen(false);
     }
 
     const handleChangeSort = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -129,17 +161,17 @@ export default function LoggedLayout({
 
             switch(pathname) {
                 case '/movies':
-                    URL = `https://api.themoviedb.org/3/search/movie?include_adult=false&include_video=false&language=en-US&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                    URL = `https://api.themoviedb.org/3/search/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                     break;
                 case '/shows':
-                    URL = `https://api.themoviedb.org/3/search/tv?include_adult=false&include_video=false&language=en-US&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                    URL = `https://api.themoviedb.org/3/search/tv?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                     break;
                 default:
                     if(pathname.includes('/movies')) {
-                        URL = `https://api.themoviedb.org/3/search/movie?include_adult=false&include_video=false&language=en-US&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                        URL = `https://api.themoviedb.org/3/search/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                         break;
                     } else {
-                        URL = `https://api.themoviedb.org/3/search/tv?include_adult=false&include_video=false&language=en-US&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                        URL = `https://api.themoviedb.org/3/search/tv?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                         break;
                     }
             }
@@ -184,7 +216,7 @@ export default function LoggedLayout({
     }
 
     return (
-        <MediaContext.Provider value={{ page, setPage, currentApiPages, setCurrentApiPages, handleClickPrevPage, handleClickNextPage, sort, movies, setMovies, shows, setShows }}>
+        <MediaContext.Provider value={{ page, setPage, currentApiPages, setCurrentApiPages, handleClickPrevPage, handleClickNextPage, sort, movies, setMovies, shows, setShows, language, setLanguage }}>
         <>
             <div ref={screenRef} className="h-screen flex flex-col overflow-y-auto bg-gradient-to-r from-[#192a49] from-1% via-[#3f577c] via-50% to-[#192a49] to-99%">
                 <div className="z-20 sticky top-0 border-b-2 border-slate-700">
@@ -242,6 +274,9 @@ export default function LoggedLayout({
                                     </Button>
                                 </div>
                             </NavbarMenuItem>
+                            <NavbarMenuItem>
+                                <LanguageSelect handleChangeLanguage={handleChangeLanguage} smallDevice={true} />
+                            </NavbarMenuItem>
                             {navbarItems.map((item, index) => (
                                 <NavbarMenuItem key={`${item}-${index}`}>
                                     {pathname.includes(item.toLowerCase()) ?
@@ -271,6 +306,7 @@ export default function LoggedLayout({
                         <button className='max-md:hidden' key="full" onClick={handleOpen}>
                             <Sliders className='max-h-6' />
                         </button>
+                        { !loading ? <LanguageSelect handleChangeLanguage={handleChangeLanguage} smallDevice={false} /> : <div className='max-md:hidden w-48'></div> }
                     </Navbar>
                 </div>
                 { (pathname === "/movies" || pathname === "/shows") ?

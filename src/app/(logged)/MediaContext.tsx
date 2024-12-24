@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { SortType, Movie, Show } from "@/types/types";
+import { SortType, Movie, Show, LanguageType } from "@/types/types";
 import { sortByOptions, orderOptions } from "@/assets/filtersData";
 
 type MediaContextType = {
@@ -14,6 +14,8 @@ type MediaContextType = {
     setMovies: React.Dispatch<React.SetStateAction<Movie[]>>,
     shows: Show[],
     setShows: React.Dispatch<React.SetStateAction<Show[]>>,
+    language: LanguageType,
+    setLanguage: React.Dispatch<React.SetStateAction<LanguageType>>,
 };
 
 export const initialPage = 1, initialCurrentApiPages = [1,2];
@@ -24,6 +26,11 @@ export const initialSort = {
     order_key: orderOptions[0].key,
     order_label: orderOptions[0].label
 };
+
+export const initialLanguage = {
+    key: 'en_US',
+    label: 'English'
+}
 
 export const MediaContext = createContext<MediaContextType>({
     page: initialPage,
@@ -36,5 +43,7 @@ export const MediaContext = createContext<MediaContextType>({
     movies: [],
     setMovies: () => void {},
     shows: [],
-    setShows: () => void {}
+    setShows: () => void {},
+    language: initialLanguage,
+    setLanguage: () => void {},
 });

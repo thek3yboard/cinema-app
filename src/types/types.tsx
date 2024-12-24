@@ -50,3 +50,8 @@ export type SortType = {
     order_key: string,
     order_label: string
 }
+
+export type LanguageType = {
+    key: string,
+    label: string
+}
