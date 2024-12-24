@@ -28,7 +28,7 @@ export const initialSort = {
 };
 
 export const initialLanguage = {
-    key: 'en_US',
+    key: 'en-US',
     label: 'English'
 }
 
