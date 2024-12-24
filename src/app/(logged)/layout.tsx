@@ -5,7 +5,6 @@ import { MediaContext, initialPage, initialCurrentApiPages, initialSort, initial
 import { SortType, Movie, Show, LanguageType } from '@/types/types';
 import { orderOptions, sortByOptions } from '@/assets/filtersData';
 import { usePathname, useRouter } from 'next/navigation';
-/* import { US, ES } from 'country-flag-icons/react/3x2' */
 import { Search, Sliders, AlignJustify } from 'lucide-react'
 import { Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, 
     Navbar, NavbarBrand, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, NavbarContent, NavbarItem, Link, useDisclosure } from "@nextui-org/react";
@@ -57,6 +56,7 @@ export default function LoggedLayout({
     const handleClickPrevPage = () => {
         setMovies([]);
         setShows([]);
+        setSearch('');
         if(currentApiPages[0] === 1) {
             return;
         }
@@ -78,6 +78,7 @@ export default function LoggedLayout({
     const handleClickNextPage = () => {
         setMovies([]);
         setShows([]);
+        setSearch('');
         screenRef.current!.scroll({
             top: 0,
             behavior: "smooth"
@@ -107,6 +108,7 @@ export default function LoggedLayout({
             router.push('/shows');
         }
 
+        setSearch('');
         setIsMenuOpen(false);
     }
 
@@ -120,6 +122,7 @@ export default function LoggedLayout({
 
     const handleSetFilters = () => {
         setIsMenuOpen(false);
+        setSearch('');
 
         const selectedOrder = orderOptions.find((option) => option.key === orderRef.current)!;
         const selectedSort = sortByOptions.find((option) => option.key === sortRef.current)!;
@@ -264,7 +267,7 @@ export default function LoggedLayout({
                             <NavbarMenuItem>
                                 <div className='md:hidden w-full flex justify-between'>
                                     <span className="flex items-center rounded-l-sm w-full h-10 bg-blueish-gray">
-                                        <input type='text' onChange={(e) => handleChangeSearch(e)} onKeyDown={(e) => handleKeydownSearch(e)} className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray' />
+                                        <input type='text' value={search} onChange={(e) => handleChangeSearch(e)} onKeyDown={(e) => handleKeydownSearch(e)} className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray' />
                                         <button className='bg-lapis-lazuli ml-[1px] h-full rounded-r-sm' onClick={handleClickSearch}>
                                             <Search className='mx-2 max-h-6' />
                                         </button>
@@ -298,7 +301,7 @@ export default function LoggedLayout({
                             ))}
                         </NavbarMenu>
                         <span className="max-md:hidden flex items-center w-2/3 h-10 bg-blueish-gray rounded-[3px]">
-                            <input type='text' onChange={(e) => handleChangeSearch(e)} onKeyDown={(e) => handleKeydownSearch(e)} className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray' />
+                            <input type='text' value={search} onChange={(e) => handleChangeSearch(e)} onKeyDown={(e) => handleKeydownSearch(e)} className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray' />
                             <button onClick={handleClickSearch}>
                                 <Search className='mx-2 max-h-6' />
                             </button>
