@@ -18,9 +18,18 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [] 
     const [imagesLoaded, setImagesLoaded] = useState(false);
     const countLoadedImages = useRef(0);
     const { page, currentApiPages, sort, handleClickPrevPage, handleClickNextPage, movies, setMovies,
-    shows, setShows, language } = useContext(MediaContext);
+    shows, setShows, language, setLanguage } = useContext(MediaContext);
     const router = useRouter();
     const pathname = usePathname();
+
+    useEffect(() => {
+        const storedLanguageKey = localStorage.getItem('language_key');
+        const storedLanguageLabel = localStorage.getItem('language_label');
+
+        if (storedLanguageKey && storedLanguageLabel) {
+            setLanguage({ key: storedLanguageKey, label: storedLanguageLabel });
+        }
+    }, [])
 
     useEffect(() => {
         setImagesLoaded(false);
@@ -38,86 +47,88 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [] 
 
         let firstAPIURL = '', secondAPIURL = '';
 
-        switch(sort.key) {
-            case 'vote_average':
-                if(type === 'shows') {
-                    firstAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&without_genres=99,10755&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
-                    secondAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&without_genres=99,10755&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
-                } else {
-                    firstAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&without_genres=99,10755&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                    secondAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&without_genres=99,10755&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                }
-                break;
-            case 'now_playing':
-                const endDate = new Date();
-                let startDate = new Date();
-                startDate.setDate(endDate.getDate() - 21);
-                if(type === 'shows') {
-                    firstAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=popularity.${sort.order_key}&with_release_type=2|3&release_date.gte=${startDate}&release_date.lte=${endDate}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
-                    secondAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=popularity.${sort.order_key}&with_release_type=2|3&release_date.gte=${startDate}&release_date.lte=${endDate}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
-                } else {
-                    firstAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=popularity.${sort.order_key}&with_release_type=2|3&release_date.gte=${startDate}&release_date.lte=${endDate}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                    secondAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=popularity.${sort.order_key}&with_release_type=2|3&release_date.gte=${startDate}&release_date.lte=${endDate}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                }
-                break;
-            default:
-                if(type === 'shows') {
-                    firstAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
-                    secondAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
-                } else {
-                    firstAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                    secondAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                }
-                break;
-        }
-
-        const fetchFirstPage = async () => {
-            try {
-                let res = await fetch(firstAPIURL, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
+        if(language.key === localStorage.getItem('language_key')) {
+            switch(sort.key) {
+                case 'vote_average':
+                    if(type === 'shows') {
+                        firstAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&without_genres=99,10755&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+                        secondAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&without_genres=99,10755&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+                    } else {
+                        firstAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&without_genres=99,10755&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                        secondAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&without_genres=99,10755&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                     }
-                });
-                
-                const data = await res.json();
-                
-                return data.results;
-            } catch (error) {
-                console.error(error)
-            }
-        }
-
-        const fetchSecondPage = async () => {
-            try {
-                let res = await fetch(secondAPIURL, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
+                    break;
+                case 'now_playing':
+                    const endDate = new Date();
+                    let startDate = new Date();
+                    startDate.setDate(endDate.getDate() - 21);
+                    if(type === 'shows') {
+                        firstAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=popularity.${sort.order_key}&with_release_type=2|3&release_date.gte=${startDate}&release_date.lte=${endDate}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+                        secondAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=popularity.${sort.order_key}&with_release_type=2|3&release_date.gte=${startDate}&release_date.lte=${endDate}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+                    } else {
+                        firstAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=popularity.${sort.order_key}&with_release_type=2|3&release_date.gte=${startDate}&release_date.lte=${endDate}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                        secondAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=popularity.${sort.order_key}&with_release_type=2|3&release_date.gte=${startDate}&release_date.lte=${endDate}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                     }
-                });
-                
-                const data = await res.json();
-                
-                return data.results;
-            } catch (error) {
-                console.error(error)
+                    break;
+                default:
+                    if(type === 'shows') {
+                        firstAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+                        secondAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+                    } else {
+                        firstAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                        secondAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                    }
+                    break;
             }
+    
+            const fetchFirstPage = async () => {
+                try {
+                    let res = await fetch(firstAPIURL, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
+                        }
+                    });
+                    
+                    const data = await res.json();
+                    
+                    return data.results;
+                } catch (error) {
+                    console.error(error)
+                }
+            }
+    
+            const fetchSecondPage = async () => {
+                try {
+                    let res = await fetch(secondAPIURL, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
+                        }
+                    });
+                    
+                    const data = await res.json();
+                    
+                    return data.results;
+                } catch (error) {
+                    console.error(error)
+                }
+            }
+            
+            const fetchBoth = async () => {
+                const firstBatchMedia = await fetchFirstPage();
+                const secondBatchMedia = await fetchSecondPage();
+                const allMediaPage = [...firstBatchMedia, ...secondBatchMedia];
+    
+                if(type === 'movies')
+                    setMovies(allMediaPage);
+                else {
+                    setShows(allMediaPage);
+                }
+            };
+            
+            fetchBoth();
         }
-        
-        const fetchBoth = async () => {
-            const firstBatchMedia = await fetchFirstPage();
-            const secondBatchMedia = await fetchSecondPage();
-            const allMediaPage = [...firstBatchMedia, ...secondBatchMedia];
-
-            if(type === 'movies')
-                setMovies(allMediaPage);
-            else {
-                setShows(allMediaPage);
-            }
-        };
-        
-        fetchBoth();
     }, [currentApiPages, sort, type, language]);
 
     const handleClickMediaImage = (media: Movie | Show): void => {
