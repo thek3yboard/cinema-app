@@ -60,38 +60,16 @@ export default function LoggedLayout({
         if(currentApiPages[0] === 1) {
             return;
         }
-        screenRef.current!.scroll({
-            top: 0,
-            behavior: "smooth"
-        });
-        if(screenRef.current!.scrollTop !== 0) {
-            setTimeout(() => {
-            setCurrentApiPages([currentApiPages[0]-2, currentApiPages[1]-2]);
-            setPage(p => p - 1);
-            }, 1000);
-        } else {
-            setCurrentApiPages([currentApiPages[0]-2, currentApiPages[1]-2]);
-            setPage(p => p - 1);
-        }
+        setCurrentApiPages([currentApiPages[0]-2, currentApiPages[1]-2]);
+        setPage(p => p - 1);
     }
 
     const handleClickNextPage = () => {
         setMovies([]);
         setShows([]);
         setSearch('');
-        screenRef.current!.scroll({
-            top: 0,
-            behavior: "smooth"
-        });
-        if(screenRef.current!.scrollTop !== 0) {
-            setTimeout(() => {
-            setCurrentApiPages([currentApiPages[0]+2, currentApiPages[1]+2]);
-            setPage(p => p + 1);
-            }, 1000);
-        } else {
-            setCurrentApiPages([currentApiPages[0]+2, currentApiPages[1]+2]);
-            setPage(p => p + 1);
-        }
+        setCurrentApiPages([currentApiPages[0]+2, currentApiPages[1]+2]);
+        setPage(p => p + 1);
     }
 
     const handleChangeLanguage = (e: ChangeEvent<HTMLSelectElement>) => {
