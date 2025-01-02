@@ -296,7 +296,7 @@ export default function LoggedLayout({
                             {children}
                         </div>
                         <div className="h-6 flex justify-center">
-                            <footer className="h-6 text-nyanza">Copyright © 2024 Juan Ignacio Leiva</footer>
+                            <footer className="h-6 text-nyanza">Copyright © {new Date().getFullYear()} Juan Ignacio Leiva</footer>
                         </div>
                     </>
                 :
@@ -305,7 +305,7 @@ export default function LoggedLayout({
                             {children}
                         </div>
                         <div className="flex h-6 justify-center">
-                            <footer className="h-6 text-nyanza">Copyright © 2024 Juan Ignacio Leiva</footer>
+                            <footer className="h-6 text-nyanza">Copyright © {new Date().getFullYear()} Juan Ignacio Leiva</footer>
                         </div> 
                     </>
                 }
