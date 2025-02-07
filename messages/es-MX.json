@@ -23,5 +23,15 @@
 
     "PageNotFound": {
         "errorMessage": "¡Ups! Página no encontrada."
+    },
+    
+    "MediaUI": {
+        "yourRating": "Tu puntaje",
+        "addToWatchlist": "Agregar a ver más tarde",
+        "removeFromWatchlist": "Quitar de ver más tarde",
+        "markAsWatched": "Marcar como vista",
+        "markAsUnwatched": "Marcar como no vista",
+        "addToFavorites": "Agregar a favoritos",
+        "removeFromFavorites": "Quitar de favoritos"
     }
 }

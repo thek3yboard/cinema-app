@@ -7,12 +7,14 @@ import { MovieData, ShowData, ProductionCompanies } from "@/types/types";
 import LiteYouTubeEmbed from "react-lite-youtube-embed"
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css"
 import { Heart, List, Eye } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 type Props = {
     mediaData: MovieData | ShowData
 }
 
 export default function MediaUI({ mediaData }: Props) {
+    const t = useTranslations('MediaUI');
     const [isImageLoaded, setIsImageLoaded] = useState<boolean>(false)
     const [inWatchlist, setInWatchlist] = useState<boolean>(false)
     const [isWatched, setIsWatched] = useState<boolean>(false)
@@ -123,42 +125,42 @@ export default function MediaUI({ mediaData }: Props) {
                                     <StarRating rating={mediaData?.vote_average} maxRating={10} />
                                     <div className="flex items-center justify-end max-md:justify-start md:gap-4 max-md:w-full">
                                         <div className='w-fit flex items-center md:gap-4 bg-slate-500 p-2 rounded-md max-md:mt-4'>
-                                            <p className="text-sm w-min max-md:hidden font-medium text-white">Your Rating:</p>
+                                            <p className="text-sm w-min max-md:hidden font-medium text-white">{t('yourRating')}:</p>
                                             <StarRating rating={userRating} maxRating={10} onChange={handleRating} />
                                             <div className="relative group max-md:ml-2 max-md:mr-2">
                                                 <button 
                                                 className={`p-2 rounded-full ${inWatchlist ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
                                                 onClick={toggleWatchlist}
-                                                aria-label={inWatchlist ? "Remove from watchlist" : "Add to watchlist"}
+                                                aria-label={inWatchlist ? `${t('removeFromWatchlist')}` : `${t('addToWatchlist')}`}
                                                 >
                                                 <List className="w-5 h-5" />
                                                 </button>
                                                 <span className="absolute bottom-[115%] left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                                {inWatchlist ? "Remove from watchlist" : "Add to watchlist"}
+                                                {inWatchlist ? `${t('removeFromWatchlist')}` : `${t('addToWatchlist')}`}
                                                 </span>
                                             </div>
                                             <div className="relative group max-md:mr-2">
                                                 <button 
                                                 className={`p-2 rounded-full ${isWatched ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}
                                                 onClick={toggleWatched}
-                                                aria-label={isWatched ? "Mark as unwatched" : "Mark as watched"}
+                                                aria-label={isWatched ? `${t('markAsUnwatched')}` : `${t('markAsWatched')}`}
                                                 >
                                                 <Eye className="w-5 h-5" />
                                                 </button>
                                                 <span className="absolute bottom-[115%] left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                                {isWatched ? "Mark as unwatched" : "Mark as watched"}
+                                                {isWatched ? `${t('markAsUnwatched')}` : `${t('markAsWatched')}`}
                                                 </span>
                                             </div>
                                             <div className="relative group max-md:mr-2">
                                                 <button 
                                                 className={`p-2 rounded-full ${isFavorite ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'}`}
                                                 onClick={toggleFavorite}
-                                                aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                                                aria-label={isFavorite ? `${t('removeFromFavorites')}` : `${t('addToFavorites')}`}
                                                 >
                                                 <Heart className="w-5 h-5" fill={isFavorite ? "currentColor" : "none"} />
                                                 </button>
                                                 <span className="absolute bottom-[115%] left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                                {isFavorite ? "Remove from favorites" : "Add to favorites"}
+                                                {isFavorite ? `${t('removeFromFavorites')}` : `${t('addToFavorites')}`}
                                                 </span>
                                             </div>
                                         </div>

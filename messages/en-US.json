@@ -23,5 +23,15 @@
     
     "PageNotFound": {
         "errorMessage": "Oops! Page not found."
+    },
+
+    "MediaUI": {
+        "yourRating": "Your rating",
+        "addToWatchlist": "Add to watchlist",
+        "removeFromWatchlist": "Remove from watchlist",
+        "markAsWatched": "Mark as watched",
+        "markAsUnwatched": "Mark as unwatched",
+        "addToFavorites": "Add to favorites",
+        "removeFromFavorites": "Remove from favorites"
     }
 }
