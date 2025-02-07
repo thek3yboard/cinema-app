@@ -1,0 +1,27 @@
+{
+    "LoggedLayout": {
+        "movies": "Películas",
+        "shows": "Series",
+        "filter": "Filtrar",
+        "sortBy": "Filtrar por",
+        "orderBy": "Ordenar por",
+        "popularity": "Popularidad",
+        "topRated": "Mejor Valoradas",
+        "nowPlaying": "En Cines",
+        "revenue": "Éxito en Taquilla",
+        "ascending": "Ascendente",
+        "descending": "Descendente",
+        "apply": "Aplicar",
+        "close": "Cerrar"
+    },
+    
+    "Language": {
+        "language": "Idioma",
+        "English": "Inglés",
+        "Spanish": "Español"
+    },
+
+    "PageNotFound": {
+        "errorMessage": "¡Ups! Página no encontrada."
+    }
+}

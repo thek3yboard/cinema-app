@@ -1,27 +1,41 @@
 "use client";
 
 import { useState, useRef, createRef, ChangeEvent, useEffect } from 'react';
-import { MediaContext, initialPage, initialCurrentApiPages, initialSort, initialLanguage } from "@/app/(logged)/MediaContext";
+import { MediaContext, initialPage, initialCurrentApiPages, initialSort, initialLanguage } from "../(logged)/MediaContext";
 import { SortType, Movie, Show, LanguageType } from '@/types/types';
 import { orderOptions, sortByOptions } from '@/assets/filtersData';
 import { usePathname, useRouter } from 'next/navigation';
 import { Search, Sliders, AlignJustify } from 'lucide-react'
 import { Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, 
     Navbar, NavbarBrand, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, NavbarContent, NavbarItem, Link, useDisclosure } from "@nextui-org/react";
-import LanguageSelect, { languageOptions } from '@/app/components/ui/LanguageSelect';
+import LanguageSelect, { languageOptions } from '../components/ui/LanguageSelect';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import Image from "next/image";
 import logo from '@/assets/cinema.png';
+
+type NavbarItems = {
+    key: string,
+    value: string
+}
 
 export default function LoggedLayout({
     children,
   }: Readonly<{
     children: React.ReactNode;
   }>) {
+    const t = useTranslations('LoggedLayout');
+    const locale = useLocale();
     const [page, setPage] = useState(initialPage);
     const [movies, setMovies] = useState<Movie[]>([]);
     const [shows, setShows] = useState<Movie[]>([]);
     const [currentApiPages, setCurrentApiPages] = useState(initialCurrentApiPages);
-    const [sort, setSort] = useState<SortType>(initialSort);
+    const [sort, setSort] = useState<SortType>({
+        key: initialSort.key,
+        label: t(`${initialSort.label}`),
+        order_key: initialSort.order_key,
+        order_label: t(`${initialSort.order_label}`)
+    });
     const [language, setLanguage] = useState(initialLanguage);
     const [loading, setLoading] = useState<boolean>(true);
     const [search, setSearch] = useState<string>('');
@@ -34,6 +48,16 @@ export default function LoggedLayout({
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
     useEffect(() => {
+        if(locale !== localStorage.getItem('language_key')) {
+            localStorage.setItem('language_key', locale)
+            switch(locale) {
+                case 'en-US':
+                    localStorage.setItem('language_label', 'English')
+                    break
+                default: 
+                    localStorage.setItem('language_label', 'Spanish')
+            }
+        }
         const storedLanguageKey = localStorage.getItem('language_key');
         const storedLanguageLabel = localStorage.getItem('language_label');
 
@@ -44,9 +68,15 @@ export default function LoggedLayout({
         setLoading(false);
     }, []);
 
-    const navbarItems = [
-        "Movies",
-        "Shows",
+    const navbarItems: NavbarItems[] = [
+        {
+            key: 'movies',
+            value: `${t('movies')}`
+        },
+        {
+            key: 'shows',
+            value: `${t('shows')}`
+        }
     ];
 
     const handleMenuToggle = () => {
@@ -77,13 +107,17 @@ export default function LoggedLayout({
         setLanguage({ key: newLanguage!.key, label: newLanguage!.label })
         localStorage.setItem('language_key', newLanguage!.key)
         localStorage.setItem('language_label', newLanguage!.label)
+
+        let newPathname = `/${newLanguage!.key}`;
         
         if(pathname.includes('/movies')) {
             setMovies([]);
-            router.push('/movies');
+            newPathname = `${newPathname}/movies`;
+            router.push(`${newPathname}`);
         } else {
             setShows([]);
-            router.push('/shows');
+            newPathname = `${newPathname}/shows`;
+            router.push(`${newPathname}`);
         }
 
         setSearch('');
@@ -104,8 +138,8 @@ export default function LoggedLayout({
 
         const selectedOrder = orderOptions.find((option) => option.key === orderRef.current)!;
         const selectedSort = sortByOptions.find((option) => option.key === sortRef.current)!;
-        setSort({ ...sort, key: selectedSort.key, label: selectedSort.label,
-            order_key: selectedOrder.key, order_label: selectedOrder.label
+        setSort({ ...sort, key: selectedSort.key, label: t(`${selectedSort.label}`),
+            order_key: selectedOrder.key, order_label: t(`${selectedOrder.label}`)
         });
         setCurrentApiPages(initialCurrentApiPages);
         setPage(initialPage);
@@ -113,10 +147,10 @@ export default function LoggedLayout({
 
         if(pathname.includes('/movies')) {
             setMovies([]);
-            router.push('/movies');
+            router.push(`/${pathname.split('/')[1]}/movies`);
         } else {
             setShows([]);
-            router.push('/shows');
+            router.push(`/${pathname.split('/')[1]}/shows`);
         }
     }
 
@@ -175,7 +209,7 @@ export default function LoggedLayout({
                 
                 setMovies(filteredMovies);
 
-                router.push('/movies');
+                router.push(`/${pathname.split('/')[1]}/movies`);
             } else {
                 const shows = data.results;
 
@@ -185,7 +219,7 @@ export default function LoggedLayout({
                 
                 setShows(filteredShows);
 
-                router.push('/shows');
+                router.push(`/${pathname.split('/')[1]}/shows`);
             }
         } catch (error) {
             console.error(error)
@@ -222,20 +256,20 @@ export default function LoggedLayout({
                                 <Image className='min-w-36 mb-2' src={logo} alt="Logo" width={144} />
                             </NavbarBrand>
                             {navbarItems.map((item, index) => (
-                                <NavbarItem key={`${item}-${index}`}>
-                                    {pathname.includes(item.toLowerCase()) ?
+                                <NavbarItem key={`${item.key}-${index}`}>
+                                    {pathname.includes(item.key.toLowerCase()) ?
                                         <Link
                                             className="text-orange-400 text-xl font-semibold"
-                                            href={`/${item.toLowerCase()}`}
+                                            href={`/${pathname.split('/')[1]}/${item.key.toLowerCase()}`}
                                         >
-                                            {item}
+                                            {item.value}
                                         </Link>
                                         :
                                         <Link
                                             className="text-nyanza text-xl font-semibold"
-                                            href={`/${item.toLowerCase()}`}
+                                            href={`/${pathname.split('/')[1]}/${item.key.toLowerCase()}`}
                                         >
-                                            {item}
+                                            {item.value}
                                         </Link>
                                     }
                                 </NavbarItem>
@@ -260,19 +294,19 @@ export default function LoggedLayout({
                             </NavbarMenuItem>
                             {navbarItems.map((item, index) => (
                                 <NavbarMenuItem key={`${item}-${index}`}>
-                                    {pathname.includes(item.toLowerCase()) ?
+                                    {pathname.includes(item.key.toLowerCase()) ?
                                         <Link
                                             className="text-orange-400 text-xl font-semibold"
-                                            href={`/${item.toLowerCase()}`}
+                                            href={`/${pathname.split('/')[1]}/${item.key.toLowerCase()}`}
                                         >
-                                            {item}
+                                            {item.value}
                                         </Link>
                                         :
                                         <Link
                                             className="text-nyanza text-xl font-semibold"
-                                            href={`/${item.toLowerCase()}`}
+                                            href={`/${pathname.split('/')[1]}/${item.key.toLowerCase()}`}
                                         >
-                                            {item}
+                                            {item.value}
                                         </Link>
                                     }
                                 </NavbarMenuItem>
@@ -290,7 +324,7 @@ export default function LoggedLayout({
                         { !loading ? <LanguageSelect handleChangeLanguage={handleChangeLanguage} smallDevice={false} /> : <div className='max-md:hidden w-48'></div> }
                     </Navbar>
                 </div>
-                { (pathname === "/movies" || pathname === "/shows") ?
+                { (pathname === `/${pathname.split('/')[1]}/movies` || pathname === `/${pathname.split('/')[1]}/shows`) ?
                     <>
                         <div onClick={handleClickChildren} className="grow content-center my-4 2xl:overflow-hidden">
                             {children}
@@ -324,43 +358,43 @@ export default function LoggedLayout({
                         <ModalContent>
                         {(onClose) => (
                             <>
-                                <ModalHeader className="flex flex-col gap-1 text-xl">Filter</ModalHeader>
+                                <ModalHeader className="flex flex-col gap-1 text-xl">{t('filter')}</ModalHeader>
                                 <ModalBody>
                                     <Select
                                         key="sort"
                                         color="default"
-                                        label="Sort by"
+                                        label={t('sortBy')}
                                         placeholder={sort.label}
                                         className="w-full"
                                         onChange={handleChangeSort}
                                     >
                                         {sortByOptions.map((option) => (
                                         <SelectItem key={option.key}>
-                                            {option.label}
+                                            {t(`${option.label}`)}
                                         </SelectItem>
                                         ))}
                                     </Select>
                                     <Select
                                         key="order"
                                         color="default"
-                                        label="Order by"
+                                        label={t('orderBy')}
                                         placeholder={sort.order_label}
                                         className="w-full"
                                         onChange={handleChangeOrder}
                                     >
                                         {orderOptions.map((option) => (
                                         <SelectItem key={option.key}>
-                                            {option.label}
+                                            {t(`${option.label}`)}
                                         </SelectItem>
                                         ))}
                                     </Select>
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button color="success" onPress={handleSetFilters}>
-                                        Apply
+                                        {t('apply')}
                                     </Button>
                                     <Button color="danger" onPress={onClose}>
-                                        Close
+                                        {t('close')}
                                     </Button>
                                 </ModalFooter>
                             </>
@@ -381,43 +415,43 @@ export default function LoggedLayout({
                         <ModalContent>
                         {(onClose) => (
                             <>
-                                <ModalHeader className="flex flex-col gap-1 text-xl">Filter</ModalHeader>
+                                <ModalHeader className="flex flex-col gap-1 text-xl">{t('filter')}</ModalHeader>
                                 <ModalBody>
                                     <Select
                                         key="sort"
                                         color="default"
-                                        label="Sort by"
+                                        label={t('sortBy')}
                                         placeholder={sort.label}
                                         className="sm:w-1/12"
                                         onChange={handleChangeSort}
                                     >
                                         {sortByOptions.map((option) => (
                                         <SelectItem key={option.key}>
-                                            {option.label}
+                                            {t(`${option.label}`)}
                                         </SelectItem>
                                         ))}
                                     </Select>
                                     <Select
                                         key="order"
                                         color="default"
-                                        label="Order by"
+                                        label={t('orderBy')}
                                         placeholder={sort.order_label}
                                         className="sm:w-1/12"
                                         onChange={handleChangeOrder}
                                     >
                                         {orderOptions.map((option) => (
                                         <SelectItem key={option.key}>
-                                            {option.label}
+                                            {t(`${option.label}`)}
                                         </SelectItem>
                                         ))}
                                     </Select>
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button color="success" onPress={handleSetFilters}>
-                                        Apply
+                                        {t('apply')}
                                     </Button>
                                     <Button color="danger" onPress={onClose}>
-                                        Close
+                                        {t('close')}
                                     </Button>
                                 </ModalFooter>
                             </>

@@ -1,8 +1,8 @@
 import { Fragment, useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import NextImage from "next/image";
-import Loading from "@/app/components/ui/Loading";
-import StarRating from "@/app/components/ui/StarRating";
+import Loading from "../components/ui/Loading";
+import StarRating from "../components/ui/StarRating";
 import { MovieData, ShowData, ProductionCompanies } from "@/types/types";
 import LiteYouTubeEmbed from "react-lite-youtube-embed"
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css"

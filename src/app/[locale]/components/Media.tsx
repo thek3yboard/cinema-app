@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useContext, useRef, lazy } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { MediaContext } from "@/app/(logged)/MediaContext";
+import { MediaContext } from "../(logged)/MediaContext";
 import { Movie, Show } from "@/types/types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-const MediaGrid = lazy(() => import('@/app/components/MediaGrid'));
+const MediaGrid = lazy(() => import('../components/MediaGrid'));
 
 type Media = {
     type: string,
@@ -132,10 +132,10 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [] 
     }, [currentApiPages, sort, type, language]);
 
     const handleClickMediaImage = (media: Movie | Show): void => {
-        if(pathname === '/movies') {
-            router.push(`/movies/${media.id}`);
+        if(pathname === `/${pathname.split('/')[1]}/movies`) {
+            router.push(`/${pathname.split('/')[1]}/movies/${media.id}`);
         } else {
-            router.push(`/shows/${media.id}`);
+            router.push(`/${pathname.split('/')[1]}/shows/${media.id}`);
         }
     }
 
@@ -162,13 +162,13 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [] 
             <div>
                 <div className='flex flex-row'>
                     <div className='max-xl:hidden content-center'>
-                        { pathname === '/movies' ?
+                        { pathname === `/${pathname.split('/')[1]}/movies` ?
                             (imagesLoaded && movies.length === 40) && <PrevPageButton />
                         :
                             (imagesLoaded && shows.length === 40) && <PrevPageButton />
                         }
                     </div>
-                    { pathname === '/movies' ?
+                    { pathname === `/${pathname.split('/')[1]}/movies` ?
                         <div className={`mx-4 grid ${movies.length !== 1 ? `media-grid-columns` : `grid-cols-1`} gap-5 xl:gap-3 justify-items-center justify-center`}>
                             <MediaGrid media={movies} handleClickMediaImage={handleClickMediaImage} imagesLoaded={imagesLoaded} setImagesLoaded={setImagesLoaded} countLoadedImages={countLoadedImages} />
                         </div>
@@ -178,7 +178,7 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [] 
                         </div>
                     }
                     <div className='max-xl:hidden content-center'>
-                        { pathname === '/movies' ?
+                        { pathname === `/${pathname.split('/')[1]}/movies` ?
                             (imagesLoaded && movies.length === 40) && <NextPageButton />
                         :
                             (imagesLoaded && shows.length === 40) && <NextPageButton />
@@ -186,7 +186,7 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [] 
                     </div>
                 </div>
                 <div className='flex xl:hidden mt-4 justify-center'>
-                    { pathname === '/movies' ?
+                    { pathname === `/${pathname.split('/')[1]}/movies` ?
                         (imagesLoaded && movies.length === 40) && 
                         <>
                             <div className='w-full flex items-center mx-8'>

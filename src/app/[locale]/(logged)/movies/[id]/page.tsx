@@ -1,19 +1,19 @@
 "use client";
 
 import { useState, useEffect, Suspense, lazy, useContext } from 'react';
-import Loading from '@/app/components/ui/Loading';
-import { ShowData } from "@/types/types";
-import { MediaContext } from "@/app/(logged)/MediaContext";
-const MediaUI = lazy(() => import('@/app/components/MediaUI'));
+import Loading from '../../../components/ui/Loading';
+import { MovieData } from "@/types/types";
+import { MediaContext } from "../../../(logged)/MediaContext";
+const MediaUI = lazy(() => import('../../../components/MediaUI'));
 
-export default function Show({ params }: { params: { id: number } }) {
+export default function Movie({ params }: { params: { id: number } }) {
     const { language } = useContext(MediaContext);
-    const [showData, setShowData] = useState<ShowData>();
+    const [movieData, setMovieData] = useState<MovieData>();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                let res = await fetch(`https://api.themoviedb.org/3/tv/${params.id}?language=${language.key}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
+                let res = await fetch(`https://api.themoviedb.org/3/movie/${params.id}?language=${language.key}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
@@ -22,7 +22,7 @@ export default function Show({ params }: { params: { id: number } }) {
                 
                 let data = await res.json();
 
-                res = await fetch(`https://api.themoviedb.org/3/tv/${params.id}/videos?language=en-US&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
+                res = await fetch(`https://api.themoviedb.org/3/movie/${params.id}/videos?language=en-US&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
@@ -42,7 +42,7 @@ export default function Show({ params }: { params: { id: number } }) {
                     data = { ...data, video_id: video.results[0].key }
                 }
 
-                setShowData(data);
+                setMovieData(data);
             } catch (error) {
                 console.error(error)
             }
@@ -53,7 +53,7 @@ export default function Show({ params }: { params: { id: number } }) {
 
     return (
         <Suspense key={params!.id} fallback={<Loading/>}>
-            <MediaUI mediaData={showData!} />
+            <MediaUI mediaData={movieData!} />
         </Suspense>
     );
 }

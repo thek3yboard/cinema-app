@@ -1,7 +1,7 @@
 "use client"
 
 import { useContext } from "react";
-import Media from "@/app/components/Media";
+import Media from "../../components/Media";
 import { MediaContext } from "../MediaContext";
 
 export default function Movies() {

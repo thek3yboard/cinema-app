@@ -1,0 +1,27 @@
+{
+    "LoggedLayout": {
+        "movies": "Movies",
+        "shows": "Shows",
+        "filter": "Filter",
+        "sortBy": "Sort by",
+        "orderBy": "Order by",
+        "popularity": "Popularity",
+        "topRated": "Top Rated",
+        "nowPlaying": "Now Playing",
+        "revenue": "Revenue",
+        "ascending": "Ascending",
+        "descending": "Descending",
+        "apply": "Apply",
+        "close": "Close"
+    },
+    
+    "Language": {
+        "language": "Language",
+        "English": "English",
+        "Spanish": "Spanish"
+    },
+    
+    "PageNotFound": {
+        "errorMessage": "Oops! Page not found."
+    }
+}
