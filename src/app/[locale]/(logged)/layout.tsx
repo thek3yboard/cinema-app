@@ -2,7 +2,7 @@
 
 import { useState, useRef, createRef, ChangeEvent, useEffect } from 'react';
 import { MediaContext, initialPage, initialCurrentApiPages, initialSort, initialLanguage } from "../(logged)/MediaContext";
-import { SortType, Movie, Show, LanguageType } from '@/types/types';
+import { SortType, Movie, Show, Person } from '@/types/types';
 import { orderOptions, sortByOptions } from '@/assets/filtersData';
 import { usePathname, useRouter } from 'next/navigation';
 import { Search, Sliders, AlignJustify } from 'lucide-react'
@@ -28,7 +28,8 @@ export default function LoggedLayout({
     const locale = useLocale();
     const [page, setPage] = useState(initialPage);
     const [movies, setMovies] = useState<Movie[]>([]);
-    const [shows, setShows] = useState<Movie[]>([]);
+    const [shows, setShows] = useState<Show[]>([]);
+    const [people, setPeople] = useState<Person[]>([]); 
     const [currentApiPages, setCurrentApiPages] = useState(initialCurrentApiPages);
     const [sort, setSort] = useState<SortType>({
         key: initialSort.key,
@@ -76,6 +77,10 @@ export default function LoggedLayout({
         {
             key: 'shows',
             value: `${t('shows')}`
+        },
+        {
+            key: 'people',
+            value: `${t('people')}`
         }
     ];
 
@@ -231,7 +236,7 @@ export default function LoggedLayout({
     }
 
     return (
-        <MediaContext.Provider value={{ page, setPage, currentApiPages, setCurrentApiPages, handleClickPrevPage, handleClickNextPage, sort, movies, setMovies, shows, setShows, language, setLanguage }}>
+        <MediaContext.Provider value={{ page, setPage, currentApiPages, setCurrentApiPages, handleClickPrevPage, handleClickNextPage, sort, movies, setMovies, shows, setShows, people, setPeople, language, setLanguage }}>
         <>
             <div ref={screenRef} className="h-screen flex flex-col overflow-y-auto bg-gradient-to-r from-[#192a49] from-1% via-[#3f577c] via-50% to-[#192a49] to-99%">
                 <div className="z-20 sticky top-0 border-b-2 border-slate-700">

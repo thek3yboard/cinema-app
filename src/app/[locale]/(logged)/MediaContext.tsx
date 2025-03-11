@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { SortType, Movie, Show, LanguageType } from "@/types/types";
+import { SortType, Movie, Show, Person, LanguageType } from "@/types/types";
 import { sortByOptions, orderOptions } from "@/assets/filtersData";
 
 type MediaContextType = {
@@ -14,6 +14,8 @@ type MediaContextType = {
     setMovies: React.Dispatch<React.SetStateAction<Movie[]>>,
     shows: Show[],
     setShows: React.Dispatch<React.SetStateAction<Show[]>>,
+    people: Person[],
+    setPeople: React.Dispatch<React.SetStateAction<Person[]>>,
     language: LanguageType,
     setLanguage: React.Dispatch<React.SetStateAction<LanguageType>>,
 };
@@ -44,6 +46,8 @@ export const MediaContext = createContext<MediaContextType>({
     setMovies: () => void {},
     shows: [],
     setShows: () => void {},
+    people: [],
+    setPeople: () => void {},
     language: initialLanguage,
     setLanguage: () => void {},
 });

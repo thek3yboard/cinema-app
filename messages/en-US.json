@@ -2,6 +2,7 @@
     "LoggedLayout": {
         "movies": "Movies",
         "shows": "Shows",
+        "people": "People",
         "filter": "Filter",
         "sortBy": "Sort by",
         "orderBy": "Order by",

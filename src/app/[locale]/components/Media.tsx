@@ -3,7 +3,7 @@
 import { useState, useEffect, useContext, useRef, lazy } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { MediaContext } from "../(logged)/MediaContext";
-import { Movie, Show } from "@/types/types";
+import { Movie, Show, Person } from "@/types/types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 const MediaGrid = lazy(() => import('../components/MediaGrid'));
@@ -11,14 +11,15 @@ const MediaGrid = lazy(() => import('../components/MediaGrid'));
 type Media = {
     type: string,
     preloadedMovies: Movie[] | [],
-    preloadedShows: Show[] | []
+    preloadedShows: Show[] | [],
+    preloadedPeople: Person[] | []
 }
 
-export default function Media({ type, preloadedMovies = [], preloadedShows = [] }: Media) {
+export default function Media({ type, preloadedMovies = [], preloadedShows = [], preloadedPeople = [] }: Media) {
     const [imagesLoaded, setImagesLoaded] = useState(false);
     const countLoadedImages = useRef(0);
     const { page, currentApiPages, sort, handleClickPrevPage, handleClickNextPage, movies, setMovies,
-    shows, setShows, language, setLanguage } = useContext(MediaContext);
+    shows, setShows, people, setPeople, language, setLanguage } = useContext(MediaContext);
     const router = useRouter();
     const pathname = usePathname();
 

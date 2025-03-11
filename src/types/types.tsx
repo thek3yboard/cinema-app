@@ -3,7 +3,8 @@ export type Movie = {
     title: string,
     overview: string,
     poster_path: string,
-    vote_count: number
+    vote_count: number,
+    profile_path: string
 }
 
 export type MovieData = {
@@ -23,7 +24,8 @@ export type Show = {
     title: string,
     overview: string,
     poster_path: string,
-    vote_count: number
+    vote_count: number,
+    profile_path: string
 }
 
 export type ShowData = {
@@ -35,6 +37,26 @@ export type ShowData = {
     vote_average: number,
     production_companies: Array<ProductionCompanies>,
     video_id: string
+}
+
+export type Person = {
+    id: number,
+    name: string,
+    profile_path: string,
+    poster_path: string
+}
+
+
+export type PersonData = {
+    id: number,
+    name: string,
+    biography: string,
+    birthday: string,
+    deathday: string,
+    gender: number,
+    known_for_department: string,
+    place_of_birth: number,
+    profile_path: string
 }
 
 export type ProductionCompanies = {

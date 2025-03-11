@@ -1,11 +1,11 @@
 import { Fragment } from "react";
 import Image from "next/image";
 import Loading from "../components/ui/Loading";
-import { Movie, Show } from "@/types/types";
+import { Movie, Show, Person } from "@/types/types";
 
 type Props = {
-    media: Movie[] | Show[],
-    handleClickMediaImage: ((movie: Movie) => void) | ((show: Show) => void),
+    media: Movie[] | Show[] | Person[],
+    handleClickMediaImage: ((media: Movie | Show | Person) => void),
     imagesLoaded: boolean,
     setImagesLoaded: React.Dispatch<React.SetStateAction<boolean>>,
     countLoadedImages: React.MutableRefObject<number>

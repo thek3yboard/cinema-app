@@ -8,6 +8,6 @@ export default function Movies() {
     const { movies } = useContext(MediaContext);
 
     return (
-        <Media type={'movies'} preloadedMovies={movies} preloadedShows={[]} />
+        <Media type={'movies'} preloadedMovies={movies} preloadedShows={[]} preloadedPeople={[]} />
     );
 }

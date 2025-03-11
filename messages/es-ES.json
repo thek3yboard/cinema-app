@@ -2,6 +2,7 @@
     "LoggedLayout": {
         "movies": "Películas",
         "shows": "Series",
+        "people": "Gente",
         "filter": "Filtrar",
         "sortBy": "Filtrar por",
         "orderBy": "Ordenar por",
