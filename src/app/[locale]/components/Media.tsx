@@ -46,6 +46,11 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [],
             return;
         }
 
+        if(preloadedPeople.length !== 0) {
+            setPeople(preloadedPeople);
+            return;
+        }
+
         let firstAPIURL = '', secondAPIURL = '';
 
         if(language.key === localStorage.getItem('language_key')) {
@@ -132,11 +137,13 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [],
         }
     }, [currentApiPages, sort, type, language]);
 
-    const handleClickMediaImage = (media: Movie | Show): void => {
+    const handleClickMediaImage = (media: Movie | Show | Person) => {
         if(pathname === `/${pathname.split('/')[1]}/movies`) {
             router.push(`/${pathname.split('/')[1]}/movies/${media.id}`);
-        } else {
+        } else if(pathname === `/${pathname.split('/')[1]}/shows`) {
             router.push(`/${pathname.split('/')[1]}/shows/${media.id}`);
+        } else if(pathname === `/${pathname.split('/')[1]}/people`) {
+            router.push(`/${pathname.split('/')[1]}/people/${media.id}`);
         }
     }
 
@@ -165,7 +172,7 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [],
                     <div className='max-xl:hidden content-center'>
                         { pathname === `/${pathname.split('/')[1]}/movies` ?
                             (imagesLoaded && movies.length === 40) && <PrevPageButton />
-                        :
+                        : pathname === `/${pathname.split('/')[1]}/shows` &&
                             (imagesLoaded && shows.length === 40) && <PrevPageButton />
                         }
                     </div>
@@ -173,15 +180,19 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [],
                         <div className={`mx-4 grid ${movies.length !== 1 ? `media-grid-columns` : `grid-cols-1`} gap-5 xl:gap-3 justify-items-center justify-center`}>
                             <MediaGrid media={movies} handleClickMediaImage={handleClickMediaImage} imagesLoaded={imagesLoaded} setImagesLoaded={setImagesLoaded} countLoadedImages={countLoadedImages} />
                         </div>
-                    :
+                    : pathname === `/${pathname.split('/')[1]}/shows` ?
                         <div className={`mx-4 grid ${shows.length !== 1 ? `media-grid-columns` : `grid-cols-1`} gap-5 xl:gap-3 justify-items-center justify-center`}>
                             <MediaGrid media={shows} handleClickMediaImage={handleClickMediaImage} imagesLoaded={imagesLoaded} setImagesLoaded={setImagesLoaded} countLoadedImages={countLoadedImages} />
+                        </div>
+                    : pathname === `/${pathname.split('/')[1]}/people` &&
+                        <div className={`mx-4 grid ${shows.length !== 1 ? `media-grid-columns` : `grid-cols-1`} gap-5 xl:gap-3 justify-items-center justify-center`}>
+                            <MediaGrid media={people} handleClickMediaImage={handleClickMediaImage} imagesLoaded={imagesLoaded} setImagesLoaded={setImagesLoaded} countLoadedImages={countLoadedImages} />
                         </div>
                     }
                     <div className='max-xl:hidden content-center'>
                         { pathname === `/${pathname.split('/')[1]}/movies` ?
                             (imagesLoaded && movies.length === 40) && <NextPageButton />
-                        :
+                        : pathname === `/${pathname.split('/')[1]}/shows` &&
                             (imagesLoaded && shows.length === 40) && <NextPageButton />
                         }
                     </div>
@@ -197,7 +208,7 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [],
                                 <NextPageButton />
                             </div>
                         </>   
-                    :
+                    : pathname === `/${pathname.split('/')[1]}/shows` &&
                         (imagesLoaded && shows.length === 40) && 
                         <>
                             <div className='w-full flex items-center mx-8'>

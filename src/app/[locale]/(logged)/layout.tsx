@@ -186,12 +186,18 @@ export default function LoggedLayout({
                 case '/shows':
                     URL = `https://api.themoviedb.org/3/search/tv?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                     break;
+                case '/people':
+                        URL = `https://api.themoviedb.org/3/search/person?&include_adult=false&query=${search}&language=${language.key}&page=${currentApiPages[0]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                        break;
                 default:
                     if(pathname.includes('/movies')) {
                         URL = `https://api.themoviedb.org/3/search/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                         break;
-                    } else {
+                    } else if(pathname.includes('/shows')) {
                         URL = `https://api.themoviedb.org/3/search/tv?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                        break;
+                    } else if(pathname.includes('/people')) {
+                        URL = `https://api.themoviedb.org/3/search/person?&include_adult=false&query=${search}&language=${language.key}&page=${currentApiPages[0]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                         break;
                     }
             }
@@ -215,7 +221,7 @@ export default function LoggedLayout({
                 setMovies(filteredMovies);
 
                 router.push(`/${pathname.split('/')[1]}/movies`);
-            } else {
+            } else if(pathname.includes('/shows')) {
                 const shows = data.results;
 
                 let filteredShows = shows.filter((show: Show) => show.vote_count > 1000);
@@ -225,6 +231,12 @@ export default function LoggedLayout({
                 setShows(filteredShows);
 
                 router.push(`/${pathname.split('/')[1]}/shows`);
+            } else if(pathname.includes('/people')) {
+                const people = data.results;
+                
+                setPeople(people);
+                
+                router.push(`/${pathname.split('/')[1]}/people`);
             }
         } catch (error) {
             console.error(error)
@@ -329,7 +341,7 @@ export default function LoggedLayout({
                         { !loading ? <LanguageSelect handleChangeLanguage={handleChangeLanguage} smallDevice={false} /> : <div className='max-md:hidden w-48'></div> }
                     </Navbar>
                 </div>
-                { (pathname === `/${pathname.split('/')[1]}/movies` || pathname === `/${pathname.split('/')[1]}/shows`) ?
+                { (pathname === `/${pathname.split('/')[1]}/movies` || pathname === `/${pathname.split('/')[1]}/shows` || pathname === `/${pathname.split('/')[1]}/people`) ?
                     <>
                         <div onClick={handleClickChildren} className="grow content-center my-4 2xl:overflow-hidden">
                             {children}
