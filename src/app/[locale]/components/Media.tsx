@@ -37,8 +37,17 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [],
         countLoadedImages.current = 0;
 
         if(preloadedMovies.length !== 0) {
-            setMovies(preloadedMovies);
-            return;
+            if(pathname === `/${pathname.split('/')[1]}/people/${pathname.split('/')[3]}`) {
+                let chunkSize = 40;
+                let startIndex = (page - 1) * chunkSize;
+                let endIndex = startIndex + chunkSize;
+            
+                setMovies(preloadedMovies.slice(startIndex, endIndex));
+                return;
+            } else {
+                setMovies(preloadedMovies);
+                return;
+            }
         }
 
         if(preloadedShows.length !== 0) {
