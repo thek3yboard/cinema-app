@@ -63,37 +63,42 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [],
         let firstAPIURL = '', secondAPIURL = '';
 
         if(language.key === localStorage.getItem('language_key')) {
-            switch(sort.key) {
-                case 'vote_average':
-                    if(type === 'shows') {
-                        firstAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&without_genres=99,10755&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
-                        secondAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&without_genres=99,10755&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
-                    } else {
-                        firstAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&without_genres=99,10755&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                        secondAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&without_genres=99,10755&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                    }
-                    break;
-                case 'now_playing':
-                    const endDate = new Date();
-                    let startDate = new Date();
-                    startDate.setDate(endDate.getDate() - 21);
-                    if(type === 'shows') {
-                        firstAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=popularity.${sort.order_key}&with_release_type=2|3&release_date.gte=${startDate}&release_date.lte=${endDate}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
-                        secondAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=popularity.${sort.order_key}&with_release_type=2|3&release_date.gte=${startDate}&release_date.lte=${endDate}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
-                    } else {
-                        firstAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=popularity.${sort.order_key}&with_release_type=2|3&release_date.gte=${startDate}&release_date.lte=${endDate}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                        secondAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=popularity.${sort.order_key}&with_release_type=2|3&release_date.gte=${startDate}&release_date.lte=${endDate}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                    }
-                    break;
-                default:
-                    if(type === 'shows') {
-                        firstAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
-                        secondAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
-                    } else {
-                        firstAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                        secondAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                    }
-                    break;
+            if(type !== 'people') {
+                switch(sort.key) {
+                    case 'vote_average':
+                        if(type === 'shows') {
+                            firstAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&without_genres=99,10755&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+                            secondAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&without_genres=99,10755&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+                        } else {
+                            firstAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&without_genres=99,10755&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                            secondAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&without_genres=99,10755&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                        }
+                        break;
+                    case 'now_playing':
+                        const endDate = new Date();
+                        let startDate = new Date();
+                        startDate.setDate(endDate.getDate() - 21);
+                        if(type === 'shows') {
+                            firstAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=popularity.${sort.order_key}&with_release_type=2|3&release_date.gte=${startDate}&release_date.lte=${endDate}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+                            secondAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=popularity.${sort.order_key}&with_release_type=2|3&release_date.gte=${startDate}&release_date.lte=${endDate}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+                        } else {
+                            firstAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=popularity.${sort.order_key}&with_release_type=2|3&release_date.gte=${startDate}&release_date.lte=${endDate}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                            secondAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=popularity.${sort.order_key}&with_release_type=2|3&release_date.gte=${startDate}&release_date.lte=${endDate}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                        }
+                        break;
+                    default:
+                        if(type === 'shows') {
+                            firstAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+                            secondAPIURL = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+                        } else {
+                            firstAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&sort_by=${sort.key}.${sort.order_key}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                            secondAPIURL = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[1]}&sort_by=${sort.key}.${sort.order_key}&vote_count.gte=200&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                        }
+                        break;
+                }
+            } else {
+                firstAPIURL = `https://api.themoviedb.org/3/trending/person/week?language=${language.key}&page=${currentApiPages[0]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                secondAPIURL = `https://api.themoviedb.org/3/trending/person/week?language=${language.key}&page=${currentApiPages[1]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
             }
     
             const fetchFirstPage = async () => {
@@ -135,10 +140,20 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [],
                 const secondBatchMedia = await fetchSecondPage();
                 const allMediaPage = [...firstBatchMedia, ...secondBatchMedia];
     
-                if(type === 'movies')
-                    setMovies(allMediaPage);
-                else {
-                    setShows(allMediaPage);
+                switch(type) {
+                    case 'movies':
+                        setMovies(allMediaPage);
+                        break;
+                    case 'shows':
+                        setShows(allMediaPage);
+                        break;
+                    case 'people':
+                        const peopleWithPicture = allMediaPage.filter((person) => person.profile_path !== null);
+                        const finalPeople = peopleWithPicture.slice(0, 30);
+                        setPeople(finalPeople);
+                        break;
+                    default:
+                        break;
                 }
             };
             
@@ -147,7 +162,7 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [],
     }, [currentApiPages, sort, type, language]);
 
     const handleClickMediaImage = (media: Movie | Show | Person) => {
-        if(pathname === `/${pathname.split('/')[1]}/movies`) {
+        if(pathname === `/${pathname.split('/')[1]}/movies` || pathname === `/${pathname.split('/')[1]}/people/${pathname.split('/')[3]}`) {
             router.push(`/${pathname.split('/')[1]}/movies/${media.id}`);
         } else if(pathname === `/${pathname.split('/')[1]}/shows`) {
             router.push(`/${pathname.split('/')[1]}/shows/${media.id}`);
@@ -179,13 +194,13 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [],
             <div>
                 <div className='flex flex-row'>
                     <div className='max-xl:hidden content-center'>
-                        { pathname === `/${pathname.split('/')[1]}/movies` ?
-                            (imagesLoaded && movies.length === 40) && <PrevPageButton />
+                        { pathname === `/${pathname.split('/')[1]}/movies` || pathname === `/${pathname.split('/')[1]}/people/${pathname.split('/')[3]}` ?
+                            (imagesLoaded) && <PrevPageButton />
                         : pathname === `/${pathname.split('/')[1]}/shows` &&
                             (imagesLoaded && shows.length === 40) && <PrevPageButton />
                         }
                     </div>
-                    { pathname === `/${pathname.split('/')[1]}/movies` ?
+                    { pathname === `/${pathname.split('/')[1]}/movies` || pathname === `/${pathname.split('/')[1]}/people/${pathname.split('/')[3]}` ?
                         <div className={`mx-4 grid ${movies.length !== 1 ? `media-grid-columns` : `grid-cols-1`} gap-5 xl:gap-3 justify-items-center justify-center`}>
                             <MediaGrid media={movies} handleClickMediaImage={handleClickMediaImage} imagesLoaded={imagesLoaded} setImagesLoaded={setImagesLoaded} countLoadedImages={countLoadedImages} />
                         </div>
@@ -199,16 +214,16 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [],
                         </div>
                     }
                     <div className='max-xl:hidden content-center'>
-                        { pathname === `/${pathname.split('/')[1]}/movies` ?
-                            (imagesLoaded && movies.length === 40) && <NextPageButton />
+                        { pathname === `/${pathname.split('/')[1]}/movies` || pathname === `/${pathname.split('/')[1]}/people/${pathname.split('/')[3]}` ?
+                            (imagesLoaded) && <NextPageButton />
                         : pathname === `/${pathname.split('/')[1]}/shows` &&
                             (imagesLoaded && shows.length === 40) && <NextPageButton />
                         }
                     </div>
                 </div>
                 <div className='flex xl:hidden mt-4 justify-center'>
-                    { pathname === `/${pathname.split('/')[1]}/movies` ?
-                        (imagesLoaded && movies.length === 40) && 
+                    { pathname === `/${pathname.split('/')[1]}/movies` || pathname === `/${pathname.split('/')[1]}/people/${pathname.split('/')[3]}` ?
+                        (imagesLoaded) && 
                         <>
                             <div className='w-full flex items-center mx-8'>
                                 <PrevPageButton />
