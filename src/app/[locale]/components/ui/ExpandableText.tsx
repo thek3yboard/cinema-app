@@ -20,7 +20,7 @@ const ExpandableText = ({ text, maxLength = 100, initialParentHeight }: Props) =
           <p className="text-sm mr-4 hyphens-auto text-pretty text-justify" style={{ hyphenateLimitChars: 7 }}>{updatedText}</p>
         </div>
       ) : (
-        <p className="text-sm text-ellipsis overflow-hidden">
+        <p className="text-sm text-ellipsis hyphens-auto text-pretty text-justify overflow-hidden" style={{ hyphenateLimitChars: 7 }}>
           {`${updatedText.slice(0, maxLength)}...`}
         </p>
       )}
