@@ -9,17 +9,19 @@ type Props = {
 const ExpandableText = ({ text, maxLength = 100, initialParentHeight }: Props) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  if (text.length <= maxLength) return <p>{text}</p>;
+  const updatedText = text.replace(/\u00A0/g, ' ');
+
+  if (updatedText.length <= maxLength) return <p>{updatedText}</p>;
 
   return (
     <div style={{ maxHeight: `${initialParentHeight}px` }} className="flex flex-col">
       {isExpanded ? (
-        <div className="overflow-y-auto">
-          <p className="text-sm mr-4">{text}</p>
+        <div className='overflow-y-auto'>
+          <p className="text-sm mr-4 hyphens-auto text-pretty text-justify" style={{ hyphenateLimitChars: 7 }}>{updatedText}</p>
         </div>
       ) : (
         <p className="text-sm text-ellipsis overflow-hidden">
-          {`${text.slice(0, maxLength)}...`}
+          {`${updatedText.slice(0, maxLength)}...`}
         </p>
       )}
       <button onClick={() => setIsExpanded(!isExpanded)} className="text-blue-500 mt-2">

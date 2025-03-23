@@ -45,7 +45,7 @@ export default function PersonUI({ personData, personWork }: Props) {
                     width={273}
                     />
                     <div className='grow' ref={biographyDivRef}>
-                        <ExpandableText text={personData?.biography} maxLength={400} initialParentHeight={initialHeight} />
+                        <ExpandableText text={personData!.biography} maxLength={400} initialParentHeight={initialHeight} />
                     </div>
                 </div>
                 <div className='flex w-full justify-center px-2'>
