@@ -34,6 +34,12 @@ export default function Person({ params }: { params: { id: number } }) {
 
                 let cast = personWorkData.cast.filter((m) => (m.poster_path !== null && m.vote_count >= 100));
 
+                cast = cast.filter(obra => 
+                    !(obra.hasOwnProperty('name') && (obra.name.includes('Show') || obra.name.includes('Live'))) // Exclude tv shows
+                    && !(obra.media_type === "tv" && obra.character.includes("Self")) // Exclude 'tv' + 'Self'
+                    || (obra.media_type === "movie" && obra.character.includes("Self")) // Keep 'movie' + 'Self'
+                );
+
                 cast = cast.sort((a: any, b: any) => {
                     const getDate = (item: any) => {
                         if (item.media_type === 'movie') {
