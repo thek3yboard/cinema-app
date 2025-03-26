@@ -6,6 +6,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
+import { Toaster } from 'sonner'
 
 const montserrat = Montserrat({ subsets: ["latin"] });
 
@@ -36,6 +37,7 @@ export default async function RootLocaleLayout({
                     <Providers>
                         <PWARegister />
                         <main>{children}</main>
+                        <Toaster richColors position="top-right" />
                     </Providers>
                 </NextIntlClientProvider>
             </body>
