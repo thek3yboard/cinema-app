@@ -48,8 +48,12 @@ export default function PersonUI({ personData, personWork }: Props) {
                         <ExpandableText text={personData!.biography} maxLength={400} initialParentHeight={initialHeight} />
                     </div>
                 </div>
-                <div className='flex w-full justify-center px-2'>
-                    <Media type={'movies'} preloadedMovies={personWork} preloadedShows={[]} preloadedPeople={[]} />
+                <div className='flex w-full justify-center items-center px-2'>
+                    { personWork.length === 0 ?
+                        <label className='text-2xl font-bold'>No filmography data registered.</label> //TO-DO - Add message to locales
+                    :
+                        <Media type={'movies'} preloadedMovies={personWork} preloadedShows={[]} preloadedPeople={[]} />
+                    }
                 </div>
             </div>
         }</>
