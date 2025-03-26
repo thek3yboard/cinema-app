@@ -6,6 +6,7 @@ import { MediaContext } from "../(logged)/MediaContext";
 import { Movie, Show, Person } from "@/types/types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { fetchFirstPage, fetchSecondPage, fetchBoth } from '@/app/[locale]/utils';
 const MediaGrid = lazy(() => import('../components/MediaGrid'));
 
 type Media = {
@@ -100,74 +101,35 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [],
                 firstAPIURL = `https://api.themoviedb.org/3/trending/person/week?language=${language.key}&page=${currentApiPages[0]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                 secondAPIURL = `https://api.themoviedb.org/3/trending/person/week?language=${language.key}&page=${currentApiPages[1]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
             }
-    
-            const fetchFirstPage = async () => {
-                try {
-                    let res = await fetch(firstAPIURL, {
-                        method: "GET",
-                        headers: {
-                            "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
-                        }
-                    });
-                    
-                    const data = await res.json();
-                    
-                    return data.results;
-                } catch (error) {
-                    console.error(error)
-                }
-            }
-    
-            const fetchSecondPage = async () => {
-                try {
-                    let res = await fetch(secondAPIURL, {
-                        method: "GET",
-                        headers: {
-                            "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
-                        }
-                    });
-                    
-                    const data = await res.json();
-                    
-                    return data.results;
-                } catch (error) {
-                    console.error(error)
-                }
-            }
-            
-            const fetchBoth = async () => {
-                const firstBatchMedia = await fetchFirstPage();
-                const secondBatchMedia = await fetchSecondPage();
-                const allMediaPage = [...firstBatchMedia, ...secondBatchMedia];
-    
-                switch(type) {
-                    case 'movies':
-                        setMovies(allMediaPage);
-                        break;
-                    case 'shows':
-                        setShows(allMediaPage);
-                        break;
-                    case 'people':
-                        const peopleWithPicture = allMediaPage.filter((person) => person.profile_path !== null);
-                        const finalPeople = peopleWithPicture.slice(0, 30);
-                        setPeople(finalPeople);
-                        break;
-                    default:
-                        break;
-                }
-            };
-            
-            fetchBoth();
+
+            fetchBoth(type, firstAPIURL, secondAPIURL, setMovies, setShows, setPeople);
         }
     }, [currentApiPages, sort, type, language]);
 
     const handleClickMediaImage = (media: Movie | Show | Person) => {
-        if(pathname === `/${pathname.split('/')[1]}/movies` || pathname === `/${pathname.split('/')[1]}/people/${pathname.split('/')[3]}`) {
-            router.push(`/${pathname.split('/')[1]}/movies/${media.id}`);
-        } else if(pathname === `/${pathname.split('/')[1]}/shows`) {
-            router.push(`/${pathname.split('/')[1]}/shows/${media.id}`);
-        } else if(pathname === `/${pathname.split('/')[1]}/people`) {
-            router.push(`/${pathname.split('/')[1]}/people/${media.id}`);
+        switch(pathname) {
+            case `/${pathname.split('/')[1]}/movies`:
+                router.push(`/${pathname.split('/')[1]}/movies/${media.id}`);
+                break;
+            case `/${pathname.split('/')[1]}/shows`:
+                router.push(`/${pathname.split('/')[1]}/shows/${media.id}`);
+                break;
+            case `/${pathname.split('/')[1]}/people`:
+                router.push(`/${pathname.split('/')[1]}/people/${media.id}`);
+                break;
+            case `/${pathname.split('/')[1]}/people/${pathname.split('/')[3]}`:
+                if(media.hasOwnProperty('media_type')) { 
+                    if(media.media_type === 'tv') {
+                        router.push(`/${pathname.split('/')[1]}/shows/${media.id}`); 
+                    } else {
+                        router.push(`/${pathname.split('/')[1]}/movies/${media.id}`);
+                    }
+                } else {
+                    router.push(`/${pathname.split('/')[1]}/movies/${media.id}`);
+                }
+                break;
+            default:
+                break;
         }
     }
 
