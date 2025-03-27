@@ -239,8 +239,6 @@ export default function LoggedLayout({
                 }
 
                 allMediaPage = allMediaPage.filter((person) => person.profile_path !== null);
-
-                allMediaPage = allMediaPage.filter((person) => person.popularity > 1);
             } else {
                 const data = await fetchPage(firstAPIURL);
 
