@@ -13,6 +13,8 @@ import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import Image from "next/image";
 import logo from '@/assets/cinema.png';
+import { toast } from 'sonner';
+import { fetchPage } from '@/app/[locale]/utils';
 
 type NavbarItems = {
     key: string,
@@ -177,42 +179,81 @@ export default function LoggedLayout({
         try {
             setIsMenuOpen(false);
 
-            let URL = '';
+            let firstAPIURL = '', secondAPIURL = '';
 
             switch(pathname) {
                 case '/movies':
-                    URL = `https://api.themoviedb.org/3/search/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                    firstAPIURL = `https://api.themoviedb.org/3/search/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                     break;
                 case '/shows':
-                    URL = `https://api.themoviedb.org/3/search/tv?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                    firstAPIURL = `https://api.themoviedb.org/3/search/tv?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                     break;
                 case '/people':
-                        URL = `https://api.themoviedb.org/3/search/person?&include_adult=false&query=${search}&language=${language.key}&page=${currentApiPages[0]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                        break;
+                    firstAPIURL = `https://api.themoviedb.org/3/search/person?&include_adult=false&query=${search}&language=${language.key}&page=${currentApiPages[0]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                    break;
                 default:
                     if(pathname.includes('/movies')) {
-                        URL = `https://api.themoviedb.org/3/search/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                        firstAPIURL = `https://api.themoviedb.org/3/search/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                         break;
                     } else if(pathname.includes('/shows')) {
-                        URL = `https://api.themoviedb.org/3/search/tv?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                        firstAPIURL = `https://api.themoviedb.org/3/search/tv?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                         break;
                     } else if(pathname.includes('/people')) {
-                        URL = `https://api.themoviedb.org/3/search/person?&include_adult=false&query=${search}&language=${language.key}&page=${currentApiPages[0]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                        firstAPIURL = `https://api.themoviedb.org/3/search/person?&include_adult=false&query=${search}&language=${language.key}&page=${currentApiPages[0]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                        secondAPIURL = `https://api.themoviedb.org/3/search/person?&include_adult=false&query=${search}&language=${language.key}&page=${currentApiPages[1]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
                         break;
                     }
             }
 
-            let response = await fetch(URL, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
+            let allMediaPage = [];
+
+            if(secondAPIURL !== '') {
+                let page = 1;
+
+                const data = await fetchPage(firstAPIURL);
+                const data2 = await fetchPage(secondAPIURL);
+                allMediaPage = [...data.results, ...data2.results];
+
+                let apiPages = [currentApiPages[0], currentApiPages[1]];
+                page++;
+
+                while(page < data.total_pages) {
+                    apiPages[0]+=2;
+                    apiPages[1]+=2;
+
+                    firstAPIURL = `https://api.themoviedb.org/3/search/person?&include_adult=false&query=${search}&language=${language.key}&page=${apiPages[0]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+                    secondAPIURL = `https://api.themoviedb.org/3/search/person?&include_adult=false&query=${search}&language=${language.key}&page=${apiPages[1]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
+
+                    const data = await fetchPage(firstAPIURL);
+                    const data2 = await fetchPage(secondAPIURL);
+
+                    allMediaPage.push(...data.results);
+                    allMediaPage.push(...data2.results);
+
+                    if(allMediaPage.length > 100) {
+                        toast.error('There are too many results. Please narrow your search criteria.') //TO-DO - Add message to locales
+                        return;
+                    }
+
+                    page++;
                 }
-            });
-            
-            const data = await response.json();
+
+                allMediaPage = allMediaPage.filter((person) => person.profile_path !== null);
+
+                allMediaPage = allMediaPage.filter((person) => person.popularity > 1);
+            } else {
+                const data = await fetchPage(firstAPIURL);
+
+                allMediaPage = [...data.results];
+            }
+
+            if(allMediaPage.length === 0) {
+                toast.info('No results found.') //TO-DO - Add message to locales
+                return;
+            }
 
             if(pathname.includes('/movies')) {
-                const movies = data.results;
+                const movies = allMediaPage;
 
                 let filteredMovies = movies.filter((movie: Movie) => movie.vote_count > 1000);
 
@@ -222,7 +263,7 @@ export default function LoggedLayout({
 
                 router.push(`/${pathname.split('/')[1]}/movies`);
             } else if(pathname.includes('/shows')) {
-                const shows = data.results;
+                const shows = allMediaPage;
 
                 let filteredShows = shows.filter((show: Show) => show.vote_count > 1000);
 
@@ -232,7 +273,7 @@ export default function LoggedLayout({
 
                 router.push(`/${pathname.split('/')[1]}/shows`);
             } else if(pathname.includes('/people')) {
-                const people = data.results;
+                const people = allMediaPage;
                 
                 setPeople(people);
                 
@@ -260,7 +301,7 @@ export default function LoggedLayout({
                         </NavbarContent>
                         <NavbarContent className="md:hidden" justify="end">
                             <NavbarMenuToggle 
-                                isSelected={isMenuOpen}
+                                isselected={isMenuOpen}
                                 icon={isMenuOpen ? 
                                     <button style={{ color: '#192a49' }} className='p-2 rounded-md bg-slate-200'><AlignJustify /></button> 
                                     : 

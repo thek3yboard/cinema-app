@@ -6,7 +6,7 @@ import { MediaContext } from "../(logged)/MediaContext";
 import { Movie, Show, Person } from "@/types/types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-import { fetchFirstPage, fetchSecondPage, fetchBoth } from '@/app/[locale]/utils';
+import { fetchBoth } from '@/app/[locale]/utils';
 const MediaGrid = lazy(() => import('../components/MediaGrid'));
 
 type Media = {

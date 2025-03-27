@@ -1,8 +1,8 @@
 import { Movie, Show, Person } from "@/types/types";
 
-export const fetchFirstPage = async (firstAPIURL: string) => {
+export const fetchPage = async (APIURL: string) => {
     try {
-        let res = await fetch(firstAPIURL, {
+        let res = await fetch(APIURL, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
@@ -11,24 +11,7 @@ export const fetchFirstPage = async (firstAPIURL: string) => {
         
         const data = await res.json();
         
-        return data.results;
-    } catch (error) {
-        console.error(error)
-    }
-}
-
-export const fetchSecondPage = async (secondAPIURL: string) => {
-    try {
-        let res = await fetch(secondAPIURL, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
-            }
-        });
-        
-        const data = await res.json();
-        
-        return data.results;
+        return data;
     } catch (error) {
         console.error(error)
     }
@@ -42,9 +25,9 @@ export const fetchBoth = async (
     setShows: React.Dispatch<React.SetStateAction<Show[]>>,
     setPeople: React.Dispatch<React.SetStateAction<Person[]>>
 ) => {
-    const firstBatchMedia = await fetchFirstPage(firstAPIURL);
-    const secondBatchMedia = await fetchSecondPage(secondAPIURL);
-    const allMediaPage = [...firstBatchMedia, ...secondBatchMedia];
+    const firstBatchMedia = await fetchPage(firstAPIURL);
+    const secondBatchMedia = await fetchPage(secondAPIURL);
+    const allMediaPage = [...firstBatchMedia.results, ...secondBatchMedia.results];
 
     switch(type) {
         case 'movies':
