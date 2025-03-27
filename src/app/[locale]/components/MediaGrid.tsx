@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import Image from "next/image";
 import Loading from "../components/ui/Loading";
+import { usePathname, useRouter } from 'next/navigation';
 import { Movie, Show, Person } from "@/types/types";
 
 type Props = {
@@ -12,6 +13,8 @@ type Props = {
 }
 
 export default function MediaGrid({ media, handleClickMediaImage, imagesLoaded, setImagesLoaded, countLoadedImages }: Props) {
+    const pathname = usePathname();
+
     const handleSumLoadedImages = () => {
         setTimeout(() => {
             console.log(media[countLoadedImages.current]);
@@ -45,7 +48,7 @@ export default function MediaGrid({ media, handleClickMediaImage, imagesLoaded, 
                     </Fragment>
                 )
             })}
-            { !imagesLoaded && <Loading /> }
+            { (!imagesLoaded && pathname !== `/${pathname.split('/')[1]}/people/${pathname.split('/')[3]}`) && <Loading /> }
         </>
     )
 }
