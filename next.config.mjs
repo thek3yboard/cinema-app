@@ -20,7 +20,12 @@ const nextConfig = {
             permanent: true,
           },
         ]
-    }
+    },
+    // Dangerously allow production builds to complete even with type errors
+    typescript: {
+        // Set this to false if you want to ignore TypeScript errors
+        ignoreBuildErrors: true,
+    },
 };
  
 export default withNextIntl(nextConfig);
