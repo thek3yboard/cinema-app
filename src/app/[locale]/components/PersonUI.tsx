@@ -13,7 +13,7 @@ type Props = {
 export default function PersonUI({ personData, personWork }: Props) {
     const [isLoading, setIsLoading] = useState(true);
     const [initialHeight, setInitialHeight] = useState(0);
-    const biographyDivRef = useRef(null);
+    const biographyDivRef = useRef<HTMLDivElement>(null);
 
     useLayoutEffect(() => {
         if (biographyDivRef.current) {

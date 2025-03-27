@@ -299,7 +299,7 @@ export default function LoggedLayout({
                         </NavbarContent>
                         <NavbarContent className="md:hidden" justify="end">
                             <NavbarMenuToggle 
-                                isselected={isMenuOpen}
+                                isSelected={isMenuOpen}
                                 icon={isMenuOpen ? 
                                     <button style={{ color: '#192a49' }} className='p-2 rounded-md bg-slate-200'><AlignJustify /></button> 
                                     : 

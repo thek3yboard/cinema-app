@@ -171,7 +171,7 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [],
                             <MediaGrid media={shows} handleClickMediaImage={handleClickMediaImage} imagesLoaded={imagesLoaded} setImagesLoaded={setImagesLoaded} countLoadedImages={countLoadedImages} />
                         </div>
                     : pathname === `/${pathname.split('/')[1]}/people` &&
-                        <div className={`mx-4 grid ${shows.length !== 1 ? `media-grid-columns` : `grid-cols-1`} gap-5 xl:gap-3 justify-items-center justify-center`}>
+                        <div className={`mx-4 grid ${people.length !== 1 ? `media-grid-columns` : `grid-cols-1`} gap-5 xl:gap-3 justify-items-center justify-center`}>
                             <MediaGrid media={people} handleClickMediaImage={handleClickMediaImage} imagesLoaded={imagesLoaded} setImagesLoaded={setImagesLoaded} countLoadedImages={countLoadedImages} />
                         </div>
                     }

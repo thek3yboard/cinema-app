@@ -4,7 +4,8 @@ export type Movie = {
     overview: string,
     poster_path: string,
     vote_count: number,
-    profile_path: string
+    profile_path: string,
+    media_type: string
 }
 
 export type MovieData = {
@@ -25,7 +26,8 @@ export type Show = {
     overview: string,
     poster_path: string,
     vote_count: number,
-    profile_path: string
+    profile_path: string,
+    media_type: string
 }
 
 export type ShowData = {
@@ -44,6 +46,7 @@ export type Person = {
     name: string,
     profile_path: string,
     poster_path: string
+    media_type: string
 }
 
 
