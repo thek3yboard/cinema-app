@@ -49,7 +49,6 @@ export type Person = {
     media_type: string
 }
 
-
 export type PersonData = {
     id: number,
     name: string,
