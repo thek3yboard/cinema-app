@@ -6,14 +6,14 @@ import { MovieData } from "@/types/types";
 import { MediaContext } from "../../../(logged)/MediaContext";
 const MediaUI = lazy(() => import('../../../components/MediaUI'));
 
-export default function Movie({ params }: { params: { id: number } }) {
+export default function Movie({ params }: { params: { id: number, locale: string } }) {
     const { language } = useContext(MediaContext);
     const [movieData, setMovieData] = useState<MovieData>();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                let res = await fetch(`https://api.themoviedb.org/3/movie/${params.id}?language=${language.key}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
+                let res = await fetch(`https://api.themoviedb.org/3/movie/${params.id}?language=${params.locale}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
@@ -49,10 +49,10 @@ export default function Movie({ params }: { params: { id: number } }) {
         }
 
         fetchData();
-    }, [params.id]);
+    }, [params.locale]);
 
     return (
-        <Suspense key={params!.id} fallback={<Loading/>}>
+        <Suspense key={params.locale} fallback={<Loading/>}>
             <MediaUI mediaData={movieData!} />
         </Suspense>
     );

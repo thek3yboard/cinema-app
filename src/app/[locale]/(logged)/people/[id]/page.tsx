@@ -6,7 +6,7 @@ import { Movie, PersonData } from "@/types/types";
 import { MediaContext } from "../../../(logged)/MediaContext";
 const PersonUI = lazy(() => import('../../../components/PersonUI'));
 
-export default function Person({ params }: { params: { id: number } }) {
+export default function Person({ params }: { params: { id: number, locale: string } }) {
     const { language } = useContext(MediaContext);
     const [personData, setPersonData] = useState<PersonData>();
     const [personWork, setPersonWork] = useState<Movie[]>();
@@ -14,7 +14,7 @@ export default function Person({ params }: { params: { id: number } }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                let personDataResponse = await fetch(`https://api.themoviedb.org/3/person/${params.id}?language=${language.key}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
+                let personDataResponse = await fetch(`https://api.themoviedb.org/3/person/${params.id}?language=${params.locale}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
@@ -23,7 +23,7 @@ export default function Person({ params }: { params: { id: number } }) {
                 
                 let personDetailsData = await personDataResponse.json();
 
-                let personWorkResponse = await fetch(`https://api.themoviedb.org/3/person/${params.id}/combined_credits?language=${language.key}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
+                let personWorkResponse = await fetch(`https://api.themoviedb.org/3/person/${params.id}/combined_credits?language=${params.locale}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TMDB_BEARER_TOKEN}`
@@ -79,10 +79,10 @@ export default function Person({ params }: { params: { id: number } }) {
         }
 
         fetchData();
-    }, [params.id]);
+    }, [params.locale]);
 
     return (
-        <Suspense key={params!.id} fallback={<Loading/>}>
+        <Suspense key={params.locale} fallback={<Loading/>}>
             <PersonUI personData={personData!} personWork={personWork!} />
         </Suspense>
     );
