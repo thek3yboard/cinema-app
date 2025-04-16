@@ -116,16 +116,11 @@ export default function LoggedLayout({
         localStorage.setItem('language_label', newLanguage!.label)
 
         let newPathname = `/${newLanguage!.key}`;
-        
-        if(pathname.includes('/movies')) {
-            setMovies([]);
-            newPathname = `${newPathname}/movies`;
-            router.push(`${newPathname}`);
-        } else {
-            setShows([]);
-            newPathname = `${newPathname}/shows`;
-            router.push(`${newPathname}`);
-        }
+        const parts = pathname.split("/");
+        const secondPart = "/" + parts.slice(2).join("/");
+
+        newPathname = `${newPathname}${secondPart}/`;
+        router.push(`${newPathname}`);
 
         setSearch('');
         setIsMenuOpen(false);
