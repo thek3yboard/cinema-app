@@ -5,7 +5,7 @@ import { MediaContext, initialPage, initialCurrentApiPages, initialSort, initial
 import { SortType, Movie, Show, Person } from '@/types/types';
 import { orderOptions, sortByOptions } from '@/assets/filtersData';
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, Sliders, AlignJustify } from 'lucide-react'
+import { Search, Sliders, AlignJustify, X } from 'lucide-react'
 import { Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, 
     Navbar, NavbarBrand, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, NavbarContent, NavbarItem, Link, useDisclosure } from "@nextui-org/react";
 import LanguageSelect, { languageOptions } from '../components/ui/LanguageSelect';
@@ -329,8 +329,23 @@ export default function LoggedLayout({
                         <NavbarMenu className='max-h-fit mt-[1.5px] gap-3 p-5'>
                             <NavbarMenuItem>
                                 <div className='md:hidden w-full flex justify-between'>
-                                    <span className="flex items-center rounded-l-sm w-full h-10 bg-blueish-gray">
-                                        <input type='text' value={search} onChange={(e) => handleChangeSearch(e)} onKeyDown={(e) => handleKeydownSearch(e)} className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray' />
+                                    <span className="flex items-center rounded-l-sm w-full h-10 bg-blueish-gray relative">
+                                        <input 
+                                            type='text' 
+                                            value={search} 
+                                            onChange={(e) => handleChangeSearch(e)} 
+                                            onKeyDown={(e) => handleKeydownSearch(e)} 
+                                            className='w-[calc(100%-30px)] pl-2 pr-8 ml-[2px] h-full bg-blueish-gray' 
+                                        />
+                                        {search && (
+                                            <button 
+                                                onClick={() => setSearch('')}
+                                                className='absolute right-11 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1'
+                                                type="button"
+                                            >
+                                                <X className='w-4 h-4' />
+                                            </button>
+                                        )}
                                         <button className='bg-lapis-lazuli ml-[1px] h-full rounded-r-sm' onClick={handleClickSearch}>
                                             <Search className='mx-2 max-h-6' />
                                         </button>
@@ -363,8 +378,23 @@ export default function LoggedLayout({
                                 </NavbarMenuItem>
                             ))}
                         </NavbarMenu>
-                        <span className="max-md:hidden flex items-center w-2/3 h-10 bg-blueish-gray rounded-[3px]">
-                            <input type='text' value={search} onChange={(e) => handleChangeSearch(e)} onKeyDown={(e) => handleKeydownSearch(e)} className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray' />
+                        <span className="max-md:hidden flex items-center w-2/3 h-10 bg-blueish-gray rounded-[3px] relative">
+                            <input 
+                                type='text' 
+                                value={search} 
+                                onChange={(e) => handleChangeSearch(e)} 
+                                onKeyDown={(e) => handleKeydownSearch(e)} 
+                                className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray' 
+                            />
+                            {search && (
+                                <button 
+                                    onClick={() => setSearch('')}
+                                    className='absolute right-11 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1'
+                                    type="button"
+                                >
+                                    <X className='w-4 h-4' />
+                                </button>
+                            )}
                             <button onClick={handleClickSearch}>
                                 <Search className='mx-2 max-h-6' />
                             </button>
