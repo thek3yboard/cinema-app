@@ -2,9 +2,9 @@
 
 import { Blocks } from 'react-loader-spinner';
 
-export default function Loading() {
+export default function Loading({ top = '50'}) {
     return (
-        <div className="absolute top-[50%] left-[50%] translate-y-[-50%] translate-x-[-50%]">
+        <div className={`absolute top-[${top}%] left-[50%] translate-y-[-50%] translate-x-[-50%]`}>
             <Blocks
                 height={100}
                 width={100}
