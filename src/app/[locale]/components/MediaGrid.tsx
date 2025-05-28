@@ -50,7 +50,14 @@ export default function MediaGrid({ media, handleClickMediaImage, imagesLoaded, 
             })}
             { !imagesLoaded && 
                 (pathname === `/${pathname.split('/')[1]}/people/${pathname.split('/')[3]}` ?
-                    <Loading top="80" /> 
+                    <>
+                        <div className="md:hidden">
+                            <Loading translateY="-80" top="80" /> 
+                        </div>
+                        <div className="max-md:hidden">
+                            <Loading />
+                        </div>
+                    </>
                 : pathname !== `/${pathname.split('/')[1]}/people/${pathname.split('/')[3]}` &&
                     <Loading />)
             }
