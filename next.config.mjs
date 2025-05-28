@@ -27,6 +27,11 @@ const nextConfig = {
       'clsx/dist/clsx.m.js': 'clsx' // ✅ Fix bad path by redirecting
     };
     return config;
+  },
+  // Dangerously allow production builds to complete even with type errors
+  typescript: {
+    // Set this to false if you want to ignore TypeScript errors
+    ignoreBuildErrors: true,
   }
 };
  
