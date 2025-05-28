@@ -52,7 +52,7 @@ export default function MediaGrid({ media, handleClickMediaImage, imagesLoaded, 
                 (pathname === `/${pathname.split('/')[1]}/people/${pathname.split('/')[3]}` ?
                     <>
                         <div className="md:hidden">
-                            <Loading translateY="-80" top="80" /> 
+                            <Loading translateY="-95" top="95" /> 
                         </div>
                         <div className="max-md:hidden">
                             <Loading />
