@@ -35,5 +35,9 @@
         "markAsUnwatched": "Mark as unwatched",
         "addToFavorites": "Add to favorites",
         "removeFromFavorites": "Remove from favorites"
+    },
+
+    "OnScreenTogether": {
+        "didTheyWorkTogether": "Did they work together?"
     }
 }

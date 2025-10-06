@@ -8,9 +8,11 @@ import { PersonData } from "@/types/types";
 import { fetchPage } from "../../utils";
 import { Check, X as Cross } from "lucide-react";
 import Media from "../../components/Media";
+import { useTranslations } from 'next-intl';
 
 export default function OnScreenTogether() {
     const { language } = useContext(MediaContext);
+    const t = useTranslations('OnScreenTogether');
     const [searchLeft, setSearchLeft] = useState('');
     const [searchRight, setSearchRight] = useState('');
     const [leftImageLoaded, setLeftImageLoaded] = useState(false);
@@ -20,6 +22,8 @@ export default function OnScreenTogether() {
     const [workedTogether, setWorkedTogether] = useState<boolean | null>(null);
     const [leftSuggestions, setLeftSuggestions] = useState<PersonData[]>([]);
     const [rightSuggestions, setRightSuggestions] = useState<PersonData[]>([]);
+    const [highlightedLeftIndex, setHighlightedLeftIndex] = useState<number>(-1);
+    const [highlightedRightIndex, setHighlightedRightIndex] = useState<number>(-1);
     const [isLeftFocused, setIsLeftFocused] = useState(false);
     const [isRightFocused, setIsRightFocused] = useState(false);
     const leftInputRef = useRef<HTMLInputElement>(null);
@@ -79,20 +83,8 @@ export default function OnScreenTogether() {
         return () => clearTimeout(timer);
     }, [searchRight, language.key]);
 
-    const handleKeydownSearchleft = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if(e.key === 'Enter') {
-            handleClickSearchLeft();
-        } 
-    }
-    
     const handleChangeSearchLeft = (e: ChangeEvent<HTMLInputElement>) => {
         setSearchLeft(e.target.value);
-    }
-
-    const handleKeydownSearchRight = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if(e.key === 'Enter') {
-            handleClickSearchRight();
-        } 
     }
         
     const handleChangeSearchRight = (e: ChangeEvent<HTMLInputElement>) => {
@@ -114,6 +106,54 @@ export default function OnScreenTogether() {
             setRightResult(data.results[0]);
         } catch (error) {
             console.error(error);
+        }
+    }
+
+    function handleLeftKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+        if (!leftSuggestions.length) return;
+
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setHighlightedLeftIndex((prev) =>
+            prev < leftSuggestions.length - 1 ? prev + 1 : 0
+            );
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setHighlightedLeftIndex((prev) =>
+            prev > 0 ? prev - 1 : leftSuggestions.length - 1
+            );
+        } else if (e.key === "Enter" && highlightedLeftIndex >= 0) {
+            e.preventDefault();
+            const selected = leftSuggestions[highlightedLeftIndex];
+            setLeftResult(selected);
+            setSearchLeft(selected.name);
+            setLeftSuggestions([]);
+            setHighlightedLeftIndex(-1);
+            setIsLeftFocused(false);
+        }
+    }
+
+    function handleRightKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+        if (!rightSuggestions.length) return;
+
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setHighlightedRightIndex((prev) =>
+            prev < rightSuggestions.length - 1 ? prev + 1 : 0
+            );
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setHighlightedRightIndex((prev) =>
+            prev > 0 ? prev - 1 : rightSuggestions.length - 1
+            );
+        } else if (e.key === "Enter" && highlightedRightIndex >= 0) {
+            e.preventDefault();
+            const selected = rightSuggestions[highlightedRightIndex];
+            setRightResult(selected);
+            setSearchRight(selected.name);
+            setRightSuggestions([]);
+            setHighlightedRightIndex(-1);
+            setIsRightFocused(false);
         }
     }
 
@@ -157,16 +197,19 @@ export default function OnScreenTogether() {
         ]);
 
         function extractCleanMovies(credits: any) {
-            const cleanCast = credits.cast.filter(
-            (c: any) =>
-                !c.character?.toLowerCase().includes("archive") &&
-                !c.character?.toLowerCase().includes("uncredited")
-            );
+            const cleanCast = credits.cast.filter((c: any) => {
+                const ch = c.character?.toLowerCase() ?? "";
+                const isSelf = ch.includes("self") || ch.includes("archive") || ch.includes("uncredited");
+                const isDoc = (c.genre_ids ?? []).includes(99);
+                return !isSelf && !isDoc;
+            });
 
-            const cleanCrew = credits.crew.filter(
-            (c: any) =>
-                !["thanks", "in memory of"].includes(c.job?.toLowerCase())
-            );
+            const cleanCrew = credits.crew.filter((c: any) => {
+                const job = c.job?.toLowerCase() ?? "";
+                const isDoc = (c.genre_ids ?? []).includes(99);
+                const badJob = job.includes("thanks") || job.includes("in memory") || job.includes("archive");
+                return !badJob && !isDoc;
+            });
 
             return [...cleanCast, ...cleanCrew];
         }
@@ -177,8 +220,7 @@ export default function OnScreenTogether() {
         const leftMap = new Map(leftMovies.map((m: any) => [m.id, m]));
         const shared = rightMovies.filter((m: any) => leftMap.has(m.id));
 
-        // 🔥 normalize to match search/movie results
-        return shared.map((m: any) => ({
+        const normalized = shared.map((m: any) => ({
             id: m.id,
             title: m.title,
             original_title: m.original_title,
@@ -189,166 +231,176 @@ export default function OnScreenTogether() {
             vote_average: m.vote_average,
             vote_count: m.vote_count,
             popularity: m.popularity,
-            genre_ids: m.genre_ids ?? [], // credits may not always return this
+            genre_ids: m.genre_ids ?? [],
             adult: false,
             video: false,
             original_language: m.original_language
         }));
+
+        // ✅ remove duplicates
+        return Array.from(new Map(normalized.map((m) => [m.id, m])).values());
     }
 
     return (
-        <div className="h-full flex flex-col p-16">
-            <h1 className="text-5xl m-auto">Did they work together?</h1>
-            <div className="grow flex flex-col pt-5 w-1/2 m-auto">
-                <div className="flex justify-between">
-                    <span className="max-md:hidden flex items-center w-1/3 h-10 bg-blueish-gray rounded-[3px] relative">
-                        <input 
-                            type='text' 
-                            value={searchLeft}
-                            onChange={(e) => handleChangeSearchLeft(e)} 
-                            onKeyDown={(e) => handleKeydownSearchleft(e)} 
-                            className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray'
-                            ref={leftInputRef}
-                            onFocus={() => setIsLeftFocused(true)}
-                            onBlur={() => setTimeout(() => setIsLeftFocused(false), 200)} // little delay so clicks on suggestions work
-                        />
-                        {isLeftFocused && leftSuggestions.length > 0 && (
-                        <ul className="absolute top-full left-0 w-full bg-blueish-gray text-white border rounded shadow-md z-10">
-                            {leftSuggestions.map((person) => (
-                            <li
-                                key={person.id}
-                                onClick={() => {
-                                    setLeftResult(person);
-                                    setLeftSuggestions([]);
-                                    setSearchLeft(person.name);
-                                }}
-                                className="cursor-pointer hover:bg-slate-800 text-white p-2 flex items-center"
-                            >
-                                <img
-                                src={
-                                    person.profile_path
-                                    ? `https://image.tmdb.org/t/p/w45${person.profile_path}`
-                                    : 'https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-38-picture-grey-c2ebdbb057f2a7614185931650f8cee23fa137b93812ccb132b9df511df1cfac.svg'
-                                }
-                                alt={person.name}
-                                className="w-8 h-8 rounded-full mr-2 object-cover"
-                                />
-                                {person.name}
-                            </li>
+        <div className="h-full flex flex-col p-6 md:p-16">
+            <h1 className="text-4xl md:text-5xl text-center mb-10">{`${t('didTheyWorkTogether')}`}</h1>
+
+            {/* Search section */}
+            <div className="flex flex-col gap-6 items-center md:flex-row md:justify-center w-full max-w-5xl mx-auto">
+                {/* Left search box */}
+                <div className="relative w-full md:w-1/2 max-w-sm">
+                    <input
+                        type="text"
+                        value={searchLeft}
+                        onChange={handleChangeSearchLeft}
+                        onKeyDown={handleLeftKeyDown}
+                        ref={leftInputRef}
+                        onFocus={() => setIsLeftFocused(true)}
+                        onBlur={() => setTimeout(() => setIsLeftFocused(false), 200)}
+                        className="w-full pl-3 pr-10 h-10 rounded-md bg-blueish-gray text-white placeholder:text-gray-400"
+                    />
+                    {searchLeft && (
+                        <button
+                            onClick={() => setSearchLeft('')}
+                            className="absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    )}
+                    <button onClick={handleClickSearchLeft} className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                        <Search className="w-5 h-5 text-white" />
+                    </button>
+
+                    {isLeftFocused && leftSuggestions.length > 0 && (
+                        <ul className="absolute w-full mt-1 bg-blueish-gray text-white border border-slate-600 rounded shadow-md z-10 max-h-60 overflow-auto">
+                            {leftSuggestions.map((person, index) => (
+                                <li
+                                    key={person.id}
+                                    onMouseDown={() => {
+                                        setLeftResult(person);
+                                        setSearchLeft(person.name);
+                                        setLeftSuggestions([]);
+                                        setHighlightedLeftIndex(-1);
+                                        setIsLeftFocused(false);
+                                    }}
+                                    className={`flex items-center px-3 py-2 cursor-pointer ${
+                                        highlightedLeftIndex === index ? "bg-slate-800" : "hover:bg-slate-700"
+                                    }`}
+                                >
+                                    <Image
+                                        src={person.profile_path ? `https://image.tmdb.org/t/p/w45${person.profile_path}` : "/fallback-portrait.svg"}
+                                        alt={person.name}
+                                        className="w-8 h-8 rounded-full mr-2 object-cover"
+                                        width={32}
+                                        height={32}
+                                    />
+                                    {person.name}
+                                </li>
                             ))}
                         </ul>
-                        )}
-                        {searchLeft && (
-                            <button 
-                                onClick={() => setSearchLeft('')}
-                                className='absolute right-11 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1'
-                                type="button"
-                            >
-                                <X className='w-4 h-4' />
-                            </button>
-                        )}
-                        <button onClick={handleClickSearchLeft}>
-                            <Search className='mx-2 max-h-6' />
-                        </button>
-                    </span>
-                    <span className="max-md:hidden flex items-center w-1/3 h-10 bg-blueish-gray rounded-[3px] relative">
-                        <input 
-                            type='text' 
-                            value={searchRight} 
-                            onChange={(e) => handleChangeSearchRight(e)} 
-                            onKeyDown={(e) => handleKeydownSearchRight(e)} 
-                            className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray'
-                            ref={rightInputRef}
-                            onFocus={() => setIsRightFocused(true)}
-                            onBlur={() => setTimeout(() => setIsRightFocused(false), 200)} // little delay so clicks on suggestions work
-                        />
-                        {isRightFocused && rightSuggestions.length > 0 && (
-                        <ul className="absolute top-full left-0 w-full bg-blueish-gray text-white border rounded shadow-md z-10">
-                            {rightSuggestions.map((person) => (
-                            <li
-                                key={person.id}
-                                onClick={() => {
-                                    setRightResult(person);
-                                    setRightSuggestions([]);
-                                    setSearchRight(person.name);
-                                }}
-                                className="cursor-pointer hover:bg-slate-800 text-white p-2 flex items-center"
-                            >
-                                <img
-                                src={
-                                    person.profile_path
-                                    ? `https://image.tmdb.org/t/p/w45${person.profile_path}`
-                                    : 'https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-38-picture-grey-c2ebdbb057f2a7614185931650f8cee23fa137b93812ccb132b9df511df1cfac.svg'
-                                }
-                                alt={person.name}
-                                className="w-8 h-8 rounded-full mr-2 object-cover"
-                                />
-                                {person.name}
-                            </li>
-                            ))}
-                        </ul>
-                        )}
-                        {searchRight && (
-                            <button 
-                                onClick={() => setSearchRight('')}
-                                className='absolute right-11 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1'
-                                type="button"
-                            >
-                                <X className='w-4 h-4' />
-                            </button>
-                        )}
-                        <button onClick={handleClickSearchRight}>
-                            <Search className='mx-2 max-h-6' />
-                        </button>
-                    </span>
+                    )}
                 </div>
-                <div className="grow flex mt-5 mb-10">
-                    <div className="w-1/3 flex justify-center items-center h-[300px]">
-                        <Image
-                            onLoad={() => setLeftImageLoaded(true)}
-                            src={
-                                leftResult?.profile_path
-                                ? `https://image.tmdb.org/t/p/w300${leftResult.profile_path}`
-                                : 'https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-38-picture-grey-c2ebdbb057f2a7614185931650f8cee23fa137b93812ccb132b9df511df1cfac.svg'
-                            }
-                            alt={leftResult?.name ?? "Poster"}
-                            width={200}
-                            height={300}
-                            className="rounded-xl border border-gray-300 object-cover"
-                        />
-                    </div>
-                    <div className="w-1/3 flex justify-center items-center h-[300px]">
+
+                {/* Right search box */}
+                <div className="relative w-full md:w-1/2 max-w-sm">
+                    <input
+                        type="text"
+                        value={searchRight}
+                        onChange={handleChangeSearchRight}
+                        onKeyDown={handleRightKeyDown}
+                        ref={rightInputRef}
+                        onFocus={() => setIsRightFocused(true)}
+                        onBlur={() => setTimeout(() => setIsRightFocused(false), 200)}
+                        className="w-full pl-3 pr-10 h-10 rounded-md bg-blueish-gray text-white placeholder:text-gray-400"
+                    />
+                    {searchRight && (
+                        <button
+                            onClick={() => setSearchRight('')}
+                            className="absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    )}
+                    <button onClick={handleClickSearchRight} className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                        <Search className="w-5 h-5 text-white" />
+                    </button>
+
+                    {isRightFocused && rightSuggestions.length > 0 && (
+                        <ul className="absolute w-full mt-1 bg-blueish-gray text-white border border-slate-600 rounded shadow-md z-10 max-h-60 overflow-auto">
+                            {rightSuggestions.map((person, index) => (
+                                <li
+                                    key={person.id}
+                                    onMouseDown={() => {
+                                        setRightResult(person);
+                                        setSearchRight(person.name);
+                                        setRightSuggestions([]);
+                                        setHighlightedRightIndex(-1);
+                                        setIsRightFocused(false);
+                                    }}
+                                    className={`flex items-center px-3 py-2 cursor-pointer ${
+                                        highlightedRightIndex === index ? "bg-slate-800" : "hover:bg-slate-700"
+                                    }`}
+                                >
+                                    <Image
+                                        src={person.profile_path ? `https://image.tmdb.org/t/p/w45${person.profile_path}` : "/fallback-portrait.svg"}
+                                        alt={person.name}
+                                        className="w-8 h-8 rounded-full mr-2 object-cover"
+                                        width={32}
+                                        height={32}
+                                    />
+                                    {person.name}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            </div>
+
+            {/* Avatars & checkmark */}
+            <div className="flex max-md:flex-col max-md:gap-8 gap-12 mt-10 justify-center items-center flex-wrap">
+                <div className="flex flex-col items-center w-[200px]">
+                    <Image
+                        src={leftResult?.profile_path ? `https://image.tmdb.org/t/p/w300${leftResult.profile_path}` : "/fallback-portrait.svg"}
+                        alt={leftResult?.name ?? "Left Person"}
+                        width={200}
+                        height={300}
+                        className="rounded-xl border border-gray-300 object-cover aspect-[2/3]"
+                    />
+                </div>
+                <div className="flex items-center justify-center w-12 h-12">
                     {leftResult && rightResult && (
                         workedTogether === null ? (
-                        <span>Loading...</span>
+                            <span className="text-white text-xl">Loading...</span>
                         ) : workedTogether ? (
-                        <Check className="text-green-500 w-12 h-12" />
+                            <Check className="text-green-500 w-12 h-12" />
                         ) : (
-                        <Cross className="text-red-500 w-12 h-12" />
+                            <Cross className="text-red-500 w-12 h-12" />
                         )
                     )}
-                    </div>
-                    <div className="w-1/3 flex justify-center items-center h-[300px]">
-                        <Image
-                            onLoad={() => setRightImageLoaded(true)}
-                            src={
-                                rightResult?.profile_path
-                                ? `https://image.tmdb.org/t/p/w300${rightResult.profile_path}`
-                                : 'https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-38-picture-grey-c2ebdbb057f2a7614185931650f8cee23fa137b93812ccb132b9df511df1cfac.svg'
-                            }
-                            alt={rightResult?.name ?? "Poster"}
-                            width={200}
-                            height={300}
-                            className="rounded-xl border border-gray-300 object-cover"
-                        />
-                    </div>
+                </div>
+                <div className="flex flex-col items-center w-[200px]">
+                    <Image
+                        src={rightResult?.profile_path ? `https://image.tmdb.org/t/p/w300${rightResult.profile_path}` : "/fallback-portrait.svg"}
+                        alt={rightResult?.name ?? "Right Person"}
+                        width={200}
+                        height={300}
+                        className="rounded-xl border border-gray-300 object-cover aspect-[2/3]"
+                    />
                 </div>
             </div>
-            <div className="grow">
-            {sharedMovies.length > 0 &&
-                <Media type={'movies'} preloadedMovies={sharedMovies} preloadedShows={[]} preloadedPeople={[]} />
-            }
-            </div>
+
+            {/* Shared Movies */}
+            {sharedMovies.length > 0 && (
+                <div className="mt-12 px-6 md:px-32 overflow-x-auto">
+                    <Media
+                        type={'movies'}
+                        preloadedMovies={sharedMovies}
+                        preloadedShows={[]}
+                        preloadedPeople={[]}
+                    />
+                </div>
+            )}
         </div>
     );
+
 }

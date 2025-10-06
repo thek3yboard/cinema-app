@@ -23,6 +23,7 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [],
     shows, setShows, people, setPeople, language, setLanguage } = useContext(MediaContext);
     const router = useRouter();
     const pathname = usePathname();
+    const isCarousel = pathname.includes('/onscreentogether');
 
     useEffect(() => {
         const storedLanguageKey = localStorage.getItem('language_key');
@@ -166,8 +167,21 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [],
                         }
                     </div>
                     { pathname === `/${pathname.split('/')[1]}/movies` || pathname === `/${pathname.split('/')[1]}/people/${pathname.split('/')[3]}` || pathname === `/${pathname.split('/')[1]}/onscreentogether` ?
-                        <div className={`mx-4 grid ${movies.length !== 1 ? `media-grid-columns` : `grid-cols-1`} gap-5 xl:gap-3 justify-items-center justify-center`}>
-                            <MediaGrid media={movies} handleClickMediaImage={handleClickMediaImage} imagesLoaded={imagesLoaded} setImagesLoaded={setImagesLoaded} countLoadedImages={countLoadedImages} />
+                        <div
+                            className={
+                                isCarousel
+                                ? 'flex overflow-x-auto space-x-4 px-4 py-2 w-full scrollbar-thin scrollbar-thumb-gray-400 flex-nowrap'
+                                : `mx-4 grid ${movies.length !== 1 ? `media-grid-columns` : `grid-cols-1`} gap-5 xl:gap-3 justify-items-center justify-center`
+                            }
+                        >
+                            <MediaGrid
+                                media={movies}
+                                handleClickMediaImage={handleClickMediaImage}
+                                imagesLoaded={imagesLoaded}
+                                setImagesLoaded={setImagesLoaded}
+                                countLoadedImages={countLoadedImages}
+                                isCarousel={isCarousel}
+                            />
                         </div>
                     : pathname === `/${pathname.split('/')[1]}/shows` ?
                         <div className={`mx-4 grid ${shows.length !== 1 ? `media-grid-columns` : `grid-cols-1`} gap-5 xl:gap-3 justify-items-center justify-center`}>
