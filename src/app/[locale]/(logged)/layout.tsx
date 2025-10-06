@@ -254,7 +254,7 @@ export default function LoggedLayout({
 
                 let filteredMovies = movies.filter((movie: Movie) => movie.vote_count > 1000);
 
-                filteredMovies = filteredMovies.sort((a: any, b: any) => a.release_date.substring(0, 4) - b.release_date.substring(0, 4));
+                filteredMovies = filteredMovies.sort((a: any, b: any) => a.release_date?.localeCompare(b.release_date));
                 
                 setMovies(filteredMovies);
 
@@ -264,7 +264,7 @@ export default function LoggedLayout({
 
                 let filteredShows = shows.filter((show: Show) => show.vote_count > 1000);
 
-                filteredShows = filteredShows.sort((a: any, b: any) => a.first_air_date.substring(0, 4) - b.first_air_date.substring(0, 4));
+                filteredShows = filteredShows.sort((a: any, b: any) => a.first_air_date?.localeCompare(b.first_air_date));
                 
                 setShows(filteredShows);
 

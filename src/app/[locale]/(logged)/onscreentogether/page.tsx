@@ -30,26 +30,20 @@ export default function OnScreenTogether() {
     const rightInputRef = useRef<HTMLInputElement>(null);
     const [sharedMovies, setSharedMovies] = useState<any[]>([]);
 
-   useEffect(() => {
-        if (leftResult?.id && rightResult?.id) {
-            setSharedMovies([]);
-            setWorkedTogether(null);
-            didTheyWorkTogether(leftResult.id, rightResult.id).then(setWorkedTogether);
-        }
-    }, [leftResult, rightResult, language.key]);
-
     useEffect(() => {
-        async function loadShared() {
-            if(workedTogether) {
-                if (leftResult?.id && rightResult?.id) {
-                    const movies = await getSharedMovies(leftResult.id, rightResult.id, language.key);
-                    setSharedMovies(movies);
-                }
+        async function processPair() {
+            if (leftResult?.id && rightResult?.id) {
+                setSharedMovies([]);
+                setWorkedTogether(null);
+
+                const shared = await fetchAndCompareMovies(leftResult.id, rightResult.id, language.key);
+                setSharedMovies(shared);
+                setWorkedTogether(shared.length > 0);
             }
         }
 
-        loadShared();
-    }, [workedTogether]);
+        processPair();
+    }, [leftResult, rightResult, language.key]);
 
     useEffect(() => {
         if (!searchLeft) {
@@ -61,7 +55,8 @@ export default function OnScreenTogether() {
             const data = await fetchPage(
             `https://api.themoviedb.org/3/search/person?query=${searchLeft}&language=${language.key}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
             );
-            setLeftSuggestions(data.results.slice(0, 5)); // top 5
+            const knownSuggestions = data.results.filter((obj: any) => obj.profile_path !== null);
+            setLeftSuggestions(knownSuggestions.slice(0, 5)); // top 5
         }, 100);
 
         return () => clearTimeout(timer);
@@ -77,7 +72,8 @@ export default function OnScreenTogether() {
             const data = await fetchPage(
             `https://api.themoviedb.org/3/search/person?query=${searchRight}&language=${language.key}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
             );
-            setRightSuggestions(data.results.slice(0, 5)); // top 5
+            const knownSuggestions = data.results.filter((obj: any) => obj.profile_path !== null);
+            setRightSuggestions(knownSuggestions.slice(0, 5)); // top 5
         }, 100);
 
         return () => clearTimeout(timer);
@@ -157,38 +153,7 @@ export default function OnScreenTogether() {
         }
     }
 
-    async function didTheyWorkTogether(leftId: number, rightId: number) {
-        const [leftCredits, rightCredits] = await Promise.all([
-            fetchPage(`https://api.themoviedb.org/3/person/${leftId}/movie_credits?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`),
-            fetchPage(`https://api.themoviedb.org/3/person/${rightId}/movie_credits?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`)
-        ]);
-
-        // helper: clean credits (cast + crew) → movie IDs
-        function extractCleanMovieIds(credits: any) {
-            const cleanCast = credits.cast.filter(
-            (c: any) =>
-                !c.character?.toLowerCase().includes("archive") &&
-                !c.character?.toLowerCase().includes("uncredited")
-            );
-
-            const cleanCrew = credits.crew.filter(
-            (c: any) =>
-                !["thanks", "in memory of"].includes(c.job?.toLowerCase())
-            );
-
-            return [
-            ...cleanCast.map((m: any) => m.id),
-            ...cleanCrew.map((m: any) => m.id),
-            ];
-        }
-
-        const leftMovies = new Set(extractCleanMovieIds(leftCredits));
-        const rightMovies = extractCleanMovieIds(rightCredits);
-
-        return rightMovies.some((id: number) => leftMovies.has(id));
-    }
-
-    async function getSharedMovies(leftId: number, rightId: number, language: string) {
+    async function fetchAndCompareMovies(leftId: number, rightId: number, language: string) {
         const apiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 
         const [leftCredits, rightCredits] = await Promise.all([
@@ -221,8 +186,8 @@ export default function OnScreenTogether() {
         const shared = rightMovies.filter((m: any) => leftMap.has(m.id));
 
         const sortedSharedMovies = shared
-            ?.slice() // shallow copy to avoid mutating original
-            .sort((a, b) => a.release_date.substring(0, 4) - b.release_date.substring(0, 4)); // ascending (oldest to newest)
+            ?.slice()
+            .sort((a, b) => a.release_date?.localeCompare(b.release_date));
 
         const normalized = sortedSharedMovies.map((m: any) => ({
             id: m.id,
@@ -241,8 +206,9 @@ export default function OnScreenTogether() {
             original_language: m.original_language
         }));
 
-        // ✅ remove duplicates
-        return Array.from(new Map(normalized.map((m) => [m.id, m])).values());
+        const unique = Array.from(new Map(normalized.map((m) => [m.id, m])).values());
+
+        return unique;
     }
 
     return (
