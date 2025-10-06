@@ -3,6 +3,7 @@
         "movies": "Movies",
         "shows": "Shows",
         "people": "People",
+        "onScreenTogether": "On Screen Together",
         "filter": "Filter",
         "sortBy": "Sort by",
         "orderBy": "Order by",
@@ -34,5 +35,9 @@
         "markAsUnwatched": "Mark as unwatched",
         "addToFavorites": "Add to favorites",
         "removeFromFavorites": "Remove from favorites"
+    },
+
+    "OnScreenTogether": {
+        "didTheyWorkTogether": "Did they work together?"
     }
 }

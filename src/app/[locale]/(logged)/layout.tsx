@@ -83,6 +83,10 @@ export default function LoggedLayout({
         {
             key: 'people',
             value: `${t('people')}`
+        },
+        {
+            key: 'onScreenTogether',
+            value: `${t('onScreenTogether')}`
         }
     ];
 
