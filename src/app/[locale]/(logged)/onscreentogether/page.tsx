@@ -220,7 +220,11 @@ export default function OnScreenTogether() {
         const leftMap = new Map(leftMovies.map((m: any) => [m.id, m]));
         const shared = rightMovies.filter((m: any) => leftMap.has(m.id));
 
-        const normalized = shared.map((m: any) => ({
+        const sortedSharedMovies = shared
+            ?.slice() // shallow copy to avoid mutating original
+            .sort((a, b) => a.release_date.substring(0, 4) - b.release_date.substring(0, 4)); // ascending (oldest to newest)
+
+        const normalized = sortedSharedMovies.map((m: any) => ({
             id: m.id,
             title: m.title,
             original_title: m.original_title,
