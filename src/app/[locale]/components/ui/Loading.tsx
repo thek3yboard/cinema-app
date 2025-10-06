@@ -1,20 +1,15 @@
 "use client";
 
-import { Blocks } from 'react-loader-spinner';
+import { Blocks } from "react-loader-spinner";
 
-export default function Loading({ translateY = '-50', top = '50' }) {
+export default function Loading() {
     return (
-        <div 
-            className="absolute left-1/2 translate-x-[-50%]"
-            style={{ top: `${top}%`, transform: `translate(-50%, ${translateY}%)` }}
-        >
+        <div className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center z-[9999] bg-transparent">
             <Blocks
                 height={100}
                 width={100}
                 color="#e4fde1"
-                ariaLabel="ball-triangle-loading"
-                wrapperStyle={{}}
-                wrapperClass=""
+                ariaLabel="blocks-loading"
                 visible={true}
             />
         </div>

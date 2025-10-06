@@ -357,8 +357,8 @@ export default function OnScreenTogether() {
             </div>
 
             {/* Avatars & checkmark */}
-            <div className="flex max-md:flex-col max-md:gap-8 gap-12 mt-10 justify-center items-center flex-wrap">
-                <div className="flex flex-col items-center w-[200px]">
+            <div className="flex max-md:flex-col max-md:gap-4 max-md:mt-6 gap-12 mt-10 justify-center items-center flex-wrap">
+                <div className="flex flex-col items-center w-[200px] max-md:w-[150px]">
                     <Image
                         src={leftResult?.profile_path ? `https://image.tmdb.org/t/p/w300${leftResult.profile_path}` : "/fallback-portrait.svg"}
                         alt={leftResult?.name ?? "Left Person"}
@@ -378,7 +378,7 @@ export default function OnScreenTogether() {
                         )
                     )}
                 </div>
-                <div className="flex flex-col items-center w-[200px]">
+                <div className="flex flex-col items-center w-[200px] max-md:w-[150px]">
                     <Image
                         src={rightResult?.profile_path ? `https://image.tmdb.org/t/p/w300${rightResult.profile_path}` : "/fallback-portrait.svg"}
                         alt={rightResult?.name ?? "Right Person"}

@@ -170,7 +170,7 @@ export default function Media({ type, preloadedMovies = [], preloadedShows = [],
                         <div
                             className={
                                 isCarousel
-                                ? 'flex overflow-x-auto space-x-4 px-4 py-2 w-full scrollbar-thin scrollbar-thumb-gray-400 flex-nowrap'
+                                ? 'flex overflow-x-auto gap-4 px-4 py-2 w-full scrollbar-thin scrollbar-thumb-gray-400 flex-nowrap'
                                 : `mx-4 grid ${movies.length !== 1 ? `media-grid-columns` : `grid-cols-1`} gap-5 xl:gap-3 justify-items-center justify-center`
                             }
                         >
