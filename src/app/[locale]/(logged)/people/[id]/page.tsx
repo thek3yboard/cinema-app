@@ -6,10 +6,17 @@ import { Movie, PersonData } from "@/types/types";
 import { MediaContext } from "../../../(logged)/MediaContext";
 const PersonUI = lazy(() => import('../../../components/PersonUI'));
 
+type PersonWork = Movie & {
+    name?: string;
+    character?: string;
+    release_date?: string;
+    first_air_date?: string;
+};
+
 export default function Person({ params }: { params: { id: number, locale: string } }) {
     const { language } = useContext(MediaContext);
     const [personData, setPersonData] = useState<PersonData>();
-    const [personWork, setPersonWork] = useState<Movie[]>();
+    const [personWork, setPersonWork] = useState<PersonWork[]>();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -32,35 +39,35 @@ export default function Person({ params }: { params: { id: number, locale: strin
                 
                 let personWorkData = await personWorkResponse.json();
 
-                let work = null;
+                const credits = personWorkData as { crew: PersonWork[]; cast: PersonWork[] };
+                let work: PersonWork[] = [];
 
                 if(personDetailsData.known_for_department === 'Directing') {
-                    work = personWorkData.crew.filter((m) => m.poster_path !== null && m.vote_count >= 100);
+                    work = credits.crew.filter((m) => m.poster_path !== null && m.vote_count >= 100);
 
                     work = work.filter(obra => 
-                        !(obra.hasOwnProperty('name') && (obra.name.includes('Show') || obra.name.includes('Live'))) 
-                        && !(obra.media_type === "tv" && obra.hasOwnProperty('character') && obra.character.includes("Self"))
+                        !((obra.name ?? '').includes('Show') || (obra.name ?? '').includes('Live'))
+                        && !(obra.media_type === "tv" && (obra.character ?? '').includes("Self"))
                         /* || (obra.media_type === "movie" && obra.character.includes("Self")) */
                     );
                 } else {
-                    work = personWorkData.cast.filter((m) => m.poster_path !== null && m.vote_count >= 100);
+                    work = credits.cast.filter((m) => m.poster_path !== null && m.vote_count >= 100);
 
                     work = work.filter(obra => 
-                        !(obra.hasOwnProperty('name') && (obra.name.includes('Show') || obra.name.includes('Live'))) 
-                        && !(obra.media_type === "tv" && obra.hasOwnProperty('character') && obra.character.includes("Self"))
+                        !((obra.name ?? '').includes('Show') || (obra.name ?? '').includes('Live'))
+                        && !(obra.media_type === "tv" && (obra.character ?? '').includes("Self"))
                         /* || (obra.media_type === "movie" && obra.character.includes("Self")) */
                     );
                 }
 
-                work = Array.from(new Set(work.map(item => item.id)))
-                .map(id => work.find(item => item.id === id));
+                work = Array.from(new Map(work.map(item => [item.id, item])).values());
             
-                work = work.sort((a: any, b: any) => {
-                    const getDate = (item: any) => {
+                work = work.sort((a, b) => {
+                    const getDate = (item: PersonWork) => {
                         if (item.media_type === 'movie') {
-                            return new Date(item.release_date).getTime();
+                            return new Date(item.release_date ?? 0).getTime();
                         }
-                        return new Date(item.first_air_date).getTime();
+                        return new Date(item.first_air_date ?? 0).getTime();
                     };
                 
                     const aDate = getDate(a);
@@ -79,11 +86,11 @@ export default function Person({ params }: { params: { id: number, locale: strin
         }
 
         fetchData();
-    }, [params.locale]);
+    }, [params.id, params.locale]);
 
     return (
         <Suspense key={params.locale} fallback={<Loading/>}>
-            <PersonUI personData={personData!} personWork={personWork!} />
+            {personData && personWork ? <PersonUI personData={personData} personWork={personWork} /> : <Loading />}
         </Suspense>
     );
 }
