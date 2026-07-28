@@ -1,28 +1,32 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Cinema
 
-## Getting Started
+Aplicación de descubrimiento de películas, series y personas basada en TMDB. Incluye cuentas de usuario con email/contraseña + activación OTP, inicio de sesión con Google, perfil editable y listas privadas sincronizadas.
 
-First, run the development server:
+## Puesta en marcha
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Copiar `.env.example` a `.env.local` y completar TMDB y Supabase.
+2. Ejecutar todas las migraciones de `supabase/migrations/` en orden en el proyecto Supabase. Si ya se ejecutó la primera, aplicar también `20260726000001_user_media_metadata.sql` para mostrar títulos y posters en las listas existentes.
+3. Completar la configuración de Email OTP y Google OAuth detallada en [supabase/README.md](supabase/README.md).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Comandos
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```bash
+npm run lint
+npm run typecheck
+npm run build
+```
 
-## Learn More
+## Seguridad de datos
 
-To learn more about Next.js, take a look at the following resources:
+- Las listas de usuario se almacenan en `user_media`; las políticas RLS impiden leer o modificar datos de otra cuenta.
+- El estado local anterior se migra una única vez después del primer inicio de sesión.
+- Las claves públicas de Supabase pueden estar en el navegador. Nunca agregar una `service_role` al cliente ni al repositorio.
+- Las credenciales de TMDB siguen pendientes de moverse a rutas de servidor; consultar `CONTEXTO_Y_AUDITORIA.md`.
 
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
