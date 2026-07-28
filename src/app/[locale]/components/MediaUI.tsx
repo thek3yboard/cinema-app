@@ -8,10 +8,20 @@ import LiteYouTubeEmbed from "react-lite-youtube-embed"
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css"
 import { Heart, List, Eye } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { createClient } from '@/lib/supabase/client';
 
 type Props = {
-    mediaData: MovieData | ShowData
+    mediaData?: MovieData | ShowData
 }
+
+type UserMediaState = {
+    in_watchlist: boolean;
+    is_watched: boolean;
+    is_favorite: boolean;
+    rating: number;
+};
 
 export default function MediaUI({ mediaData }: Props) {
     const t = useTranslations('MediaUI');
@@ -22,6 +32,8 @@ export default function MediaUI({ mediaData }: Props) {
     const [userRating, setUserRating] = useState<number>(0)
     const pathname = usePathname();
     const [thumbnailHeight, setThumbnailHeight] = useState<number>(0);
+    const { user } = useAuth();
+    const mediaType = pathname.includes('/movies') ? 'movie' : 'tv';
 
     const checkThumbnail = async () => {
         const img = new Image();
@@ -33,71 +45,80 @@ export default function MediaUI({ mediaData }: Props) {
     };
 
     useEffect(() => {
+        if (!mediaData?.video_id) return;
         checkThumbnail();
-    }, []);
+    }, [mediaData?.video_id]);
 
     useEffect(() => {
-        if(pathname.includes('/movies')) {
-            const storedWatchlist = localStorage.getItem(`movie_watchlist_${mediaData?.id}`)
-            const storedWatched = localStorage.getItem(`movie_watched_${mediaData?.id}`)
-            const storedFavorite = localStorage.getItem(`movie_favorite_${mediaData?.id}`)
-            const storedRating = localStorage.getItem(`movie_rating_${mediaData?.id}`)
-
-            setInWatchlist(storedWatchlist === 'true')
-            setIsWatched(storedWatched === 'true')
-            setIsFavorite(storedFavorite === 'true')
-            setUserRating(storedRating ? parseInt(storedRating) : 0)
-        } else {
-            const storedWatchlist = localStorage.getItem(`show_watchlist_${mediaData?.id}`)
-            const storedWatched = localStorage.getItem(`show_watched_${mediaData?.id}`)
-            const storedFavorite = localStorage.getItem(`show_favorite_${mediaData?.id}`)
-            const storedRating = localStorage.getItem(`show_rating_${mediaData?.id}`)
-
-            setInWatchlist(storedWatchlist === 'true')
-            setIsWatched(storedWatched === 'true')
-            setIsFavorite(storedFavorite === 'true')
-            setUserRating(storedRating ? parseInt(storedRating) : 0)
+        if (!user || !mediaData?.id) {
+            setInWatchlist(false);
+            setIsWatched(false);
+            setIsFavorite(false);
+            setUserRating(0);
+            return;
         }
-    }, [mediaData?.id, pathname])
+
+        let active = true;
+        createClient().from('user_media')
+            .select('in_watchlist, is_watched, is_favorite, rating')
+            .eq('user_id', user.id)
+            .eq('media_type', mediaType)
+            .eq('media_id', mediaData.id)
+            .maybeSingle()
+            .then(({ data, error }: { data: UserMediaState | null; error: { message: string } | null }) => {
+                if (!active || error) return;
+                setInWatchlist(data?.in_watchlist ?? false);
+                setIsWatched(data?.is_watched ?? false);
+                setIsFavorite(data?.is_favorite ?? false);
+                setUserRating(Number(data?.rating ?? 0));
+            });
+
+        return () => { active = false; };
+    }, [mediaData?.id, mediaType, user]);
+
+    const persistUserMedia = async (changes: Record<string, boolean | number>) => {
+        if (!user || !mediaData?.id) return;
+        const title = 'title' in mediaData ? mediaData.title : mediaData.name;
+        const { error } = await createClient().from('user_media').upsert({
+            user_id: user.id,
+            media_type: mediaType,
+            media_id: mediaData.id,
+            in_watchlist: inWatchlist,
+            is_watched: isWatched,
+            is_favorite: isFavorite,
+            rating: userRating,
+            title,
+            poster_path: mediaData.poster_path,
+            ...changes
+        }, { onConflict: 'user_id,media_type,media_id' });
+
+        if (error) toast.error(t('saveError'));
+    };
 
     const toggleWatchlist = () => {
         const newState = !inWatchlist
         setInWatchlist(newState)
-        if(pathname.includes('/movies')) {
-            localStorage.setItem(`movie_watchlist_${mediaData?.id}`, newState.toString())
-        } else {
-            localStorage.setItem(`show_watchlist_${mediaData?.id}`, newState.toString())
-        }
+        persistUserMedia({ in_watchlist: newState });
     }
 
     const toggleWatched = () => {
         const newState = !isWatched
         setIsWatched(newState)
-        if(pathname.includes('/movies')) {
-            localStorage.setItem(`movie_watched_${mediaData?.id}`, newState.toString())
-        } else {
-            localStorage.setItem(`show_watched_${mediaData?.id}`, newState.toString())
-        }
+        persistUserMedia({ is_watched: newState });
     }
 
     const toggleFavorite = () => {
         const newState = !isFavorite
         setIsFavorite(newState)
-        if(pathname.includes('/movies')) {
-            localStorage.setItem(`movie_favorite_${mediaData?.id}`, newState.toString())
-        } else {
-            localStorage.setItem(`show_favorite_${mediaData?.id}`, newState.toString())
-        }
+        persistUserMedia({ is_favorite: newState });
     }
 
     const handleRating = (rating: number) => {
         setUserRating(rating)
-        if(pathname.includes('/movies')) {
-            localStorage.setItem(`movie_rating_${mediaData?.id}`, rating.toString())
-        } else {
-            localStorage.setItem(`show_rating_${mediaData?.id}`, rating.toString())
-        }
+        persistUserMedia({ rating });
     }
+
+    if (!mediaData) return <Loading />;
 
     return (
         <div className='flex flex-col items-center'>
@@ -123,7 +144,7 @@ export default function MediaUI({ mediaData }: Props) {
                             <div className="w-screen xl:w-[1000px] 2xl:w-[1250px] px-3 xl:pl-8">
                                 <div className='mt-4 flex max-md:flex-col md:justify-between md:items-center'>
                                     <StarRating rating={mediaData?.vote_average} maxRating={10} />
-                                    <div className="flex items-center justify-end max-md:justify-start md:gap-4 max-md:w-full">
+                                    {user && <div className="flex items-center justify-end max-md:justify-start md:gap-4 max-md:w-full">
                                         <div className='w-fit flex items-center md:gap-4 bg-slate-500 p-2 rounded-md max-md:mt-4'>
                                             <p className="text-sm w-min max-md:hidden font-medium text-white">{t('yourRating')}:</p>
                                             <StarRating rating={userRating} maxRating={10} onChange={handleRating} />
@@ -164,13 +185,13 @@ export default function MediaUI({ mediaData }: Props) {
                                                 </span>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div>}
                                 </div>
                                 <p className="text-white mt-2 max-md:mt-4 sm:text-lg">{mediaData!.overview}</p>
                             </div>
                             <div className='w-full p-5 flex justify-evenly'>
-                                <div className='w-3/4 max-md:w-full'>
-                                    <div className='border-3 border-blueish-gray'>
+                                    <div className='w-3/4 max-md:w-full'>
+                                    {mediaData.video_id ? <div className='border-3 border-blueish-gray'>
                                         <LiteYouTubeEmbed
                                             aspectHeight={9}
                                             aspectWidth={16}
@@ -178,7 +199,7 @@ export default function MediaUI({ mediaData }: Props) {
                                             title="Trailer"
                                             poster={thumbnailHeight <= 90 ? 'hqdefault' : 'maxresdefault'}
                                         />
-                                    </div>
+                                    </div> : <p className="rounded-md bg-slate-700 p-5 text-center text-white">{t('trailerUnavailable')}</p>}
                                 </div>
                                 <div className="flex flex-col max-md:hidden justify-center w-fit">
                                     {mediaData?.production_companies.map((pc: ProductionCompanies) => {
