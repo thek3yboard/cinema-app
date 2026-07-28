@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useRef, createRef, ChangeEvent, useEffect } from 'react';
+import { useState, useRef, ChangeEvent, useEffect } from 'react';
 import { MediaContext, initialPage, initialCurrentApiPages, initialSort, initialLanguage } from "../(logged)/MediaContext";
 import { SortType, Movie, Show, Person } from '@/types/types';
 import { orderOptions, sortByOptions } from '@/assets/filtersData';
 import { usePathname, useRouter } from 'next/navigation';
 import { Search, Sliders, AlignJustify, X } from 'lucide-react'
 import { Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, 
-    Navbar, NavbarBrand, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, NavbarContent, NavbarItem, Link, useDisclosure } from "@nextui-org/react";
+    Navbar, NavbarBrand, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, NavbarContent, NavbarItem, Link, useDisclosure,
+    Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar } from "@nextui-org/react";
 import LanguageSelect, { languageOptions } from '../components/ui/LanguageSelect';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
@@ -15,6 +16,7 @@ import Image from "next/image";
 import logo from '@/assets/cinema.png';
 import { toast } from 'sonner';
 import { fetchPage } from '@/app/[locale]/utils';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 type NavbarItems = {
     key: string,
@@ -44,11 +46,13 @@ export default function LoggedLayout({
     const [search, setSearch] = useState<string>('');
     const sortRef = useRef(sort.key);
     const orderRef = useRef(sort.order_key);
-    const screenRef = createRef<HTMLDivElement>();
+    const screenRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const pathname = usePathname();
     const {isOpen, onOpen, onClose} = useDisclosure();
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+    const { user, profile, signOut } = useAuth();
+    const profileName = profile?.display_name || profile?.username || user?.user_metadata?.full_name || user?.email || t('defaultUser');
 
     useEffect(() => {
         if(locale !== localStorage.getItem('language_key')) {
@@ -285,18 +289,29 @@ export default function LoggedLayout({
         setIsMenuOpen(false);
     }
 
+    const handleSignOut = async () => {
+        try {
+            await signOut();
+            setIsMenuOpen(false);
+            router.replace(`/${locale}/signin`);
+            router.refresh();
+        } catch {
+            toast.error(t('signOutError'));
+        }
+    }
+
     return (
         <MediaContext.Provider value={{ page, setPage, currentApiPages, setCurrentApiPages, handleClickPrevPage, handleClickNextPage, sort, movies, setMovies, shows, setShows, people, setPeople, language, setLanguage }}>
         <>
             <div ref={screenRef} className="h-screen flex flex-col overflow-y-auto bg-gradient-to-r from-[#192a49] from-1% via-[#3f577c] via-50% to-[#192a49] to-99%">
                 <div className="z-20 sticky top-0 border-b-2 border-slate-700">
-                    <Navbar disableAnimation={true} isMenuOpen={isMenuOpen} onMenuOpenChange={handleMenuToggle} className="h-auto bg-gradient-to-r from-aero-blue to-blueish-gray">
-                        <NavbarContent className="md:hidden" justify="start">
+                    <Navbar maxWidth="full" disableAnimation={true} isMenuOpen={isMenuOpen} onMenuOpenChange={handleMenuToggle} className="h-auto bg-gradient-to-r from-aero-blue to-blueish-gray">
+                        <NavbarContent className="xl:hidden" justify="start">
                             <NavbarBrand>
                                 <Image className='min-w-32 mb-2' src={logo} alt="Logo" width={128} />
                             </NavbarBrand>
                         </NavbarContent>
-                        <NavbarContent className="md:hidden" justify="end">
+                        <NavbarContent className="xl:hidden" justify="end">
                             <NavbarMenuToggle 
                                 isSelected={isMenuOpen}
                                 icon={isMenuOpen ? 
@@ -306,7 +321,7 @@ export default function LoggedLayout({
                                 }
                             />
                         </NavbarContent>
-                        <NavbarContent className="hidden md:flex gap-6" justify="center">
+                        <NavbarContent className="hidden xl:flex flex-1 gap-4 2xl:gap-6" justify="start">
                             <NavbarBrand>
                                 <Image className='min-w-36 mb-2' src={logo} alt="Logo" width={144} />
                             </NavbarBrand>
@@ -317,14 +332,14 @@ export default function LoggedLayout({
                                             className="text-orange-400 text-xl font-semibold"
                                             href={`/${pathname.split('/')[1]}/${item.key.toLowerCase()}`}
                                         >
-                                            {item.value}
+                                            {item.key === 'onScreenTogether' ? <><span className="2xl:hidden">{t('onScreenTogetherShort')}</span><span className="hidden 2xl:inline">{item.value}</span></> : item.value}
                                         </Link>
                                         :
                                         <Link
                                             className="text-nyanza text-xl font-semibold"
                                             href={`/${pathname.split('/')[1]}/${item.key.toLowerCase()}`}
                                         >
-                                            {item.value}
+                                            {item.key === 'onScreenTogether' ? <><span className="2xl:hidden">{t('onScreenTogetherShort')}</span><span className="hidden 2xl:inline">{item.value}</span></> : item.value}
                                         </Link>
                                     }
                                 </NavbarItem>
@@ -332,13 +347,15 @@ export default function LoggedLayout({
                         </NavbarContent>
                         <NavbarMenu className='max-h-fit mt-[1.5px] gap-3 p-5'>
                             <NavbarMenuItem>
-                                <div className='md:hidden w-full flex justify-between'>
+                                <div className='xl:hidden w-full flex justify-between'>
                                     <span className="flex items-center rounded-l-sm w-full h-10 bg-blueish-gray relative">
                                         <input 
                                             type='text' 
                                             value={search} 
                                             onChange={(e) => handleChangeSearch(e)} 
                                             onKeyDown={(e) => handleKeydownSearch(e)} 
+                                            placeholder={t('searchPlaceholder')}
+                                            aria-label={t('searchPlaceholder')}
                                             className='w-[calc(100%-30px)] pl-2 pr-8 ml-[2px] h-full bg-blueish-gray' 
                                         />
                                         {search && (
@@ -350,7 +367,7 @@ export default function LoggedLayout({
                                                 <X className='w-4 h-4' />
                                             </button>
                                         )}
-                                        <button className='bg-lapis-lazuli ml-[1px] h-full rounded-r-sm' onClick={handleClickSearch}>
+                                        <button aria-label={t('searchPlaceholder')} className='bg-lapis-lazuli ml-[1px] h-full rounded-r-sm' onClick={handleClickSearch}>
                                             <Search className='mx-2 max-h-6' />
                                         </button>
                                     </span>
@@ -381,32 +398,96 @@ export default function LoggedLayout({
                                     }
                                 </NavbarMenuItem>
                             ))}
-                        </NavbarMenu>
-                        <span className="max-md:hidden flex items-center w-2/3 h-10 bg-blueish-gray rounded-[3px] relative">
-                            <input 
-                                type='text' 
-                                value={search} 
-                                onChange={(e) => handleChangeSearch(e)} 
-                                onKeyDown={(e) => handleKeydownSearch(e)} 
-                                className='w-[calc(100%-30px)] pl-2 ml-[2px] h-full bg-blueish-gray' 
-                            />
-                            {search && (
-                                <button 
-                                    onClick={() => setSearch('')}
-                                    className='absolute right-11 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1'
-                                    type="button"
-                                >
-                                    <X className='w-4 h-4' />
-                                </button>
+                            {user && (
+                                <>
+                                    <NavbarMenuItem className="mt-2 border-t border-slate-500 pt-4">
+                                        <div className="flex items-center gap-3 text-nyanza">
+                                            <Avatar key={profile?.avatar_url ?? profileName} isBordered size="sm" name={profileName} src={profile?.avatar_url ?? undefined} />
+                                            <span className="min-w-0">
+                                                <span className="block truncate font-semibold">{profileName}</span>
+                                                <span className="block truncate text-xs opacity-75">{user.email}</span>
+                                            </span>
+                                        </div>
+                                    </NavbarMenuItem>
+                                    <NavbarMenuItem>
+                                        <Link className="text-lg font-semibold text-nyanza" href={`/${locale}/profile`} onPress={() => setIsMenuOpen(false)}>{t('profile')}</Link>
+                                    </NavbarMenuItem>
+                                    <NavbarMenuItem>
+                                        <Link className="text-lg font-semibold text-nyanza" href={`/${locale}/profile#lists`} onPress={() => setIsMenuOpen(false)}>{t('myLists')}</Link>
+                                    </NavbarMenuItem>
+                                    <NavbarMenuItem>
+                                        <button type="button" className="text-lg font-semibold text-red-300" onClick={handleSignOut}>{t('signOut')}</button>
+                                    </NavbarMenuItem>
+                                </>
                             )}
-                            <button onClick={handleClickSearch}>
-                                <Search className='mx-2 max-h-6' />
-                            </button>
-                        </span>
-                        <button className='max-md:hidden' key="full" onClick={handleOpen}>
-                            <Sliders className='max-h-6' />
-                        </button>
-                        { !loading ? <LanguageSelect handleChangeLanguage={handleChangeLanguage} smallDevice={false} /> : <div className='max-md:hidden w-48'></div> }
+                        </NavbarMenu>
+                        <NavbarContent className="hidden xl:flex flex-none gap-2" justify="end">
+                            <NavbarItem>
+                                <span className="relative flex h-10 w-56 shrink-0 items-center rounded-[3px] bg-blueish-gray 2xl:w-72">
+                                    <input
+                                        type="text"
+                                        value={search}
+                                        onChange={handleChangeSearch}
+                                        onKeyDown={handleKeydownSearch}
+                                        placeholder={t('searchPlaceholder')}
+                                        aria-label={t('searchPlaceholder')}
+                                        className="h-full min-w-0 flex-1 bg-blueish-gray pl-3 pr-9 outline-none"
+                                    />
+                                    {search && (
+                                        <button
+                                            onClick={() => setSearch('')}
+                                            className="absolute right-10 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-200"
+                                            type="button"
+                                            aria-label={t('clearSearch')}
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </button>
+                                    )}
+                                    <button
+                                        type="button"
+                                        aria-label={t('searchPlaceholder')}
+                                        className="flex h-full w-10 shrink-0 items-center justify-center rounded-r-[3px] bg-lapis-lazuli"
+                                        onClick={handleClickSearch}
+                                    >
+                                        <Search className="h-5 w-5" />
+                                    </button>
+                                </span>
+                            </NavbarItem>
+                            <NavbarItem>
+                                <button
+                                    type="button"
+                                    aria-label={t('filter')}
+                                    className="flex h-10 w-10 items-center justify-center rounded-md text-nyanza hover:bg-white/10"
+                                    onClick={handleOpen}
+                                >
+                                    <Sliders className="h-5 w-5" />
+                                </button>
+                            </NavbarItem>
+                            <NavbarItem className="w-32 shrink-0">
+                                {!loading ? <LanguageSelect handleChangeLanguage={handleChangeLanguage} smallDevice={false} /> : <div className="h-10 w-32" />}
+                            </NavbarItem>
+                            {user && (
+                                <NavbarItem>
+                                    <Dropdown placement="bottom-end">
+                                        <DropdownTrigger>
+                                            <button type="button" className="flex max-w-40 items-center gap-2 rounded-md p-1 text-nyanza hover:bg-white/10" aria-label={t('openUserMenu')}>
+                                                <Avatar key={profile?.avatar_url ?? profileName} isBordered size="sm" name={profileName} src={profile?.avatar_url ?? undefined} classNames={{ base: 'border-nyanza/70 bg-slate-600', name: 'font-bold text-nyanza' }} />
+                                                <span className="max-w-24 truncate text-sm font-semibold">{profileName}</span>
+                                            </button>
+                                        </DropdownTrigger>
+                                        <DropdownMenu aria-label={t('userMenu')}>
+                                            <DropdownItem key="identity" isReadOnly className="h-12 gap-2 opacity-100">
+                                                <p className="font-semibold">{profileName}</p>
+                                                <p className="text-xs text-default-500">{user.email}</p>
+                                            </DropdownItem>
+                                            <DropdownItem key="profile" onPress={() => router.push(`/${locale}/profile`)}>{t('profile')}</DropdownItem>
+                                            <DropdownItem key="lists" onPress={() => router.push(`/${locale}/profile#lists`)}>{t('myLists')}</DropdownItem>
+                                            <DropdownItem key="logout" className="text-danger" color="danger" onPress={handleSignOut}>{t('signOut')}</DropdownItem>
+                                        </DropdownMenu>
+                                    </Dropdown>
+                                </NavbarItem>
+                            )}
+                        </NavbarContent>
                     </Navbar>
                 </div>
                 { (pathname === `/${pathname.split('/')[1]}/movies` || pathname === `/${pathname.split('/')[1]}/shows` || pathname === `/${pathname.split('/')[1]}/people`) ?

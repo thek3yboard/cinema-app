@@ -21,7 +21,7 @@ const Flag = ({ children }: { children: React.ReactNode }) => (
     </div>
 );
 
-export default function LanguageSelect({ handleChangeLanguage, smallDevice }: Props) {
+export default function LanguageSelect({ handleChangeLanguage }: Props) {
     const { language } = useContext(MediaContext);
     const t = useTranslations('Language');
 
@@ -68,7 +68,7 @@ export default function LanguageSelect({ handleChangeLanguage, smallDevice }: Pr
                     )}
                 </span> as any
             }
-            className={`${smallDevice === true ? '' : 'max-md:hidden w-60'}`}
+            className="w-full"
             onChange={handleChangeLanguage}
         >
             {languageOptions.map((option) => (
