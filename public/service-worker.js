@@ -1,46 +1,44 @@
-const CACHE_NAME = 'pwa-cache';
+const CACHE_NAME = 'cinema-static-v2';
+const STATIC_ASSETS = [
+  '/favicon.ico',
+  '/manifest.json',
+  '/logo192.png',
+  '/logo512.png',
+  '/fallback-portrait.svg'
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll([
-          '/nexus/',
-          // Remove specific file paths and use a more general approach
-        ]).catch(error => {
-          console.error('Failed to cache resources:', error);
-        });
-      })
+      .then((cache) => cache.addAll(STATIC_ASSETS))
+      .then(() => self.skipWaiting())
   );
 });
 
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+
+  const url = new URL(event.request.url);
+  const isStaticAsset = url.origin === self.location.origin
+    && (STATIC_ASSETS.includes(url.pathname) || url.pathname.startsWith('/_next/static/'));
+
+  // Never cache navigations, auth callbacks, RSC payloads or API responses.
+  if (!isStaticAsset) return;
+
   event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        // Cache all successful GET requests
-        if (event.request.method === 'GET' && response.status === 200) {
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) return cachedResponse;
+
+      return fetch(event.request).then((response) => {
+        if (response.ok) {
           const responseToCache = response.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              cache.put(event.request, responseToCache);
-            });
+          event.waitUntil(
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache))
+          );
         }
         return response;
-      })
-      .catch(() => {
-        return caches.match(event.request)
-          .then(response => {
-            if (response) {
-              return response;
-            }
-            if (event.request.mode === 'navigate') {
-              return caches.match(OFFLINE_URL);
-            }
-            return new Response('Not found', { status: 404, statusText: 'Not found' });
-          });
-      })
+      });
+    })
   );
 });
 
@@ -54,6 +52,6 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });
