@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import logo from '@/assets/cinema.png';
 import { createClient } from '@/lib/supabase/client';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
@@ -50,7 +52,8 @@ export default function SignIn() {
       <section className="w-full max-w-md rounded-lg border-2 border-gray-500 bg-gradient-to-b from-nyanza to-pastel-yellow p-7 shadow-xl">
         <h1 className="text-center text-2xl font-bold text-slate-800">{t('signInTitle')}</h1>
         <p className="mt-2 text-center text-sm text-slate-700">{t('signInSubtitle')}</p>
-        <button type="button" onClick={signInWithGoogle} className="mt-6 flex h-11 w-full items-center justify-center rounded-md border border-slate-400 bg-white font-semibold text-slate-800 hover:bg-slate-100">
+        <button type="button" onClick={signInWithGoogle} className="mt-6 flex h-11 w-full items-center justify-center gap-3 rounded-md border border-slate-400 bg-white font-semibold text-slate-800 hover:bg-slate-100">
+          <FontAwesomeIcon icon={faGoogle} className="h-5 w-5 text-[#4285f4]" aria-hidden="true" />
           {t('continueWithGoogle')}
         </button>
         <div className="my-5 flex items-center gap-3 text-sm text-slate-600"><span className="h-px grow bg-slate-400" />{t('or')}<span className="h-px grow bg-slate-400" /></div>
