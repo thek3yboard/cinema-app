@@ -6,7 +6,7 @@ import { updateSession } from './lib/supabase/middleware';
  
 const intlMiddleware = createMiddleware(routing);
 
-const protectedPath = /^\/(en-US|es-ES|es-MX)\/(movies|shows|people|onscreentogether)(?:\/.*)?$/;
+const protectedPath = /^\/(en-US|es-ES|es-MX)\/(movies|shows|people|onscreentogether|search)(?:\/.*)?$/;
 
 export default async function middleware(request: NextRequest) {
   const response = intlMiddleware(request) as NextResponse;

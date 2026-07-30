@@ -20,11 +20,34 @@
         "clearSearch": "Clear search",
         "defaultUser": "User",
         "openUserMenu": "Open user menu",
+        "openNavigationMenu": "Open navigation menu",
+        "closeNavigationMenu": "Close navigation menu",
         "userMenu": "User menu",
         "profile": "Profile",
         "myLists": "My lists",
         "signOut": "Sign out",
         "signOutError": "We couldn't sign you out. Please try again."
+    },
+
+    "GlobalSearch": {
+        "placeholder": "Search movies, shows or people",
+        "clear": "Clear search",
+        "submit": "Search",
+        "searching": "Searching…",
+        "suggestions": "Search suggestions",
+        "noSuggestions": "No suggestions found.",
+        "title": "Global search",
+        "resultsFor": "Results for “{query}”",
+        "emptyPrompt": "Enter at least two characters in the search bar.",
+        "noResults": "No movies, TV shows, or people matched your search.",
+        "loadError": "We couldn't load the search results. Please try again.",
+        "loadMoreError": "We couldn't load more results.",
+        "loadMore": "Load more",
+        "loadingMore": "Loading…",
+        "movie": "Movie",
+        "show": "TV show",
+        "person": "Person",
+        "unknownYear": "Year unavailable"
     },
 
     "Auth": {

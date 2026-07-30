@@ -72,7 +72,7 @@ export default function LanguageSelect({ handleChangeLanguage }: Props) {
             onChange={handleChangeLanguage}
         >
             {languageOptions.map((option) => (
-                <SelectItem key={option.key}>
+                <SelectItem key={option.key} textValue={t(`${option.label}`)}>
                     <div className='flex flex-row items-center gap-2'>
                         {t(`${option.label}`)} 
                         {option.key === 'en-US' ? (

@@ -5,7 +5,7 @@ import { MediaContext, initialPage, initialCurrentApiPages, initialSort, initial
 import { SortType, Movie, Show, Person } from '@/types/types';
 import { orderOptions, sortByOptions } from '@/assets/filtersData';
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, Sliders, AlignJustify, X } from 'lucide-react'
+import { Sliders, AlignJustify } from 'lucide-react'
 import { Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, 
     Navbar, NavbarBrand, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, NavbarContent, NavbarItem, Link, useDisclosure,
     Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar } from "@nextui-org/react";
@@ -15,8 +15,9 @@ import { useLocale } from 'next-intl';
 import Image from "next/image";
 import logo from '@/assets/cinema.png';
 import { toast } from 'sonner';
-import { fetchPage } from '@/app/[locale]/utils';
 import { useAuth } from '@/components/auth/AuthProvider';
+import GlobalSearchInput from '@/app/[locale]/components/GlobalSearchInput';
+import { useGlobalSearch } from '@/hooks/useGlobalSearch';
 
 type NavbarItems = {
     key: string,
@@ -43,7 +44,6 @@ export default function LoggedLayout({
     });
     const [language, setLanguage] = useState(initialLanguage);
     const [loading, setLoading] = useState<boolean>(true);
-    const [search, setSearch] = useState<string>('');
     const sortRef = useRef(sort.key);
     const orderRef = useRef(sort.order_key);
     const screenRef = useRef<HTMLDivElement>(null);
@@ -51,6 +51,7 @@ export default function LoggedLayout({
     const pathname = usePathname();
     const {isOpen, onOpen, onClose} = useDisclosure();
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+    const globalSearch = useGlobalSearch(() => setIsMenuOpen(false));
     const { user, profile, signOut } = useAuth();
     const profileName = profile?.display_name || profile?.username || user?.user_metadata?.full_name || user?.email || t('defaultUser');
 
@@ -101,7 +102,6 @@ export default function LoggedLayout({
     const handleClickPrevPage = () => {
         setMovies([]);
         setShows([]);
-        setSearch('');
         if(currentApiPages[0] === 1) {
             return;
         }
@@ -112,7 +112,6 @@ export default function LoggedLayout({
     const handleClickNextPage = () => {
         setMovies([]);
         setShows([]);
-        setSearch('');
         setCurrentApiPages([currentApiPages[0]+2, currentApiPages[1]+2]);
         setPage(p => p + 1);
     }
@@ -130,7 +129,6 @@ export default function LoggedLayout({
         newPathname = `${newPathname}${secondPart}/`;
         router.push(`${newPathname}`);
 
-        setSearch('');
         setIsMenuOpen(false);
     }
 
@@ -144,7 +142,6 @@ export default function LoggedLayout({
 
     const handleSetFilters = () => {
         setIsMenuOpen(false);
-        setSearch('');
 
         const selectedOrder = orderOptions.find((option) => option.key === orderRef.current)!;
         const selectedSort = sortByOptions.find((option) => option.key === sortRef.current)!;
@@ -168,125 +165,9 @@ export default function LoggedLayout({
         onOpen();
     }
 
-    const handleKeydownSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if(e.key === 'Enter') {
-            handleClickSearch();
-        } 
-    }
-
-    const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
-        setSearch(e.target.value);
-    }
-
-    const handleClickSearch = async () => {
-        try {
-            setIsMenuOpen(false);
-
-            let firstAPIURL = '', secondAPIURL = '';
-
-            switch(pathname) {
-                case '/movies':
-                    firstAPIURL = `https://api.themoviedb.org/3/search/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                    break;
-                case '/shows':
-                    firstAPIURL = `https://api.themoviedb.org/3/search/tv?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                    break;
-                case '/people':
-                    firstAPIURL = `https://api.themoviedb.org/3/search/person?&include_adult=false&query=${search}&language=${language.key}&page=${currentApiPages[0]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                    break;
-                default:
-                    if(pathname.includes('/movies')) {
-                        firstAPIURL = `https://api.themoviedb.org/3/search/movie?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                        break;
-                    } else if(pathname.includes('/shows')) {
-                        firstAPIURL = `https://api.themoviedb.org/3/search/tv?include_adult=false&include_video=false&language=${language.key}&page=${currentApiPages[0]}&query=${search}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                        break;
-                    } else if(pathname.includes('/people')) {
-                        firstAPIURL = `https://api.themoviedb.org/3/search/person?&include_adult=false&query=${search}&language=${language.key}&page=${currentApiPages[0]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                        secondAPIURL = `https://api.themoviedb.org/3/search/person?&include_adult=false&query=${search}&language=${language.key}&page=${currentApiPages[1]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                        break;
-                    }
-            }
-
-            let allMediaPage = [];
-
-            if(secondAPIURL !== '') {
-                let page = 1;
-
-                const data = await fetchPage(firstAPIURL);
-                const data2 = await fetchPage(secondAPIURL);
-                allMediaPage = [...data.results, ...data2.results];
-
-                let apiPages = [currentApiPages[0], currentApiPages[1]];
-                page++;
-
-                while(page < data.total_pages) {
-                    apiPages[0]+=2;
-                    apiPages[1]+=2;
-
-                    firstAPIURL = `https://api.themoviedb.org/3/search/person?&include_adult=false&query=${search}&language=${language.key}&page=${apiPages[0]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-                    secondAPIURL = `https://api.themoviedb.org/3/search/person?&include_adult=false&query=${search}&language=${language.key}&page=${apiPages[1]}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`;
-
-                    const data = await fetchPage(firstAPIURL);
-                    const data2 = await fetchPage(secondAPIURL);
-
-                    allMediaPage.push(...data.results);
-                    allMediaPage.push(...data2.results);
-
-                    if(allMediaPage.length > 100) {
-                        toast.error('There are too many results. Please narrow your search criteria.') //TO-DO - Add message to locales
-                        return;
-                    }
-
-                    page++;
-                }
-
-                allMediaPage = allMediaPage.filter((person) => person.profile_path !== null);
-            } else {
-                const data = await fetchPage(firstAPIURL);
-
-                allMediaPage = [...data.results];
-            }
-
-            if(allMediaPage.length === 0) {
-                toast.info('No results found.') //TO-DO - Add message to locales
-                return;
-            }
-
-            if(pathname.includes('/movies')) {
-                const movies = allMediaPage;
-
-                let filteredMovies = movies.filter((movie: Movie) => movie.vote_count > 1000);
-
-                filteredMovies = filteredMovies.sort((a: any, b: any) => a.release_date?.localeCompare(b.release_date));
-                
-                setMovies(filteredMovies);
-
-                router.push(`/${pathname.split('/')[1]}/movies`);
-            } else if(pathname.includes('/shows')) {
-                const shows = allMediaPage;
-
-                let filteredShows = shows.filter((show: Show) => show.vote_count > 1000);
-
-                filteredShows = filteredShows.sort((a: any, b: any) => a.first_air_date?.localeCompare(b.first_air_date));
-                
-                setShows(filteredShows);
-
-                router.push(`/${pathname.split('/')[1]}/shows`);
-            } else if(pathname.includes('/people')) {
-                const people = allMediaPage;
-                
-                setPeople(people);
-                
-                router.push(`/${pathname.split('/')[1]}/people`);
-            }
-        } catch (error) {
-            console.error(error)
-        }
-    }
-
     const handleClickChildren = () => {
         setIsMenuOpen(false);
+        globalSearch.close();
     }
 
     const handleSignOut = async () => {
@@ -305,20 +186,19 @@ export default function LoggedLayout({
         <>
             <div ref={screenRef} className="h-screen flex flex-col overflow-y-auto bg-gradient-to-r from-[#192a49] from-1% via-[#3f577c] via-50% to-[#192a49] to-99%">
                 <div className="z-20 sticky top-0 border-b-2 border-slate-700">
-                    <Navbar maxWidth="full" disableAnimation={true} isMenuOpen={isMenuOpen} onMenuOpenChange={handleMenuToggle} className="h-auto bg-gradient-to-r from-aero-blue to-blueish-gray">
+                    <Navbar maxWidth="full" isMenuOpen={isMenuOpen} onMenuOpenChange={handleMenuToggle} className="h-auto bg-gradient-to-r from-aero-blue to-blueish-gray">
                         <NavbarContent className="xl:hidden" justify="start">
                             <NavbarBrand>
                                 <Image className='min-w-32 mb-2' src={logo} alt="Logo" width={128} />
                             </NavbarBrand>
                         </NavbarContent>
                         <NavbarContent className="xl:hidden" justify="end">
-                            <NavbarMenuToggle 
-                                isSelected={isMenuOpen}
-                                icon={isMenuOpen ? 
-                                    <button style={{ color: '#192a49' }} className='p-2 rounded-md bg-slate-200'><AlignJustify /></button> 
-                                    : 
-                                    <AlignJustify />
-                                }
+                            <NavbarMenuToggle
+                                aria-label={isMenuOpen ? t('closeNavigationMenu') : t('openNavigationMenu')}
+                                className={`h-11 w-11 rounded-md ${
+                                    isMenuOpen ? 'bg-slate-200 text-[#192a49]' : 'text-inherit'
+                                }`}
+                                icon={<AlignJustify />}
                             />
                         </NavbarContent>
                         <NavbarContent className="hidden xl:flex flex-1 gap-4 2xl:gap-6" justify="start">
@@ -347,31 +227,15 @@ export default function LoggedLayout({
                         </NavbarContent>
                         <NavbarMenu className='max-h-fit mt-[1.5px] gap-3 p-5'>
                             <NavbarMenuItem>
-                                <div className='xl:hidden w-full flex justify-between'>
-                                    <span className="flex items-center rounded-l-sm w-full h-10 bg-blueish-gray relative">
-                                        <input 
-                                            type='text' 
-                                            value={search} 
-                                            onChange={(e) => handleChangeSearch(e)} 
-                                            onKeyDown={(e) => handleKeydownSearch(e)} 
-                                            placeholder={t('searchPlaceholder')}
-                                            aria-label={t('searchPlaceholder')}
-                                            className='w-[calc(100%-30px)] pl-2 pr-8 ml-[2px] h-full bg-blueish-gray' 
-                                        />
-                                        {search && (
-                                            <button 
-                                                onClick={() => setSearch('')}
-                                                className='absolute right-11 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1'
-                                                type="button"
-                                            >
-                                                <X className='w-4 h-4' />
-                                            </button>
-                                        )}
-                                        <button aria-label={t('searchPlaceholder')} className='bg-lapis-lazuli ml-[1px] h-full rounded-r-sm' onClick={handleClickSearch}>
-                                            <Search className='mx-2 max-h-6' />
-                                        </button>
-                                    </span>
-                                    <Button disabled={pathname.includes('/shows') === true} className={`max-w-fit bg-lapis-lazuli ml-2 rounded-sm ${pathname.includes('/shows') && 'opacity-50'}`} key="full" onClick={handleOpen}>
+                                <div className='flex w-full min-w-0 gap-2 xl:hidden'>
+                                    <GlobalSearchInput controller={globalSearch} className="min-w-0 flex-1" />
+                                    <Button
+                                        isIconOnly
+                                        disabled={!pathname.includes('/movies') && !pathname.includes('/shows')}
+                                        className="h-10 w-10 min-w-10 shrink-0 rounded-sm bg-lapis-lazuli disabled:opacity-50"
+                                        key="full"
+                                        onPress={handleOpen}
+                                    >
                                         <Sliders />
                                     </Button>
                                 </div>
@@ -422,42 +286,15 @@ export default function LoggedLayout({
                             )}
                         </NavbarMenu>
                         <NavbarContent className="hidden xl:flex flex-none gap-2" justify="end">
-                            <NavbarItem>
-                                <span className="relative flex h-10 w-56 shrink-0 items-center rounded-[3px] bg-blueish-gray 2xl:w-72">
-                                    <input
-                                        type="text"
-                                        value={search}
-                                        onChange={handleChangeSearch}
-                                        onKeyDown={handleKeydownSearch}
-                                        placeholder={t('searchPlaceholder')}
-                                        aria-label={t('searchPlaceholder')}
-                                        className="h-full min-w-0 flex-1 bg-blueish-gray pl-3 pr-9 outline-none"
-                                    />
-                                    {search && (
-                                        <button
-                                            onClick={() => setSearch('')}
-                                            className="absolute right-10 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-200"
-                                            type="button"
-                                            aria-label={t('clearSearch')}
-                                        >
-                                            <X className="h-4 w-4" />
-                                        </button>
-                                    )}
-                                    <button
-                                        type="button"
-                                        aria-label={t('searchPlaceholder')}
-                                        className="flex h-full w-10 shrink-0 items-center justify-center rounded-r-[3px] bg-lapis-lazuli"
-                                        onClick={handleClickSearch}
-                                    >
-                                        <Search className="h-5 w-5" />
-                                    </button>
-                                </span>
+                            <NavbarItem className="w-64 shrink-0 2xl:w-72">
+                                <GlobalSearchInput controller={globalSearch} className="w-full" />
                             </NavbarItem>
                             <NavbarItem>
                                 <button
                                     type="button"
                                     aria-label={t('filter')}
-                                    className="flex h-10 w-10 items-center justify-center rounded-md text-nyanza hover:bg-white/10"
+                                    disabled={!pathname.includes('/movies') && !pathname.includes('/shows')}
+                                    className="flex h-10 w-10 items-center justify-center rounded-md text-nyanza hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
                                     onClick={handleOpen}
                                 >
                                     <Sliders className="h-5 w-5" />
