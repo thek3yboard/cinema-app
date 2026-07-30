@@ -96,8 +96,10 @@ Las prioridades generales deberían ser:
 
 ### Internacionalización y navegación
 
-- Locales `en-US`, `es-ES` y `es-MX`.
-- Los tres archivos de traducciones contienen las mismas 154 claves.
+- Locales `en-US` y `es-AR`.
+- Los dos archivos de traducciones contienen las mismas claves. Los antiguos
+  `es-ES` y `es-MX` se consolidaron porque duplicaban prácticamente todo su
+  contenido.
 - Navbar responsive.
 - Selector de idioma.
 - Menú de perfil.
@@ -685,8 +687,9 @@ atribución requerida a JustWatch.
 - [ ] Corregir o deshabilitar el service worker.
 - [ ] Rehacer carga de imágenes y loaders del grid.
 - [ ] Agregar atribución oficial de TMDB.
-- [ ] Proteger `/profile` mediante middleware o servidor.
-- [ ] Decidir explícitamente si el catálogo será público.
+- [x] Proteger `/profile` mediante middleware o servidor.
+- [x] Mantener el catálogo público y reservar las acciones personales para
+  usuarios autenticados.
 - [ ] Incorporar CI y smoke tests de autenticación.
 
 ### P1 — Consolidación de experiencia
@@ -722,7 +725,7 @@ atribución requerida a JustWatch.
 Antes de agregar una feature nueva, verificar:
 
 1. ¿Reutiliza la capa TMDB central?
-2. ¿Funciona en los tres locales?
+2. ¿Funciona en los dos locales?
 3. ¿Tiene estado loading, empty, error y retry?
 4. ¿Es accesible con teclado?
 5. ¿Funciona en mobile?

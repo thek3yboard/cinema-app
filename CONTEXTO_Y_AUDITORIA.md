@@ -17,7 +17,7 @@ La aplicación ya cuenta con autenticación real y persistencia por usuario medi
 - Migración única de preferencias heredadas desde `localStorage` después del primer inicio de sesión.
 - Listas de perfil con título, póster, puntuación y navegación al detalle; los registros antiguos sin metadata se completan desde TMDB.
 - Navbar responsive con avatar, menú de usuario y buscador estable; en viewports angostos las acciones pasan al menú compacto.
-- Flujos nuevos de autenticación, perfil y preferencias internacionalizados para `en-US`, `es-ES` y `es-MX`.
+- Flujos nuevos de autenticación, perfil y preferencias internacionalizados para `en-US` y `es-AR`.
 - Estados recuperables para detalles sin datos o sin tráiler.
 
 ### Persistencia y componentes principales
@@ -50,7 +50,7 @@ La aplicación ya cuenta con autenticación real y persistencia por usuario medi
 
 ## Resumen ejecutivo
 
-Cinema es una aplicación Next.js 14 (App Router) que consume TMDB para explorar películas, series y personas; permite comparar filmografías de dos personas y guardar estado local de cada título (favorito, visto, lista y puntuación). Tiene tres locales (`en-US`, `es-ES`, `es-MX`), NextUI, Tailwind y una PWA básica.
+Cinema es una aplicación Next.js 14 (App Router) que consume TMDB para explorar películas, series y personas; permite comparar filmografías de dos personas y guardar estado local de cada título (favorito, visto, lista y puntuación). Tiene dos locales (`en-US`, `es-AR`), NextUI, Tailwind y una PWA básica.
 
 El proyecto tiene una buena base visual y el flujo de descubrimiento está claro, pero hoy no está en condiciones confiables de despliegue: el build de producción falla, TypeScript tiene errores que se omiten explícitamente, las credenciales de TMDB se envían al navegador y varios estados de carga/error pueden dejar pantallas bloqueadas o producir excepciones. Las prioridades inmediatas son restaurar un build reproducible, retirar secretos del cliente y consolidar el acceso a TMDB.
 
@@ -60,7 +60,7 @@ El proyecto tiene una buena base visual y el flujo de descubrimiento está claro
 | --- | --- |
 | Framework | Next.js 14.2.5, React 18, TypeScript estricto en `tsconfig` |
 | Rutas | `/[locale]/movies`, `/shows`, `/people`, detalle por ID y `/onscreentogether` |
-| Internacionalización | `next-intl`, con `en-US`, `es-ES` y `es-MX` |
+| Internacionalización | `next-intl`, con `en-US` y `es-AR` |
 | Datos | Llamadas `fetch` desde componentes cliente directamente a TMDB |
 | Estado | `MediaContext` dentro del layout “logged”; estado de usuario en `localStorage` |
 | UI | NextUI, Tailwind, `next/image`, Font Awesome y Lucide |
@@ -128,7 +128,7 @@ El primer intento de build no pudo descargar Montserrat por la red aislada; al r
 
 20. **Estructura de layouts HTML inválida.** El root layout produce `<html><body>` y el layout de locale vuelve a producir otros `<html><body>` anidados. Debe haber un único par por árbol de documento; el layout por locale debería aportar providers/contenido, mientras que el root resuelve atributos de documento de forma compatible con i18n. Archivos: `src/app/layout.tsx:9-12`, `src/app/[locale]/layout.tsx:34-43`.
 
-21. **Internacionalización parcial.** Persisten textos en inglés/español dentro de componentes: formularios de auth, mensajes toast, copyright, “Trailer”, “Less/More”, loader y mensajes de filmografía. Además `es-ES` y `es-MX` tienen la misma etiqueta “Spanish”. Extraer todas las cadenas a `messages/`, usar textos localizados y definir nomenclaturas distinguibles. Ejemplos: `PersonUI.tsx:51`, `ExpandableText.tsx:31`, `layout.tsx:233`.
+21. **Internacionalización parcial.** Persisten textos en inglés/español dentro de componentes: formularios de auth, mensajes toast, copyright, “Trailer”, “Less/More”, loader y mensajes de filmografía. Los antiguos `es-ES` y `es-MX` se consolidaron en `es-AR` para evitar traducciones duplicadas. Extraer las cadenas restantes a `messages/`. Ejemplos: `PersonUI.tsx:51`, `ExpandableText.tsx:31`, `layout.tsx:233`.
 
 22. **Autenticación es una promesa visual sin implementación.** Los formularios no tienen `name`, `required`, `autoComplete`, validación, submit ni navegación; y no existe middleware de autorización. Si no será una función próxima, ocultar las rutas; si sí, diseñar sesiones, protección de rutas, estados y tratamiento seguro de contraseñas antes de conectarlos.
 
