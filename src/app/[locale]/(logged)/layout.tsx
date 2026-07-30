@@ -5,7 +5,7 @@ import { MediaContext, initialPage, initialCurrentApiPages, initialSort, initial
 import { SortType, Movie, Show, Person } from '@/types/types';
 import { orderOptions, sortByOptions } from '@/assets/filtersData';
 import { usePathname, useRouter } from 'next/navigation';
-import { Sliders, AlignJustify } from 'lucide-react'
+import { Sliders } from 'lucide-react'
 import { Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, 
     Navbar, NavbarBrand, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, NavbarContent, NavbarItem, Link, useDisclosure,
     Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar } from "@nextui-org/react";
@@ -96,10 +96,6 @@ export default function LoggedLayout({
         }
     ];
 
-    const handleMenuToggle = () => {
-        setIsMenuOpen(!isMenuOpen);
-    }
-
     const handleClickPrevPage = () => {
         setMovies([]);
         setShows([]);
@@ -187,7 +183,7 @@ export default function LoggedLayout({
         <>
             <div ref={screenRef} className="h-screen flex flex-col overflow-y-auto bg-gradient-to-r from-[#192a49] from-1% via-[#3f577c] via-50% to-[#192a49] to-99%">
                 <div className="z-20 sticky top-0 border-b-2 border-slate-700">
-                    <Navbar maxWidth="full" isMenuOpen={isMenuOpen} onMenuOpenChange={handleMenuToggle} className="h-auto bg-gradient-to-r from-aero-blue to-blueish-gray">
+                    <Navbar maxWidth="full" isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen} className="h-auto bg-gradient-to-r from-aero-blue to-blueish-gray">
                         <NavbarContent className="xl:hidden" justify="start">
                             <NavbarBrand>
                                 <Image className='min-w-32 mb-2' src={logo} alt="Logo" width={128} />
@@ -196,10 +192,9 @@ export default function LoggedLayout({
                         <NavbarContent className="xl:hidden" justify="end">
                             <NavbarMenuToggle
                                 aria-label={isMenuOpen ? t('closeNavigationMenu') : t('openNavigationMenu')}
-                                className={`h-11 w-11 rounded-md ${
+                                className={`h-11 w-11 rounded-md transition-colors duration-200 ease-out motion-reduce:transition-none ${
                                     isMenuOpen ? 'bg-slate-200 text-[#192a49]' : 'text-inherit'
                                 }`}
-                                icon={<AlignJustify />}
                             />
                         </NavbarContent>
                         <NavbarContent className="hidden xl:flex flex-1 gap-4 2xl:gap-6" justify="start">
@@ -226,7 +221,31 @@ export default function LoggedLayout({
                                 </NavbarItem>
                             ))}
                         </NavbarContent>
-                        <NavbarMenu className='max-h-fit mt-[1.5px] gap-3 p-5'>
+                        <NavbarMenu
+                            className="mt-[1.5px] gap-3 p-5"
+                            motionProps={{
+                                variants: {
+                                    enter: {
+                                        height: 'calc(100vh - var(--navbar-height))',
+                                        opacity: 1,
+                                        y: 0,
+                                        transition: {
+                                            duration: 0.24,
+                                            ease: 'easeOut'
+                                        }
+                                    },
+                                    exit: {
+                                        height: 0,
+                                        opacity: 0,
+                                        y: -6,
+                                        transition: {
+                                            duration: 0.18,
+                                            ease: 'easeIn'
+                                        }
+                                    }
+                                }
+                            }}
+                        >
                             <NavbarMenuItem>
                                 <div className='flex w-full min-w-0 gap-2 xl:hidden'>
                                     <GlobalSearchInput controller={globalSearch} className="min-w-0 flex-1" />
