@@ -86,7 +86,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (error) throw error;
     setProfile(data);
-    await migrateLegacyMedia(currentUser.id);
+    // Importing old local preferences is optional and must never invalidate
+    // an otherwise healthy authentication session.
+    try {
+      await migrateLegacyMedia(currentUser.id);
+    } catch {
+      // Keep the migration pending so it can be retried on a future refresh.
+    }
   }, []);
 
   useEffect(() => {
@@ -101,7 +107,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshProfile()
       .catch(() => {
         if (mounted) {
-          setUser(null);
           setProfile(null);
         }
       })

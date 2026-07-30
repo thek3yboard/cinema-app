@@ -1,6 +1,14 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
+function createAuthRedirect(url: URL) {
+  const response = NextResponse.redirect(url);
+  response.headers.set('Cache-Control', 'private, no-cache, no-store, must-revalidate, max-age=0');
+  response.headers.set('Expires', '0');
+  response.headers.set('Pragma', 'no-cache');
+  return response;
+}
+
 export async function GET(request: NextRequest, { params }: { params: { locale: string } }) {
   const code = request.nextUrl.searchParams.get('code');
   const requestedNext = request.nextUrl.searchParams.get('next');
@@ -12,7 +20,7 @@ export async function GET(request: NextRequest, { params }: { params: { locale: 
   if (!code) {
     redirectUrl.pathname = `/${params.locale}/signin`;
     redirectUrl.searchParams.set('error', 'oauth_callback');
-    return NextResponse.redirect(redirectUrl);
+    return createAuthRedirect(redirectUrl);
   }
 
   const supabase = await createClient();
@@ -22,5 +30,5 @@ export async function GET(request: NextRequest, { params }: { params: { locale: 
     redirectUrl.searchParams.set('error', 'oauth_callback');
   }
 
-  return NextResponse.redirect(redirectUrl);
+  return createAuthRedirect(redirectUrl);
 }
