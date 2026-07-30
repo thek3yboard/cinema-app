@@ -29,7 +29,6 @@ export default function ProfilePage() {
   const router = useRouter();
   const { user, profile, isLoading, refreshProfile } = useAuth();
   const [username, setUsername] = useState('');
-  const [displayName, setDisplayName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [media, setMedia] = useState<UserMedia[]>([]);
 
@@ -39,7 +38,6 @@ export default function ProfilePage() {
 
   useEffect(() => {
     setUsername(profile?.username ?? '');
-    setDisplayName(profile?.display_name ?? '');
   }, [profile]);
 
   useEffect(() => {
@@ -78,15 +76,15 @@ export default function ProfilePage() {
 
   const saveProfile = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!user || !usernamePattern.test(username)) {
+    const normalizedUsername = username.toLowerCase();
+    if (!user || !usernamePattern.test(normalizedUsername)) {
       return toast.error(t('usernameFormatError'));
     }
-    if (!displayName.trim() || displayName.trim().length > 60) return toast.error(t('displayNameError'));
 
     setIsSaving(true);
     const { error } = await createClient().from('profiles').update({
-      username: username.toLowerCase(),
-      display_name: displayName.trim()
+      username: normalizedUsername,
+      display_name: normalizedUsername
     }).eq('id', user.id);
     setIsSaving(false);
 
@@ -141,7 +139,7 @@ export default function ProfilePage() {
       <h1 className="text-3xl font-bold text-white">{t('title')}</h1>
       <div className="mt-6 grid gap-6 rounded-xl bg-slate-800/80 p-6 md:grid-cols-[180px_1fr]">
         <div className="flex flex-col items-center gap-4">
-          <Avatar name={profile?.display_name || profile?.username} src={profile?.avatar_url ?? undefined} className="h-32 w-32 text-large" />
+          <Avatar name={profile?.username} src={profile?.avatar_url ?? undefined} className="h-32 w-32 text-large" />
           <label className="cursor-pointer rounded-md bg-lapis-lazuli px-4 py-2 text-sm font-semibold text-white hover:opacity-90">
             {t('changePhoto')}
             <input className="sr-only" type="file" accept="image/png,image/jpeg,image/webp" onChange={uploadAvatar} disabled={isSaving} />
@@ -151,9 +149,6 @@ export default function ProfilePage() {
         <form className="flex flex-col gap-4" onSubmit={saveProfile}>
           <label className="font-semibold text-white">{t('username')}
             <input required minLength={3} maxLength={30} autoComplete="username" value={username} onChange={(event) => setUsername(event.target.value)} className="mt-1 h-10 w-full rounded-md border border-slate-500 bg-slate-700 px-3 text-white" />
-          </label>
-          <label className="font-semibold text-white">{t('displayName')}
-            <input required maxLength={60} value={displayName} onChange={(event) => setDisplayName(event.target.value)} className="mt-1 h-10 w-full rounded-md border border-slate-500 bg-slate-700 px-3 text-white" />
           </label>
           <p className="text-sm text-slate-300">{user.email}</p>
           <Button type="submit" isLoading={isSaving} className="w-fit bg-lapis-lazuli font-bold text-white">{t('save')}</Button>

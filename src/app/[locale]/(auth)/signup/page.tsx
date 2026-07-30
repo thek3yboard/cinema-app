@@ -28,11 +28,12 @@ export default function SignUp() {
     if (password.length < 8) return toast.error(t('passwordLengthError'));
 
     setIsSubmitting(true);
+    const normalizedUsername = username.toLowerCase();
     const { error } = await createClient().auth.signUp({
       email,
       password,
       options: {
-        data: { username: username.toLowerCase(), display_name: username },
+        data: { username: normalizedUsername, display_name: normalizedUsername },
         emailRedirectTo: `${window.location.origin}/${locale}/auth/callback`
       }
     });

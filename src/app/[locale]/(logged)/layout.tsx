@@ -60,7 +60,7 @@ export default function LoggedLayout({
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const globalSearch = useGlobalSearch(() => setIsMenuOpen(false));
     const { user, profile, isLoading: isAuthLoading, signOut } = useAuth();
-    const profileName = profile?.display_name || profile?.username || user?.user_metadata?.full_name || user?.email || t('defaultUser');
+    const profileName = profile?.username || user?.user_metadata?.full_name || user?.email || t('defaultUser');
 
     useEffect(() => {
         const selectedLanguage = languageOptions.find((option) => option.key === locale) ?? languageOptions[0];
