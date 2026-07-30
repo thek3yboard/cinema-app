@@ -148,6 +148,39 @@
         "showLoadError": "We couldn't load this TV show. Please try again."
     },
 
+    "PersonDetails": {
+        "loadError": "We couldn't load this person's details. Please try again.",
+        "knownFor": "Known for {department}",
+        "departments": {
+            "acting": "Acting",
+            "directing": "Directing",
+            "writing": "Writing",
+            "production": "Production"
+        },
+        "born": "Born",
+        "died": "Died",
+        "age": "{age} years old",
+        "works": "Credits",
+        "movies": "Movies",
+        "shows": "TV shows",
+        "biography": "Biography",
+        "showMoreBiography": "Read full biography",
+        "showLessBiography": "Show less",
+        "noBiography": "No biography is available for this person.",
+        "filmography": "Filmography",
+        "creditsCount": "{count, plural, one {# credit} other {# credits}}",
+        "filterAria": "Filter filmography",
+        "all": "All",
+        "sortBy": "Sort by",
+        "mostPopular": "Most popular",
+        "newest": "Newest",
+        "movie": "Movie",
+        "show": "TV show",
+        "unknownYear": "Year unavailable",
+        "showMore": "Show more",
+        "noFilmography": "No filmography is available for this filter."
+    },
+
     "OnScreenTogether": {
         "didTheyWorkTogether": "Did they work together?"
     }

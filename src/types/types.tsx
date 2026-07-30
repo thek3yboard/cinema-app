@@ -55,12 +55,31 @@ export type PersonData = {
     id: number,
     name: string,
     biography: string,
-    birthday: string,
-    deathday: string,
+    birthday: string | null,
+    deathday: string | null,
     gender: number,
     known_for_department: string,
-    place_of_birth: number,
-    profile_path: string
+    place_of_birth: string | null,
+    profile_path: string | null
+}
+
+export type PersonCredit = {
+    id: number,
+    media_type: 'movie' | 'tv',
+    title?: string,
+    name?: string,
+    overview?: string,
+    poster_path: string | null,
+    vote_count: number,
+    vote_average?: number,
+    popularity?: number,
+    episode_count?: number,
+    genre_ids?: number[],
+    character?: string,
+    job?: string,
+    department?: string,
+    release_date?: string,
+    first_air_date?: string
 }
 
 export type ProductionCompanies = {

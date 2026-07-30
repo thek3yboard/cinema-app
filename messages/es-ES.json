@@ -148,6 +148,39 @@
         "showLoadError": "No pudimos cargar esta serie. Inténtalo nuevamente."
     },
 
+    "PersonDetails": {
+        "loadError": "No pudimos cargar los datos de esta persona. Inténtalo nuevamente.",
+        "knownFor": "Conocido por {department}",
+        "departments": {
+            "acting": "Actuación",
+            "directing": "Dirección",
+            "writing": "Guion",
+            "production": "Producción"
+        },
+        "born": "Nacimiento",
+        "died": "Fallecimiento",
+        "age": "{age} años",
+        "works": "Créditos",
+        "movies": "Películas",
+        "shows": "Series",
+        "biography": "Biografía",
+        "showMoreBiography": "Leer biografía completa",
+        "showLessBiography": "Ver menos",
+        "noBiography": "No hay una biografía disponible para esta persona.",
+        "filmography": "Filmografía",
+        "creditsCount": "{count, plural, one {# crédito} other {# créditos}}",
+        "filterAria": "Filtrar filmografía",
+        "all": "Todo",
+        "sortBy": "Ordenar por",
+        "mostPopular": "Más populares",
+        "newest": "Más recientes",
+        "movie": "Película",
+        "show": "Serie",
+        "unknownYear": "Año no disponible",
+        "showMore": "Mostrar más",
+        "noFilmography": "No hay filmografía disponible para este filtro."
+    },
+
     "OnScreenTogether": {
         "didTheyWorkTogether": "¿Han trabajado juntos?"
     }
