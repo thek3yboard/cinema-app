@@ -30,6 +30,7 @@ export default function LoggedLayout({
     children: React.ReactNode;
   }>) {
     const t = useTranslations('LoggedLayout');
+    const tAuth = useTranslations('Auth');
     const locale = useLocale();
     const [page, setPage] = useState(initialPage);
     const [movies, setMovies] = useState<Movie[]>([]);
@@ -52,7 +53,7 @@ export default function LoggedLayout({
     const {isOpen, onOpen, onClose} = useDisclosure();
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const globalSearch = useGlobalSearch(() => setIsMenuOpen(false));
-    const { user, profile, signOut } = useAuth();
+    const { user, profile, isLoading: isAuthLoading, signOut } = useAuth();
     const profileName = profile?.display_name || profile?.username || user?.user_metadata?.full_name || user?.email || t('defaultUser');
 
     useEffect(() => {
@@ -262,7 +263,7 @@ export default function LoggedLayout({
                                     }
                                 </NavbarMenuItem>
                             ))}
-                            {user && (
+                            {!isAuthLoading && user && (
                                 <>
                                     <NavbarMenuItem className="mt-2 border-t border-slate-500 pt-4">
                                         <div className="flex items-center gap-3 text-nyanza">
@@ -284,6 +285,26 @@ export default function LoggedLayout({
                                     </NavbarMenuItem>
                                 </>
                             )}
+                            {!isAuthLoading && !user && (
+                                <NavbarMenuItem className="mt-2 border-t border-slate-500 pt-4">
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <Link
+                                            className="flex h-11 items-center justify-center rounded-md border border-nyanza/70 px-4 font-semibold text-nyanza"
+                                            href={`/${locale}/signin`}
+                                            onPress={() => setIsMenuOpen(false)}
+                                        >
+                                            {tAuth('signIn')}
+                                        </Link>
+                                        <Link
+                                            className="flex h-11 items-center justify-center rounded-md bg-orange-400 px-4 font-bold text-slate-950"
+                                            href={`/${locale}/signup`}
+                                            onPress={() => setIsMenuOpen(false)}
+                                        >
+                                            {tAuth('createAccount')}
+                                        </Link>
+                                    </div>
+                                </NavbarMenuItem>
+                            )}
                         </NavbarMenu>
                         <NavbarContent className="hidden xl:flex flex-none gap-2" justify="end">
                             <NavbarItem className="w-64 shrink-0 2xl:w-72">
@@ -303,7 +324,7 @@ export default function LoggedLayout({
                             <NavbarItem className="w-32 shrink-0">
                                 {!loading ? <LanguageSelect handleChangeLanguage={handleChangeLanguage} smallDevice={false} /> : <div className="h-10 w-32" />}
                             </NavbarItem>
-                            {user && (
+                            {!isAuthLoading && user && (
                                 <NavbarItem>
                                     <Dropdown placement="bottom-end">
                                         <DropdownTrigger>
@@ -322,6 +343,24 @@ export default function LoggedLayout({
                                             <DropdownItem key="logout" className="text-danger" color="danger" onPress={handleSignOut}>{t('signOut')}</DropdownItem>
                                         </DropdownMenu>
                                     </Dropdown>
+                                </NavbarItem>
+                            )}
+                            {!isAuthLoading && !user && (
+                                <NavbarItem>
+                                    <div className="flex items-center gap-2">
+                                        <Link
+                                            className="rounded-md px-3 py-2 text-sm font-semibold text-nyanza transition hover:bg-white/10"
+                                            href={`/${locale}/signin`}
+                                        >
+                                            {tAuth('signIn')}
+                                        </Link>
+                                        <Link
+                                            className="rounded-md bg-orange-400 px-3 py-2 text-sm font-bold text-slate-950 transition hover:bg-orange-300"
+                                            href={`/${locale}/signup`}
+                                        >
+                                            {tAuth('createAccount')}
+                                        </Link>
+                                    </div>
                                 </NavbarItem>
                             )}
                         </NavbarContent>
