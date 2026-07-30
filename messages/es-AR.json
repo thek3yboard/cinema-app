@@ -2,7 +2,6 @@
     "LoggedLayout": {
         "movies": "Películas",
         "shows": "Series",
-        "people": "Gente",
         "onScreenTogether": "Juntos en la Pantalla",
         "onScreenTogetherShort": "Juntos",
         "searchPlaceholder": "Buscar títulos o personas",
@@ -30,7 +29,7 @@
     },
 
     "GlobalSearch": {
-        "placeholder": "Buscar películas, series o personas",
+        "placeholder": "Buscar títulos o personas",
         "clear": "Limpiar búsqueda",
         "submit": "Buscar",
         "searching": "Buscando…",
@@ -126,7 +125,7 @@
         "English": "Inglés",
         "Spanish": "Español"
     },
-    
+
     "PageNotFound": {
         "errorMessage": "¡Ups! Página no encontrada."
     },
@@ -182,6 +181,6 @@
     },
 
     "OnScreenTogether": {
-        "didTheyWorkTogether": "¿Han trabajado juntos?"
+        "didTheyWorkTogether": "¿Trabajaron juntos?"
     }
 }

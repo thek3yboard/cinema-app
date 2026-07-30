@@ -2,7 +2,6 @@
     "LoggedLayout": {
         "movies": "Movies",
         "shows": "Shows",
-        "people": "People",
         "onScreenTogether": "On Screen Together",
         "onScreenTogetherShort": "Together",
         "searchPlaceholder": "Search titles or people",
@@ -30,7 +29,7 @@
     },
 
     "GlobalSearch": {
-        "placeholder": "Search movies, shows or people",
+        "placeholder": "Search titles or people",
         "clear": "Clear search",
         "submit": "Search",
         "searching": "Searching…",

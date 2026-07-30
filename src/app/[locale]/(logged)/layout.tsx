@@ -24,6 +24,12 @@ type NavbarItems = {
     value: string
 }
 
+const persistLanguagePreference = (key: string, label: string) => {
+    localStorage.setItem('language_key', key);
+    localStorage.setItem('language_label', label);
+    document.cookie = `NEXT_LOCALE=${encodeURIComponent(key)}; Path=/; Max-Age=31536000; SameSite=Lax`;
+};
+
 export default function LoggedLayout({
     children,
   }: Readonly<{
@@ -57,25 +63,12 @@ export default function LoggedLayout({
     const profileName = profile?.display_name || profile?.username || user?.user_metadata?.full_name || user?.email || t('defaultUser');
 
     useEffect(() => {
-        if(locale !== localStorage.getItem('language_key')) {
-            localStorage.setItem('language_key', locale)
-            switch(locale) {
-                case 'en-US':
-                    localStorage.setItem('language_label', 'English')
-                    break
-                default: 
-                    localStorage.setItem('language_label', 'Spanish')
-            }
-        }
-        const storedLanguageKey = localStorage.getItem('language_key');
-        const storedLanguageLabel = localStorage.getItem('language_label');
-
-        if (storedLanguageKey && storedLanguageLabel) {
-            setLanguage({ key: storedLanguageKey, label: storedLanguageLabel });
-        }
+        const selectedLanguage = languageOptions.find((option) => option.key === locale) ?? languageOptions[0];
+        setLanguage({ key: selectedLanguage.key, label: selectedLanguage.label });
+        persistLanguagePreference(selectedLanguage.key, selectedLanguage.label);
 
         setLoading(false);
-    }, []);
+    }, [locale]);
 
     const navbarItems: NavbarItems[] = [
         {
@@ -85,10 +78,6 @@ export default function LoggedLayout({
         {
             key: 'shows',
             value: `${t('shows')}`
-        },
-        {
-            key: 'people',
-            value: `${t('people')}`
         },
         {
             key: 'onScreenTogether',
@@ -115,16 +104,14 @@ export default function LoggedLayout({
 
     const handleChangeLanguage = (e: ChangeEvent<HTMLSelectElement>) => {
         const newLanguage = languageOptions.find(language => language.key === e.target.value)
+        if (!newLanguage || newLanguage.key === locale) return;
+
         setLanguage({ key: newLanguage!.key, label: newLanguage!.label })
-        localStorage.setItem('language_key', newLanguage!.key)
-        localStorage.setItem('language_label', newLanguage!.label)
+        persistLanguagePreference(newLanguage.key, newLanguage.label)
 
-        let newPathname = `/${newLanguage!.key}`;
         const parts = pathname.split("/");
-        const secondPart = "/" + parts.slice(2).join("/");
-
-        newPathname = `${newPathname}${secondPart}/`;
-        router.push(`${newPathname}`);
+        const localizedPathname = `/${newLanguage.key}/${parts.slice(2).join("/")}`;
+        router.push(localizedPathname);
 
         setIsMenuOpen(false);
     }

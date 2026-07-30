@@ -1,8 +1,7 @@
 import "@/app/[locale]/globals.css";
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
-import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale } from "next-intl/server";
 import { Toaster } from "sonner";
 import { Providers } from "./[locale]/providers";
 import { PWARegister } from "./[locale]/lib/pwa-register";
@@ -28,21 +27,16 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-    const [locale, messages] = await Promise.all([
-        getLocale(),
-        getMessages()
-    ]);
+    const locale = await getLocale();
 
     return (
         <html lang={locale} suppressHydrationWarning>
             <body className={`${montserrat.className} antialiased`}>
-                <NextIntlClientProvider messages={messages}>
-                    <Providers>
-                        <PWARegister />
-                        <main>{children}</main>
-                        <Toaster richColors position="top-right" />
-                    </Providers>
-                </NextIntlClientProvider>
+                <Providers>
+                    <PWARegister />
+                    <main>{children}</main>
+                    <Toaster richColors position="top-right" />
+                </Providers>
             </body>
         </html>
     );

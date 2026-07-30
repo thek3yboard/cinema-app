@@ -47,7 +47,7 @@ export default function GlobalSearchInput({ controller, className = '' }: Props)
           aria-controls={listboxId}
           aria-expanded={showDropdown}
           aria-activedescendant={controller.highlightedIndex >= 0 ? `${listboxId}-${controller.highlightedIndex}` : undefined}
-          className={`h-full min-w-0 flex-1 bg-transparent pl-3 text-sm text-white outline-none placeholder:text-slate-400 ${
+          className={`h-full min-w-0 flex-1 bg-transparent pl-3 text-[13px] text-white outline-none placeholder:text-slate-400 sm:text-sm ${
             controller.query ? 'pr-9' : 'pr-3'
           }`}
         />

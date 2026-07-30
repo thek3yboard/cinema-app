@@ -6,9 +6,19 @@ import { updateSession } from './lib/supabase/middleware';
  
 const intlMiddleware = createMiddleware(routing);
 
-const protectedPath = /^\/(en-US|es-ES|es-MX)\/profile(?:\/.*)?$/;
+const protectedPath = /^\/(en-US|es-AR)\/profile(?:\/.*)?$/;
 
 export default async function middleware(request: NextRequest) {
+  if (request.nextUrl.pathname === '/') {
+    const storedLocale = request.cookies.get('NEXT_LOCALE')?.value;
+    const locale = routing.locales.find((supportedLocale) => supportedLocale === storedLocale)
+      ?? routing.defaultLocale;
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = `/${locale}/movies`;
+
+    return NextResponse.redirect(redirectUrl);
+  }
+
   const response = intlMiddleware(request) as NextResponse;
 
   // The project remains usable until its Supabase variables are configured locally.
@@ -28,5 +38,5 @@ export default async function middleware(request: NextRequest) {
  
 export const config = {
     // Match only internationalized pathnames
-    matcher: ['/', '/(en-US|es-ES|es-MX)/:path*']
+    matcher: ['/', '/(en-US|es-AR)/:path*']
 };

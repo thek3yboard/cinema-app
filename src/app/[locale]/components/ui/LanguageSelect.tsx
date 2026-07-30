@@ -1,6 +1,6 @@
 import React, { ChangeEventHandler, useContext } from 'react';
 import { Select, SelectItem } from '@nextui-org/react';
-import { US, ES, MX } from 'country-flag-icons/react/3x2';
+import { AR, US } from 'country-flag-icons/react/3x2';
 import { MediaContext } from '../../(logged)/MediaContext';
 import { useTranslations } from 'next-intl';
 
@@ -11,8 +11,7 @@ type Props = {
 
 export const languageOptions = [
     { key: 'en-US', label: 'English' },
-    { key: 'es-ES', label: 'Spanish' },
-    { key: 'es-MX', label: 'Spanish' }
+    { key: 'es-AR', label: 'Spanish' }
 ];
 
 const Flag = ({ children }: { children: React.ReactNode }) => (
@@ -20,6 +19,8 @@ const Flag = ({ children }: { children: React.ReactNode }) => (
         {children}
     </div>
 );
+
+const renderFlag = (locale: string) => locale === 'en-US' ? <US /> : <AR />;
 
 export default function LanguageSelect({ handleChangeLanguage }: Props) {
     const { language } = useContext(MediaContext);
@@ -33,39 +34,17 @@ export default function LanguageSelect({ handleChangeLanguage }: Props) {
             label={t('language')}
             radius="sm"
             renderValue={() => {
-                switch(language.key) {
-                    case 'en-US':
-                        return (
-                            <span className='flex flex-row gap-2 items-center' key={language.key}>
-                                {t(`${language.label}`)} <Flag><US /></Flag>
-                            </span>
-                        );
-                    case 'es-ES':
-                        return (
-                            <span className='flex flex-row gap-2 items-center' key={language.key}>
-                                {t(`${language.label}`)} <Flag><ES /></Flag>
-                            </span>
-                        );
-                    case 'es-MX':
-                        return (
-                            <span className='flex flex-row gap-2 items-center' key={language.key}>
-                                {t(`${language.label}`)} <Flag><MX /></Flag>
-                            </span>
-                        );
-                    default:
-                        return <span key={language.key}>{t(`${language.label}`)}</span>;
-                }
+                return (
+                    <span className='flex flex-row gap-2 items-center' key={language.key}>
+                        {t(`${language.label}`)}
+                        <Flag>{renderFlag(language.key)}</Flag>
+                    </span>
+                );
             }}
             placeholder={
                 <span className='flex flex-row gap-2 items-center' key={language.key}>
-                    {t(`${language.label}`)} 
-                    {language.key === 'en-US' ? (
-                        <Flag><US /></Flag>
-                    ) : language.key === 'es-ES' ? (
-                        <Flag><ES /></Flag>
-                    ) : (
-                        <Flag><MX /></Flag>
-                    )}
+                    {t(`${language.label}`)}
+                    <Flag>{renderFlag(language.key)}</Flag>
                 </span> as any
             }
             className="w-full"
@@ -74,14 +53,8 @@ export default function LanguageSelect({ handleChangeLanguage }: Props) {
             {languageOptions.map((option) => (
                 <SelectItem key={option.key} textValue={t(`${option.label}`)}>
                     <div className='flex flex-row items-center gap-2'>
-                        {t(`${option.label}`)} 
-                        {option.key === 'en-US' ? (
-                            <Flag><US /></Flag>
-                        ) : option.key === 'es-ES' ? (
-                            <Flag><ES /></Flag>
-                        ) : (
-                            <Flag><MX /></Flag>
-                        )}
+                        {t(`${option.label}`)}
+                        <Flag>{renderFlag(option.key)}</Flag>
                     </div>
                 </SelectItem>
             ))}

@@ -4,8 +4,9 @@
 2. En **Authentication > Providers**, habilitar Email y Google. En Google Cloud crear un OAuth Web Client y copiar su Client ID/secret al proveedor Google de Supabase.
 3. En **Authentication > URL Configuration**, agregar las URLs de redirección, por ejemplo:
    - `http://localhost:3000/en-US/auth/callback`
-   - `http://localhost:3000/es-ES/auth/callback`
+   - `http://localhost:3000/es-AR/auth/callback`
    - `https://TU-DOMINIO/en-US/auth/callback`
+   - `https://TU-DOMINIO/es-AR/auth/callback`
 4. Configurar el SMTP personalizado en **Authentication > Email**. Si se usa Resend, verificar primero el dominio del remitente en Resend; el campo **Sender email** de Supabase debe pertenecer exactamente a ese dominio (por ejemplo, `Cinema <no-reply@auth.tudominio.com>` si se verificó `auth.tudominio.com`). Los valores SMTP de Resend son host `smtp.resend.com`, usuario `resend`, password la API key de Resend y puerto `465` (SSL) o `587` (STARTTLS). No usar un dominio sin verificar: Supabase devolverá un 500 al intentar enviar el código.
 5. En **Authentication > Email Templates > Confirm signup**, usar `{{ .Token }}` para incluir el OTP. El texto no debe fijar la cantidad de dígitos: esa longitud se configura en **Authentication > Providers > Email**. Para este proyecto se recomienda mantenerla en 6; la interfaz admite de 6 a 10 para no bloquear usuarios si la configuración cambia.
 5. Copiar la URL del proyecto y la Publishable key a `.env.local`, tomando como referencia `.env.example`.

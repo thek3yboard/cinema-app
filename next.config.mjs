@@ -15,8 +15,13 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: '/',
-        destination: '/en-US/movies',
+        source: '/es-ES/:path*',
+        destination: '/es-AR/:path*',
+        permanent: true,
+      },
+      {
+        source: '/es-MX/:path*',
+        destination: '/es-AR/:path*',
         permanent: true,
       },
     ]
