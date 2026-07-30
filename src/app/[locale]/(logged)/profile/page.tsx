@@ -160,25 +160,34 @@ export default function ProfilePage() {
         </form>
       </div>
 
-      <section id="lists" className="mt-10 rounded-xl bg-slate-800/80 p-6">
+      <section id="lists" className="mt-10 min-w-0 overflow-hidden rounded-xl bg-slate-800/80 p-6">
         <h2 className="text-2xl font-bold text-white">{t('listsTitle')}</h2>
         <p className="mt-1 text-sm text-slate-300">{t('listsDescription')}</p>
-        <Tabs aria-label={t('listsAria')} className="mt-4" variant="underlined">
+        <Tabs
+          aria-label={t('listsAria')}
+          className="mt-4 w-full min-w-0"
+          classNames={{
+            base: 'w-full min-w-0',
+            tabList: 'max-w-full overflow-x-auto',
+            panel: 'w-full min-w-0 px-0'
+          }}
+          variant="underlined"
+        >
           {tabs.map((tab) => {
             const items = media.filter(tab.filter);
             return <Tab key={tab.key} title={`${tab.label} (${items.length})`}>
-              {items.length ? <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-                {items.map((item) => <li key={`${item.media_type}-${item.media_id}`}>
-                  <button type="button" onClick={() => router.push(`/${locale}/${item.media_type === 'movie' ? 'movies' : 'shows'}/${item.media_id}`)} className="flex w-full gap-3 rounded-md bg-slate-700 p-3 text-left text-white transition hover:bg-slate-600">
+              {items.length ? <ul className="mt-4 grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
+                {items.map((item) => <li className="min-w-0" key={`${item.media_type}-${item.media_id}`}>
+                  <button type="button" onClick={() => router.push(`/${locale}/${item.media_type === 'movie' ? 'movies' : 'shows'}/${item.media_id}`)} className="flex w-full min-w-0 max-w-full overflow-hidden gap-3 rounded-md bg-slate-700 p-3 text-left text-white transition hover:bg-slate-600">
                     <Image
                       src={item.poster_path ? `https://image.tmdb.org/t/p/w185${item.poster_path}` : '/fallback-portrait.svg'}
                       alt={item.title ?? t('posterAlt')}
                       width={64}
                       height={96}
-                      className="h-24 w-16 rounded object-cover"
+                      className="h-24 w-16 shrink-0 rounded object-cover"
                     />
-                    <span className="flex min-w-0 flex-col justify-center">
-                      <span className="truncate text-base font-bold">{item.title ?? t('loadingTitle')}</span>
+                    <span className="flex min-w-0 flex-1 flex-col justify-center overflow-hidden">
+                      <span className="block max-w-full truncate text-base font-bold">{item.title ?? t('loadingTitle')}</span>
                       <span className="mt-1 text-sm text-slate-300">{item.media_type === 'movie' ? t('movie') : t('show')}{item.rating > 0 ? ` · ${item.rating}/10` : ''}</span>
                     </span>
                   </button>
