@@ -42,36 +42,41 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!user) return;
-    createClient().from('user_media')
-      .select('media_type, media_id, in_watchlist, is_watched, is_favorite, rating, title, poster_path')
-      .order('updated_at', { ascending: false })
-      .then(({ data, error }: { data: UserMedia[] | null; error: { message: string } | null }) => {
-        if (error) toast.error(t('loadListsError'));
-        else {
-          const savedMedia = data ?? [];
-          setMedia(savedMedia);
+    let active = true;
 
-          const incompleteMedia = savedMedia.filter((item) => !item.title || !item.poster_path);
-          if (!incompleteMedia.length) return;
+    const loadMedia = async () => {
+      const { data, error } = await createClient().from('user_media')
+        .select('media_type, media_id, in_watchlist, is_watched, is_favorite, rating, title, poster_path')
+        .order('updated_at', { ascending: false });
 
-          Promise.all(incompleteMedia.map(async (item) => {
-            const endpoint = item.media_type === 'movie' ? 'movie' : 'tv';
-            const details = await fetchPage(`https://api.themoviedb.org/3/${endpoint}/${item.media_id}?language=${locale}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`);
-            const title = details?.title ?? details?.name ?? null;
-            const posterPath = details?.poster_path ?? null;
+      if (!active) return;
+      if (error) {
+        toast.error(t('loadListsError'));
+        return;
+      }
 
-            if (title || posterPath) {
-              await createClient().from('user_media').update({ title, poster_path: posterPath })
-                .eq('user_id', user.id).eq('media_type', item.media_type).eq('media_id', item.media_id);
-            }
+      const savedMedia = (data ?? []) as UserMedia[];
+      setMedia(savedMedia);
 
-            return { ...item, title, poster_path: posterPath };
-          })).then((hydratedMedia) => {
-            const hydratedByKey = new Map(hydratedMedia.map((item) => [`${item.media_type}:${item.media_id}`, item]));
-            setMedia((currentMedia) => currentMedia.map((item) => hydratedByKey.get(`${item.media_type}:${item.media_id}`) ?? item));
-          }).catch(() => toast.error(t('hydrateListsError')));
-        }
-      });
+      const localizedMedia = await Promise.all(savedMedia.map(async (item) => {
+        const endpoint = item.media_type === 'movie' ? 'movie' : 'tv';
+        const details = await fetchPage(`https://api.themoviedb.org/3/${endpoint}/${item.media_id}?language=${locale}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`);
+
+        return {
+          ...item,
+          title: details?.title ?? details?.name ?? item.title,
+          poster_path: details?.poster_path ?? item.poster_path
+        };
+      }));
+
+      if (active) setMedia(localizedMedia);
+    };
+
+    loadMedia().catch(() => {
+      if (active) toast.error(t('hydrateListsError'));
+    });
+
+    return () => { active = false; };
   }, [locale, t, user]);
 
   const saveProfile = async (event: FormEvent<HTMLFormElement>) => {
