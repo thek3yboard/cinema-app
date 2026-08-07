@@ -1,9 +1,9 @@
 "use client";
 
 import { Suspense, useEffect, useState } from 'react';
-import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
+import PosterCard from '@/components/media/PosterCard';
 import { searchAll } from '@/lib/tmdb/search';
 import { searchProfiles } from '@/lib/supabase/search';
 import {
@@ -131,25 +131,12 @@ function SearchResults() {
 
               return (
                 <li className="min-w-0" key={`${result.media_type}-${result.id}`}>
-                  <button
-                    type="button"
+                  <PosterCard
+                    title={title}
+                    imageSrc={imagePath ? (result.media_type === 'user' ? imagePath : `https://image.tmdb.org/t/p/w342${imagePath}`) : '/fallback-portrait.svg'}
+                    metadata={`${getTypeLabel(result)}${metadata ? ` · ${metadata}` : ''}`}
                     onClick={() => router.push(getSearchResultHref(locale, result))}
-                    className="group flex h-full w-full min-w-0 flex-col overflow-hidden rounded-lg bg-slate-800/90 text-left text-white shadow-md transition hover:-translate-y-1 hover:bg-slate-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-nyanza"
-                  >
-                    <Image
-                      src={imagePath ? (result.media_type === 'user' ? imagePath : `https://image.tmdb.org/t/p/w342${imagePath}`) : '/fallback-portrait.svg'}
-                      alt={title}
-                      width={228}
-                      height={342}
-                      className="aspect-[2/3] w-full object-cover"
-                    />
-                    <span className="flex min-w-0 flex-1 flex-col p-3">
-                      <span className="line-clamp-2 font-bold">{title}</span>
-                      <span className="mt-auto pt-2 text-xs text-slate-300">
-                        {getTypeLabel(result)}{metadata ? ` · ${metadata}` : ''}
-                      </span>
-                    </span>
-                  </button>
+                  />
                 </li>
               );
             })}
