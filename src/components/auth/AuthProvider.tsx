@@ -8,7 +8,6 @@ import { isSupabaseConfigured } from '@/lib/supabase/config';
 export type Profile = {
   id: string;
   username: string;
-  display_name: string;
   avatar_url: string | null;
 };
 
@@ -80,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, username, display_name, avatar_url')
+      .select('id, username, avatar_url')
       .eq('id', currentUser.id)
       .single();
 

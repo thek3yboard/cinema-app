@@ -33,7 +33,7 @@ export default function SignUp() {
       email,
       password,
       options: {
-        data: { username: normalizedUsername, display_name: normalizedUsername },
+        data: { username: normalizedUsername },
         emailRedirectTo: `${window.location.origin}/${locale}/auth/callback`
       }
     });

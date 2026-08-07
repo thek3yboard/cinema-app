@@ -9,6 +9,7 @@ import { Avatar, Button, Tab, Tabs } from '@nextui-org/react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { createClient } from '@/lib/supabase/client';
 import { fetchPage } from '@/app/[locale]/utils';
+import CustomListsManager from '@/components/lists/CustomListsManager';
 
 type UserMedia = {
   media_type: 'movie' | 'tv';
@@ -19,6 +20,7 @@ type UserMedia = {
   rating: number;
   title: string | null;
   poster_path: string | null;
+  is_title_loading?: boolean;
 };
 
 const usernamePattern = /^[a-zA-Z0-9_]{3,30}$/;
@@ -56,20 +58,37 @@ export default function ProfilePage() {
       }
 
       const savedMedia = (data ?? []) as UserMedia[];
-      setMedia(savedMedia);
+      setMedia(savedMedia.map((item) => ({ ...item, title: null, is_title_loading: true })));
 
-      const localizedMedia = await Promise.all(savedMedia.map(async (item) => {
-        const endpoint = item.media_type === 'movie' ? 'movie' : 'tv';
-        const details = await fetchPage(`https://api.themoviedb.org/3/${endpoint}/${item.media_id}?language=${locale}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`);
+      let nextIndex = 0;
+      let failedTitles = 0;
+      const workerCount = Math.min(4, savedMedia.length);
 
-        return {
-          ...item,
-          title: details?.title ?? details?.name ?? item.title,
-          poster_path: details?.poster_path ?? item.poster_path
-        };
-      }));
+      const localizeNextItem = async () => {
+        while (active && nextIndex < savedMedia.length) {
+          const item = savedMedia[nextIndex++];
+          const endpoint = item.media_type === 'movie' ? 'movie' : 'tv';
+          const details = await fetchPage(`https://api.themoviedb.org/3/${endpoint}/${item.media_id}?language=${locale}&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`);
+          const localizedTitle = details?.title ?? details?.name ?? null;
 
-      if (active) setMedia(localizedMedia);
+          if (!localizedTitle) failedTitles += 1;
+          if (!active) return;
+
+          setMedia((currentMedia) => currentMedia.map((currentItem) =>
+            currentItem.media_type === item.media_type && currentItem.media_id === item.media_id
+              ? {
+                  ...currentItem,
+                  title: localizedTitle,
+                  poster_path: details?.poster_path ?? currentItem.poster_path,
+                  is_title_loading: false
+                }
+              : currentItem
+          ));
+        }
+      };
+
+      await Promise.all(Array.from({ length: workerCount }, () => localizeNextItem()));
+      if (active && failedTitles > 0) toast.error(t('hydrateListsError'));
     };
 
     loadMedia().catch(() => {
@@ -88,8 +107,7 @@ export default function ProfilePage() {
 
     setIsSaving(true);
     const { error } = await createClient().from('profiles').update({
-      username: normalizedUsername,
-      display_name: normalizedUsername
+      username: normalizedUsername
     }).eq('id', user.id);
     setIsSaving(false);
 
@@ -187,7 +205,9 @@ export default function ProfilePage() {
                       className="h-24 w-16 shrink-0 rounded object-cover"
                     />
                     <span className="flex min-w-0 flex-1 flex-col justify-center overflow-hidden">
-                      <span className="block max-w-full truncate text-base font-bold">{item.title ?? t('loadingTitle')}</span>
+                      <span className="block max-w-full truncate text-base font-bold">
+                        {item.is_title_loading ? t('loadingTitle') : item.title ?? t('titleUnavailable')}
+                      </span>
                       <span className="mt-1 text-sm text-slate-300">{item.media_type === 'movie' ? t('movie') : t('show')}{item.rating > 0 ? ` · ${item.rating}/10` : ''}</span>
                     </span>
                   </button>
@@ -197,6 +217,8 @@ export default function ProfilePage() {
           })}
         </Tabs>
       </section>
+
+      <CustomListsManager locale={locale} userId={user.id} username={profile?.username ?? null} />
     </div>
   );
 }

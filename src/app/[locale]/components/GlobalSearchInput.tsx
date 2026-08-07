@@ -26,6 +26,7 @@ export default function GlobalSearchInput({ controller, className = '' }: Props)
   const getTypeLabel = (result: GlobalSearchResult) => {
     if (result.media_type === 'movie') return t('movie');
     if (result.media_type === 'tv') return t('show');
+    if (result.media_type === 'user') return t('user');
     return t('person');
   };
 
@@ -100,7 +101,7 @@ export default function GlobalSearchInput({ controller, className = '' }: Props)
                       }`}
                     >
                       <Image
-                        src={imagePath ? `https://image.tmdb.org/t/p/w92${imagePath}` : '/fallback-portrait.svg'}
+                        src={imagePath ? (suggestion.media_type === 'user' ? imagePath : `https://image.tmdb.org/t/p/w92${imagePath}`) : '/fallback-portrait.svg'}
                         alt=""
                         width={40}
                         height={56}

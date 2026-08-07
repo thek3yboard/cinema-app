@@ -4,6 +4,7 @@ import { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react';
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { searchAll } from '@/lib/tmdb/search';
+import { searchProfiles } from '@/lib/supabase/search';
 import {
   getSearchResultHref,
   getSearchResultTitle,
@@ -37,8 +38,16 @@ export function useGlobalSearch(onNavigate?: () => void) {
     const timer = window.setTimeout(async () => {
       setIsLoading(true);
       try {
-        const data = await searchAll(normalizedQuery, locale, 1, controller.signal);
-        setSuggestions(data.results.slice(0, 8));
+        const [mediaResult, profileResult] = await Promise.allSettled([
+          searchAll(normalizedQuery, locale, 1, controller.signal),
+          searchProfiles(normalizedQuery, 4)
+        ]);
+        if (controller.signal.aborted) return;
+        if (mediaResult.status === 'rejected' && profileResult.status === 'rejected') throw mediaResult.reason;
+
+        const media = mediaResult.status === 'fulfilled' ? mediaResult.value.results : [];
+        const profiles = profileResult.status === 'fulfilled' ? profileResult.value : [];
+        setSuggestions([...profiles, ...media].slice(0, 8));
         setHighlightedIndex(-1);
         setHasSearched(true);
       } catch (error) {
@@ -68,7 +77,7 @@ export function useGlobalSearch(onNavigate?: () => void) {
   };
 
   const selectSuggestion = (suggestion: GlobalSearchResult) => {
-    setQuery(getSearchResultTitle(suggestion));
+    setQuery(suggestion.media_type === 'user' ? suggestion.username ?? '' : getSearchResultTitle(suggestion));
     setSuggestions([]);
     setHighlightedIndex(-1);
     setIsOpen(false);

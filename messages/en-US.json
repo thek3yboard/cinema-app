@@ -29,7 +29,7 @@
     },
 
     "GlobalSearch": {
-        "placeholder": "Search titles or people",
+        "placeholder": "Search titles, people, or users",
         "clear": "Clear search",
         "submit": "Search",
         "searching": "Searching…",
@@ -38,7 +38,7 @@
         "title": "Global search",
         "resultsFor": "Results for “{query}”",
         "emptyPrompt": "Enter at least two characters in the search bar.",
-        "noResults": "No movies, TV shows, or people matched your search.",
+        "noResults": "No movies, TV shows, people, or users matched your search.",
         "loadError": "We couldn't load the search results. Please try again.",
         "loadMoreError": "We couldn't load more results.",
         "loadMore": "Load more",
@@ -46,6 +46,7 @@
         "movie": "Movie",
         "show": "TV show",
         "person": "Person",
+        "user": "User",
         "unknownYear": "Year unavailable"
     },
 
@@ -113,9 +114,61 @@
         "listsAria": "User lists",
         "posterAlt": "Title without a poster",
         "loadingTitle": "Loading title…",
+        "titleUnavailable": "Title unavailable",
         "movie": "Movie",
         "show": "TV show",
         "emptyList": "You haven't added any titles to this list yet."
+    },
+
+    "CustomLists": {
+        "title": "Custom lists",
+        "description": "Group movies into private lists or share them from your public profile.",
+        "name": "List name",
+        "namePlaceholder": "For example: Favorite science fiction",
+        "publicList": "Public list",
+        "create": "Create list",
+        "created": "List created.",
+        "createError": "We couldn't create the list.",
+        "loadError": "We couldn't load your custom lists.",
+        "loading": "Loading lists…",
+        "empty": "You haven't created any custom lists yet.",
+        "public": "Public",
+        "private": "Private",
+        "visibilityError": "We couldn't change the list privacy.",
+        "movieCount": "{count, plural, =0 {No movies} one {# movie} other {# movies}}",
+        "deleteList": "Delete the list {name}",
+        "deleteConfirmation": "Delete “{name}” and all its movies?",
+        "deleteError": "We couldn't delete the list.",
+        "deleted": "List deleted.",
+        "viewPublicProfile": "View my public profile",
+        "addToCustomList": "Add to a custom list",
+        "chooseLists": "Choose lists",
+        "loadMembershipsError": "We couldn't check which lists contain this movie.",
+        "membershipError": "We couldn't update the list.",
+        "addedToList": "Added to “{name}”.",
+        "removedFromList": "Removed from “{name}”.",
+        "included": "Included",
+        "notIncluded": "Add",
+        "noListsForPicker": "Create a custom list first.",
+        "createFirstList": "Create my first list",
+        "close": "Close",
+        "listNotFound": "This list doesn't exist, is private, or you don't have permission to view it.",
+        "createdBy": "Created by",
+        "emptyCustomList": "This list doesn't contain any movies yet.",
+        "removeMovie": "Remove {title} from the list",
+        "removeMovieError": "We couldn't remove the movie.",
+        "movieRemoved": "Movie removed from the list.",
+        "posterAlt": "Movie without a poster",
+        "loadingTitle": "Loading title…",
+        "titleUnavailable": "Title unavailable",
+        "coverPreview": "Cover mosaic for {name}"
+    },
+
+    "PublicProfile": {
+        "loading": "Loading profile…",
+        "notFound": "We couldn't find that user.",
+        "publicLists": "Public lists",
+        "noPublicLists": "This user doesn't have any public lists yet."
     },
     
     "Language": {

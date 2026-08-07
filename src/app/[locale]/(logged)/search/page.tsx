@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { searchAll } from '@/lib/tmdb/search';
+import { searchProfiles } from '@/lib/supabase/search';
 import {
   getSearchResultHref,
   getSearchResultImage,
@@ -39,10 +40,18 @@ function SearchResults() {
     setHasError(false);
     setCurrentPage(1);
 
-    searchAll(query, locale, 1, controller.signal)
-      .then((data) => {
-        setResults(data.results);
-        setTotalPages(data.total_pages);
+    Promise.allSettled([
+      searchAll(query, locale, 1, controller.signal),
+      searchProfiles(query)
+    ])
+      .then(([mediaResult, profileResult]) => {
+        if (controller.signal.aborted) return;
+        if (mediaResult.status === 'rejected' && profileResult.status === 'rejected') throw mediaResult.reason;
+
+        const media = mediaResult.status === 'fulfilled' ? mediaResult.value : null;
+        const profiles = profileResult.status === 'fulfilled' ? profileResult.value : [];
+        setResults([...profiles, ...(media?.results ?? [])]);
+        setTotalPages(media?.total_pages ?? 0);
       })
       .catch((error) => {
         if ((error as Error).name !== 'AbortError') {
@@ -86,10 +95,12 @@ function SearchResults() {
   const getTypeLabel = (result: GlobalSearchResult) => {
     if (result.media_type === 'movie') return t('movie');
     if (result.media_type === 'tv') return t('show');
+    if (result.media_type === 'user') return t('user');
     return t('person');
   };
 
   const getMetadata = (result: GlobalSearchResult) => {
+    if (result.media_type === 'user') return null;
     if (result.media_type === 'person') return result.known_for_department || t('person');
     const date = result.media_type === 'movie' ? result.release_date : result.first_air_date;
     return date?.slice(0, 4) || t('unknownYear');
@@ -116,6 +127,7 @@ function SearchResults() {
             {results.map((result) => {
               const title = getSearchResultTitle(result);
               const imagePath = getSearchResultImage(result);
+              const metadata = getMetadata(result);
 
               return (
                 <li className="min-w-0" key={`${result.media_type}-${result.id}`}>
@@ -125,7 +137,7 @@ function SearchResults() {
                     className="group flex h-full w-full min-w-0 flex-col overflow-hidden rounded-lg bg-slate-800/90 text-left text-white shadow-md transition hover:-translate-y-1 hover:bg-slate-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-nyanza"
                   >
                     <Image
-                      src={imagePath ? `https://image.tmdb.org/t/p/w342${imagePath}` : '/fallback-portrait.svg'}
+                      src={imagePath ? (result.media_type === 'user' ? imagePath : `https://image.tmdb.org/t/p/w342${imagePath}`) : '/fallback-portrait.svg'}
                       alt={title}
                       width={228}
                       height={342}
@@ -134,7 +146,7 @@ function SearchResults() {
                     <span className="flex min-w-0 flex-1 flex-col p-3">
                       <span className="line-clamp-2 font-bold">{title}</span>
                       <span className="mt-auto pt-2 text-xs text-slate-300">
-                        {getTypeLabel(result)} · {getMetadata(result)}
+                        {getTypeLabel(result)}{metadata ? ` · ${metadata}` : ''}
                       </span>
                     </span>
                   </button>

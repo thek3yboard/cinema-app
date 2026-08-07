@@ -11,6 +11,7 @@ import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { createClient } from '@/lib/supabase/client';
+import CustomListPicker from '@/components/lists/CustomListPicker';
 
 type Props = {
     mediaData?: MovieData | ShowData
@@ -184,6 +185,14 @@ export default function MediaUI({ mediaData }: Props) {
                                                 {isFavorite ? `${t('removeFromFavorites')}` : `${t('addToFavorites')}`}
                                                 </span>
                                             </div>
+                                            {mediaType === 'movie' && 'title' in mediaData && (
+                                                <CustomListPicker
+                                                    userId={user.id}
+                                                    movieId={mediaData.id}
+                                                    title={mediaData.title}
+                                                    posterPath={mediaData.poster_path}
+                                                />
+                                            )}
                                         </div>
                                     </div>}
                                 </div>
