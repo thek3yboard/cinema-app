@@ -142,6 +142,7 @@
         "deleted": "Lista eliminada.",
         "viewPublicProfile": "Ver mi perfil público",
         "addToCustomList": "Agregar a una lista personalizada",
+        "listsLabel": "Listas",
         "chooseLists": "Elegir listas",
         "loadMembershipsError": "No pudimos comprobar en qué listas está esta película.",
         "membershipError": "No pudimos actualizar la lista.",
@@ -183,6 +184,9 @@
     
     "MediaUI": {
         "yourRating": "Tu puntaje",
+        "watchlistLabel": "Quiero ver",
+        "watchedLabel": "Vista",
+        "favoriteLabel": "Favorita",
         "addToWatchlist": "Agregar a ver más tarde",
         "removeFromWatchlist": "Quitar de ver más tarde",
         "markAsWatched": "Marcar como vista",

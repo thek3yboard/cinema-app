@@ -92,11 +92,14 @@ export default function CustomListPicker({ userId, movieId, title, posterPath }:
 
   return (
     <>
-      <div className="relative group max-md:mr-2">
-        <button type="button" onClick={onOpen} className="rounded-full bg-gray-200 p-2 text-gray-700" aria-label={t('addToCustomList')}>
-          <ListPlus className="h-5 w-5" />
+      <div className="relative shrink-0 group">
+        <button type="button" onClick={onOpen} className="flex flex-col items-center gap-1 text-white" aria-label={t('addToCustomList')}>
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 text-gray-700">
+            <ListPlus className="h-5 w-5" />
+          </span>
+          <span className="text-xs leading-none md:hidden">{t('listsLabel')}</span>
         </button>
-        <span className="absolute bottom-[115%] left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        <span className="pointer-events-none absolute bottom-[115%] left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:block">
           {t('addToCustomList')}
         </span>
       </div>

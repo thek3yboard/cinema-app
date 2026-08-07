@@ -142,6 +142,7 @@
         "deleted": "List deleted.",
         "viewPublicProfile": "View my public profile",
         "addToCustomList": "Add to a custom list",
+        "listsLabel": "Lists",
         "chooseLists": "Choose lists",
         "loadMembershipsError": "We couldn't check which lists contain this movie.",
         "membershipError": "We couldn't update the list.",
@@ -183,6 +184,9 @@
 
     "MediaUI": {
         "yourRating": "Your rating",
+        "watchlistLabel": "Watchlist",
+        "watchedLabel": "Watched",
+        "favoriteLabel": "Favorite",
         "addToWatchlist": "Add to watchlist",
         "removeFromWatchlist": "Remove from watchlist",
         "markAsWatched": "Mark as watched",

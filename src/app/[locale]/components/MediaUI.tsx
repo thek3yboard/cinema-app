@@ -146,53 +146,68 @@ export default function MediaUI({ mediaData }: Props) {
                                 <div className='mt-4 flex max-md:flex-col md:justify-between md:items-center'>
                                     <StarRating rating={mediaData?.vote_average} maxRating={10} />
                                     {user && <div className="flex items-center justify-end max-md:justify-start md:gap-4 max-md:w-full">
-                                        <div className='w-fit flex items-center md:gap-4 bg-slate-500 p-2 rounded-md max-md:mt-4'>
-                                            <p className="text-sm w-min max-md:hidden font-medium text-white">{t('yourRating')}:</p>
-                                            <StarRating rating={userRating} maxRating={10} onChange={handleRating} />
-                                            <div className="relative group max-md:ml-2 max-md:mr-2">
-                                                <button 
-                                                className={`p-2 rounded-full ${inWatchlist ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-                                                onClick={toggleWatchlist}
-                                                aria-label={inWatchlist ? `${t('removeFromWatchlist')}` : `${t('addToWatchlist')}`}
-                                                >
-                                                <List className="w-5 h-5" />
-                                                </button>
-                                                <span className="absolute bottom-[115%] left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                                {inWatchlist ? `${t('removeFromWatchlist')}` : `${t('addToWatchlist')}`}
-                                                </span>
+                                        <div className="flex w-full flex-col gap-3 rounded-md bg-slate-500 p-3 max-md:mt-4 md:w-fit md:flex-row md:items-center md:gap-4 md:p-2">
+                                            <div className="flex w-full items-center justify-between gap-3 md:contents">
+                                                <p className="text-sm font-medium text-slate-100 md:w-min md:text-white">{t('yourRating')}:</p>
+                                                <StarRating compact rating={userRating} maxRating={10} onChange={handleRating} />
                                             </div>
-                                            <div className="relative group max-md:mr-2">
-                                                <button 
-                                                className={`p-2 rounded-full ${isWatched ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-                                                onClick={toggleWatched}
-                                                aria-label={isWatched ? `${t('markAsUnwatched')}` : `${t('markAsWatched')}`}
-                                                >
-                                                <Eye className="w-5 h-5" />
-                                                </button>
-                                                <span className="absolute bottom-[115%] left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                                {isWatched ? `${t('markAsUnwatched')}` : `${t('markAsWatched')}`}
-                                                </span>
+                                            <div className="flex w-full items-start md:w-auto md:items-center md:gap-4">
+                                                <div className="relative flex flex-1 justify-center md:block md:flex-none group">
+                                                    <button
+                                                        className="flex flex-col items-center gap-1 text-white"
+                                                        onClick={toggleWatchlist}
+                                                        aria-label={inWatchlist ? t('removeFromWatchlist') : t('addToWatchlist')}
+                                                    >
+                                                        <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${inWatchlist ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}>
+                                                            <List className="h-5 w-5" />
+                                                        </span>
+                                                        <span className="text-xs leading-none md:hidden">{t('watchlistLabel')}</span>
+                                                    </button>
+                                                    <span className="pointer-events-none absolute bottom-[115%] left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:block">
+                                                        {inWatchlist ? t('removeFromWatchlist') : t('addToWatchlist')}
+                                                    </span>
+                                                </div>
+                                                <div className="relative flex flex-1 justify-center md:block md:flex-none group">
+                                                    <button
+                                                        className="flex flex-col items-center gap-1 text-white"
+                                                        onClick={toggleWatched}
+                                                        aria-label={isWatched ? t('markAsUnwatched') : t('markAsWatched')}
+                                                    >
+                                                        <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${isWatched ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}>
+                                                            <Eye className="h-5 w-5" />
+                                                        </span>
+                                                        <span className="text-xs leading-none md:hidden">{t('watchedLabel')}</span>
+                                                    </button>
+                                                    <span className="pointer-events-none absolute bottom-[115%] left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:block">
+                                                        {isWatched ? t('markAsUnwatched') : t('markAsWatched')}
+                                                    </span>
+                                                </div>
+                                                <div className="relative flex flex-1 justify-center md:block md:flex-none group">
+                                                    <button
+                                                        className="flex flex-col items-center gap-1 text-white"
+                                                        onClick={toggleFavorite}
+                                                        aria-label={isFavorite ? t('removeFromFavorites') : t('addToFavorites')}
+                                                    >
+                                                        <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${isFavorite ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'}`}>
+                                                            <Heart className="h-5 w-5" fill={isFavorite ? 'currentColor' : 'none'} />
+                                                        </span>
+                                                        <span className="text-xs leading-none md:hidden">{t('favoriteLabel')}</span>
+                                                    </button>
+                                                    <span className="pointer-events-none absolute bottom-[115%] left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:block">
+                                                        {isFavorite ? t('removeFromFavorites') : t('addToFavorites')}
+                                                    </span>
+                                                </div>
+                                                {mediaType === 'movie' && 'title' in mediaData && (
+                                                    <div className="flex flex-1 justify-center md:flex-none">
+                                                        <CustomListPicker
+                                                            userId={user.id}
+                                                            movieId={mediaData.id}
+                                                            title={mediaData.title}
+                                                            posterPath={mediaData.poster_path}
+                                                        />
+                                                    </div>
+                                                )}
                                             </div>
-                                            <div className="relative group max-md:mr-2">
-                                                <button 
-                                                className={`p-2 rounded-full ${isFavorite ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-                                                onClick={toggleFavorite}
-                                                aria-label={isFavorite ? `${t('removeFromFavorites')}` : `${t('addToFavorites')}`}
-                                                >
-                                                <Heart className="w-5 h-5" fill={isFavorite ? "currentColor" : "none"} />
-                                                </button>
-                                                <span className="absolute bottom-[115%] left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                                {isFavorite ? `${t('removeFromFavorites')}` : `${t('addToFavorites')}`}
-                                                </span>
-                                            </div>
-                                            {mediaType === 'movie' && 'title' in mediaData && (
-                                                <CustomListPicker
-                                                    userId={user.id}
-                                                    movieId={mediaData.id}
-                                                    title={mediaData.title}
-                                                    posterPath={mediaData.poster_path}
-                                                />
-                                            )}
                                         </div>
                                     </div>}
                                 </div>

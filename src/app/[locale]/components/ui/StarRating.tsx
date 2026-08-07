@@ -5,9 +5,10 @@ interface StarRatingProps {
     rating: number
     maxRating?: number
     onChange?: (rating: number) => void
+    compact?: boolean
 }
 
-export default function StarRating({ rating, maxRating = 10, onChange }: StarRatingProps) {
+export default function StarRating({ rating, maxRating = 10, onChange, compact = false }: StarRatingProps) {
     const [hoverRating, setHoverRating] = useState(0)
 
     // Ensure the rating is between 0 and maxRating
@@ -18,6 +19,7 @@ export default function StarRating({ rating, maxRating = 10, onChange }: StarRat
 
     // Create an array of 5 elements to represent the stars
     const stars = Array(5).fill(0)
+    const starSize = compact ? 'h-5 w-5 md:h-8 md:w-8' : 'h-6 w-6 md:h-8 md:w-8'
 
     const handleRating = (index: number, isHalf: boolean) => {
         if (onChange) {
@@ -40,8 +42,8 @@ export default function StarRating({ rating, maxRating = 10, onChange }: StarRat
     }
 
     return (
-        <div 
-            className="flex items-center space-x-1" 
+        <div
+            className="inline-flex shrink-0 items-center gap-1"
             aria-label={`Rating: ${rating.toFixed(1)} out of ${maxRating}`}
             onMouseLeave={handleMouseLeave}
         >
@@ -52,11 +54,11 @@ export default function StarRating({ rating, maxRating = 10, onChange }: StarRat
             return (
                 <span 
                     key={index} 
-                    className={`relative inline-block ${onChange !== undefined && 'cursor-pointer'}`}
+                    className={`relative inline-block shrink-0 ${onChange !== undefined && 'cursor-pointer'}`}
                     onClick={() => handleRating(index, false)}
                     onMouseEnter={() => handleMouseEnter(index, false)}
                 >
-                <Star className="md:w-8 md:h-8 w-6 h-6 text-gray-300" />
+                <Star className={`${starSize} text-gray-300`} />
                 <span 
                     className="absolute top-0 left-0 overflow-hidden"
                     style={{ 
@@ -64,7 +66,7 @@ export default function StarRating({ rating, maxRating = 10, onChange }: StarRat
                         transition: 'width 0.2s ease-in-out'
                     }}
                 >
-                    <Star className="md:w-8 md:h-8 w-6 h-6 text-yellow-400" />
+                    <Star className={`${starSize} text-yellow-400`} />
                 </span>
                 <span 
                     className="absolute top-0 left-0 w-1/2 h-full"
@@ -80,7 +82,7 @@ export default function StarRating({ rating, maxRating = 10, onChange }: StarRat
                 </span>
             )
         })}
-            <span className="ml-2 md:text-md text-white">
+            <span className={`ml-1 shrink-0 whitespace-nowrap tabular-nums text-white md:ml-2 md:text-base ${compact ? 'text-sm' : ''}`}>
                 {rating.toFixed(1)} / {maxRating}
             </span>
         </div>
