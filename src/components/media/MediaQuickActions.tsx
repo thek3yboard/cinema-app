@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Tooltip } from '@nextui-org/react';
 import { Eye, Heart, List, MoreVertical, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -44,15 +44,26 @@ function ActionButton({ label, active, activeClassName, disabled, icon, onClick 
 
 export default function MediaQuickActions({ item, state, userId, disabled, onToggle }: Props) {
   const t = useTranslations('MediaUI');
-  const [isTouchOpen, setIsTouchOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const watchlistLabel = state.in_watchlist ? t('removeFromWatchlist') : t('addToWatchlist');
   const watchedLabel = state.is_watched ? t('markAsUnwatched') : t('markAsWatched');
   const favoriteLabel = state.is_favorite ? t('removeFromFavorites') : t('addToFavorites');
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsOpen(false);
+    };
+
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, [isOpen]);
+
   return (
     <div className="pointer-events-none absolute inset-0 isolate">
       <div
-        className={`absolute inset-0 z-20 flex items-center justify-center rounded-lg bg-slate-950/65 p-3 backdrop-blur-[3px] transition duration-200 ${isTouchOpen ? 'visible opacity-100' : 'invisible opacity-0 group-focus-within:visible group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:visible [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-hover:delay-150'}`}
+        className={`absolute inset-0 z-20 flex items-center justify-center rounded-lg bg-slate-950/65 p-3 backdrop-blur-[3px] transition duration-200 ${isOpen ? 'visible opacity-100' : 'invisible opacity-0'}`}
         aria-label={t('quickActions', { title: item.title })}
       >
         <div className="grid grid-cols-2 gap-3">
@@ -96,12 +107,12 @@ export default function MediaQuickActions({ item, state, userId, disabled, onTog
       <button
         type="button"
         data-no-drag="true"
-        aria-label={isTouchOpen ? t('closeQuickActions') : t('openQuickActions', { title: item.title })}
-        aria-expanded={isTouchOpen}
-        onClick={() => setIsTouchOpen((current) => !current)}
-        className="pointer-events-auto absolute right-2 top-2 z-30 hidden h-9 w-9 items-center justify-center rounded-full bg-slate-950/85 text-white shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-nyanza [@media(hover:none)]:inline-flex"
+        aria-label={isOpen ? t('closeQuickActions') : t('openQuickActions', { title: item.title })}
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen((current) => !current)}
+        className={`absolute right-2 top-2 z-30 inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-950/85 text-white shadow-lg transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-nyanza ${isOpen ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none translate-y-1 opacity-0 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100 [@media(hover:none)]:pointer-events-auto [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100'}`}
       >
-        {isTouchOpen ? <X className="h-4 w-4" /> : <MoreVertical className="h-4 w-4" />}
+        {isOpen ? <X className="h-4 w-4" /> : <MoreVertical className="h-4 w-4" />}
       </button>
     </div>
   );
