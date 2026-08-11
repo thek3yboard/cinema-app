@@ -7,6 +7,7 @@ import { Eye } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import ListCoverMosaic from '@/components/lists/ListCoverMosaic';
+import ProfileHeartBadge from '@/components/auth/ProfileHeartBadge';
 
 type PublicProfile = {
   id: string;
@@ -20,10 +21,15 @@ type PublicList = {
   custom_list_items: { poster_path: string | null }[];
 };
 
+type HeartBadge = {
+  tooltip_profile: { username: string } | null;
+};
+
 export default function PublicProfilePage({ params }: { params: { username: string; locale: string } }) {
   const t = useTranslations('PublicProfile');
   const tLists = useTranslations('CustomLists');
   const [profile, setProfile] = useState<PublicProfile | null>(null);
+  const [heartBadge, setHeartBadge] = useState<HeartBadge | null>(null);
   const [lists, setLists] = useState<PublicList[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -51,9 +57,15 @@ export default function PublicProfilePage({ params }: { params: { username: stri
         .eq('is_public', true)
         .order('updated_at', { ascending: false });
 
+      const { data: badgeData } = await supabase.from('profile_heart_badges')
+        .select('tooltip_profile:profiles!profile_heart_badges_tooltip_profile_id_fkey(username)')
+        .eq('profile_id', profileData.id)
+        .maybeSingle();
+
       if (!active) return;
       setProfile(profileData as PublicProfile);
       setLists((listData ?? []) as PublicList[]);
+      setHeartBadge(badgeData as HeartBadge | null);
       setIsLoading(false);
     };
 
@@ -70,7 +82,10 @@ export default function PublicProfilePage({ params }: { params: { username: stri
         <div className="flex items-center gap-5">
           <Avatar className="h-24 w-24 text-large" name={profile.username} src={profile.avatar_url ?? undefined} />
           <div className="min-w-0">
-            <h1 className="truncate text-3xl font-bold">@{profile.username}</h1>
+            <div className="flex min-w-0 items-center gap-2">
+              <h1 className="truncate text-3xl font-bold">@{profile.username}</h1>
+              {heartBadge?.tooltip_profile?.username && <ProfileHeartBadge partnerUsername={heartBadge.tooltip_profile.username} />}
+            </div>
           </div>
         </div>
       </section>
