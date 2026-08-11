@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/components/auth/AuthProvider';
 import MovieListItems, { CustomListMovie } from '@/components/lists/MovieListItems';
 import ListCoverMosaic from '@/components/lists/ListCoverMosaic';
+import ListCustomizationEditor from '@/components/lists/ListCustomizationEditor';
 import { createClient } from '@/lib/supabase/client';
 
 type ListOwner = {
@@ -20,6 +21,9 @@ type CustomListDetail = {
   user_id: string;
   name: string;
   is_public: boolean;
+  description: string | null;
+  background_color: string;
+  cover_url: string | null;
   profiles: ListOwner;
 };
 
@@ -38,7 +42,7 @@ export default function CustomListPage({ params }: { params: { id: string; local
     const loadList = async () => {
       const supabase = createClient();
       const { data: listData, error: listError } = await supabase.from('custom_lists')
-        .select('id, user_id, name, is_public, profiles!custom_lists_user_id_fkey(username, avatar_url)')
+        .select('id, user_id, name, is_public, description, background_color, cover_url, profiles!custom_lists_user_id_fkey(username, avatar_url)')
         .eq('id', params.id)
         .maybeSingle();
 
@@ -50,9 +54,9 @@ export default function CustomListPage({ params }: { params: { id: string; local
       }
 
       const { data: itemData, error: itemError } = await supabase.from('custom_list_items')
-        .select('media_id, title, poster_path, added_at')
+        .select('media_id, media_type, title, poster_path, added_at, position, release_year, popularity, vote_average')
         .eq('list_id', params.id)
-        .order('added_at', { ascending: false });
+        .order('position', { ascending: true });
 
       if (!active) return;
       if (itemError) {
@@ -75,12 +79,22 @@ export default function CustomListPage({ params }: { params: { id: string; local
 
   return (
     <main className="mx-auto w-full max-w-6xl p-6 md:p-10">
-      <div className="rounded-xl bg-slate-800/80 p-6 text-white">
-        <div className="rounded-lg bg-gradient-to-br from-slate-700 via-slate-700/80 to-slate-900 p-5 shadow-lg">
+      <div
+        style={{
+          backgroundColor: list.background_color,
+          backgroundImage: 'linear-gradient(145deg, rgba(15, 23, 42, 0.48), rgba(15, 23, 42, 0.82))'
+        }}
+        className="rounded-xl p-6 text-white shadow-xl"
+      >
+        <div style={{ backgroundColor: list.background_color }} className="relative overflow-hidden rounded-lg p-5 shadow-lg">
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black/10 via-slate-950/35 to-slate-950/80" />
+          <div className="relative">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-end">
             <ListCoverMosaic
               posterPaths={items.map((item) => item.poster_path)}
               label={t('coverPreview', { name: list.name })}
+              coverUrl={list.cover_url}
+              backgroundColor={list.background_color}
               className="h-40 w-40 sm:h-44 sm:w-44"
               priority
             />
@@ -90,7 +104,17 @@ export default function CustomListPage({ params }: { params: { id: string; local
                 {list.is_public ? t('public') : t('private')}
               </div>
               <h1 className="break-words text-3xl font-bold md:text-4xl">{list.name}</h1>
+              {list.description && <p className="mt-3 max-w-2xl whitespace-pre-wrap text-sm text-slate-100">{list.description}</p>}
               <p className="mt-3 text-sm text-slate-300">{t('movieCount', { count: items.length })}</p>
+              {canEdit && (
+                <div className="mt-4">
+                  <ListCustomizationEditor
+                    list={list}
+                    userId={list.user_id}
+                    onUpdated={(changes) => setList((current) => current ? { ...current, ...changes } : current)}
+                  />
+                </div>
+              )}
             </div>
             <Link href={`/${params.locale}/users/${encodeURIComponent(list.profiles.username)}`} className="flex shrink-0 items-center gap-3 rounded-lg bg-slate-800/80 px-4 py-3 hover:bg-slate-700">
               <Avatar name={list.profiles.username} src={list.profiles.avatar_url ?? undefined} size="sm" />
@@ -99,6 +123,7 @@ export default function CustomListPage({ params }: { params: { id: string; local
                 <span className="block font-semibold">@{list.profiles.username}</span>
               </span>
             </Link>
+          </div>
           </div>
         </div>
 

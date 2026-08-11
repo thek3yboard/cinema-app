@@ -18,6 +18,8 @@ type PublicProfile = {
 type PublicList = {
   id: string;
   name: string;
+  background_color: string;
+  cover_url: string | null;
   custom_list_items: { poster_path: string | null }[];
 };
 
@@ -52,7 +54,7 @@ export default function PublicProfilePage({ params }: { params: { username: stri
       }
 
       const { data: listData } = await supabase.from('custom_lists')
-        .select('id, name, custom_list_items(poster_path)')
+        .select('id, name, background_color, cover_url, custom_list_items(poster_path)')
         .eq('user_id', profileData.id)
         .eq('is_public', true)
         .order('updated_at', { ascending: false });
@@ -96,13 +98,16 @@ export default function PublicProfilePage({ params }: { params: { username: stri
           <ul className="mt-5 grid gap-3 sm:grid-cols-2">
             {lists.map((list) => (
               <li key={list.id}>
-                <Link href={`/${params.locale}/lists/${list.id}`} className="flex min-w-0 gap-4 rounded-lg bg-slate-700 p-3 transition hover:-translate-y-0.5 hover:bg-slate-600">
+                <Link href={`/${params.locale}/lists/${list.id}`} style={{ backgroundColor: list.background_color }} className="relative flex min-w-0 gap-4 overflow-hidden rounded-lg p-3 transition hover:-translate-y-0.5">
+                  <span className="pointer-events-none absolute inset-0 bg-slate-950/45" />
                   <ListCoverMosaic
                     posterPaths={list.custom_list_items.map((item) => item.poster_path)}
                     label={tLists('coverPreview', { name: list.name })}
-                    className="h-28 w-28"
+                    coverUrl={list.cover_url}
+                    backgroundColor={list.background_color}
+                    className="relative h-28 w-28"
                   />
-                  <span className="flex min-w-0 flex-1 flex-col justify-center">
+                  <span className="relative flex min-w-0 flex-1 flex-col justify-center">
                     <span className="flex min-w-0 items-center gap-2 text-lg font-bold"><Eye className="h-4 w-4 shrink-0" /><span className="truncate">{list.name}</span></span>
                     <span className="mt-2 block text-sm text-slate-300">{tLists('movieCount', { count: list.custom_list_items.length })}</span>
                   </span>

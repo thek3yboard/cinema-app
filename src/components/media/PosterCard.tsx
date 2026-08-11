@@ -9,19 +9,21 @@ type Props = {
   metadata: string;
   onClick: () => void;
   action?: ReactNode;
+  footer?: ReactNode;
 };
 
-export default function PosterCard({ title, imageSrc, metadata, onClick, action }: Props) {
+export default function PosterCard({ title, imageSrc, metadata, onClick, action, footer }: Props) {
   return (
-    <div className="group relative h-full min-w-0 transition hover:-translate-y-1">
+    <div className={`group relative min-w-0 transition hover:-translate-y-1 ${footer ? 'flex h-full flex-col' : 'h-full'}`}>
       <button
         type="button"
         onClick={onClick}
-        className="flex h-full w-full min-w-0 flex-col overflow-hidden rounded-lg bg-slate-800/90 text-left text-white shadow-md transition group-hover:bg-slate-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-nyanza"
+        className={`flex w-full min-w-0 flex-col overflow-hidden rounded-lg bg-slate-800/90 text-left text-white shadow-md transition group-hover:bg-slate-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-nyanza ${footer ? 'min-h-0 flex-1' : 'h-full'}`}
       >
         <Image
           src={imageSrc}
           alt={title}
+          draggable={false}
           width={228}
           height={342}
           className="aspect-[2/3] w-full object-cover"
@@ -32,6 +34,7 @@ export default function PosterCard({ title, imageSrc, metadata, onClick, action 
         </span>
       </button>
       {action}
+      {footer && <div className="shrink-0 pt-2">{footer}</div>}
     </div>
   );
 }

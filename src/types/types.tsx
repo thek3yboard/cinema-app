@@ -17,6 +17,7 @@ export type MovieData = {
     poster_path: string | null,
     release_date: string,
     vote_average: number,
+    popularity: number,
     production_companies: Array<ProductionCompanies>,
     video_id: string
 }
@@ -39,6 +40,7 @@ export type ShowData = {
     poster_path: string | null,
     first_air_date: string,
     vote_average: number,
+    popularity: number,
     production_companies: Array<ProductionCompanies>,
     video_id: string
 }

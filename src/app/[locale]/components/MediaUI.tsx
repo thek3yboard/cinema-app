@@ -197,16 +197,18 @@ export default function MediaUI({ mediaData }: Props) {
                                                         {isFavorite ? t('removeFromFavorites') : t('addToFavorites')}
                                                     </span>
                                                 </div>
-                                                {mediaType === 'movie' && 'title' in mediaData && (
-                                                    <div className="flex flex-1 justify-center md:flex-none">
-                                                        <CustomListPicker
-                                                            userId={user.id}
-                                                            movieId={mediaData.id}
-                                                            title={mediaData.title}
-                                                            posterPath={mediaData.poster_path}
-                                                        />
-                                                    </div>
-                                                )}
+                                                <div className="flex flex-1 justify-center md:flex-none">
+                                                    <CustomListPicker
+                                                        userId={user.id}
+                                                        mediaId={mediaData.id}
+                                                        mediaType={mediaType}
+                                                        title={'title' in mediaData ? mediaData.title : mediaData.name}
+                                                        posterPath={mediaData.poster_path}
+                                                        releaseYear={Number(('release_date' in mediaData ? mediaData.release_date : mediaData.first_air_date)?.slice(0, 4)) || null}
+                                                        popularity={mediaData.popularity}
+                                                        voteAverage={mediaData.vote_average}
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>}

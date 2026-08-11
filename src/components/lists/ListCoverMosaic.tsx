@@ -6,11 +6,24 @@ import { Clapperboard } from 'lucide-react';
 type Props = {
   posterPaths: Array<string | null>;
   label: string;
+  coverUrl?: string | null;
+  backgroundColor?: string;
   className?: string;
   priority?: boolean;
 };
 
-export default function ListCoverMosaic({ posterPaths, label, className = '', priority = false }: Props) {
+export default function ListCoverMosaic({ posterPaths, label, coverUrl, backgroundColor, className = '', priority = false }: Props) {
+  if (coverUrl) {
+    return (
+      <div
+        role="img"
+        aria-label={label}
+        style={{ backgroundColor, backgroundImage: `url(${JSON.stringify(coverUrl)})` }}
+        className={`shrink-0 overflow-hidden rounded-md bg-cover bg-center shadow-lg ${className}`}
+      />
+    );
+  }
+
   const posters = posterPaths.filter((path): path is string => Boolean(path)).slice(0, 4);
   const gridClass = posters.length === 1
     ? 'grid-cols-1'
@@ -22,6 +35,7 @@ export default function ListCoverMosaic({ posterPaths, label, className = '', pr
     <div
       role="img"
       aria-label={label}
+      style={{ backgroundColor }}
       className={`relative grid shrink-0 overflow-hidden rounded-md bg-gradient-to-br from-slate-600 to-slate-900 shadow-lg ${gridClass} ${className}`}
     >
       {posters.length ? posters.map((posterPath, index) => (

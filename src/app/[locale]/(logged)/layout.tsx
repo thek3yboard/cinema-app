@@ -19,6 +19,7 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import GlobalSearchInput from '@/app/[locale]/components/GlobalSearchInput';
 import { useGlobalSearch } from '@/hooks/useGlobalSearch';
 import { isEmailAuthEnabled } from '@/lib/supabase/config';
+import { cinemaModalClassNames } from '@/components/ui/modalStyles';
 
 type NavbarItems = {
     key: string,
@@ -397,121 +398,30 @@ export default function LoggedLayout({
                     </>
                 }
             </div>
-            {(typeof window !== "undefined") && 
-                window.innerWidth >= 640 ?
-                    <Modal 
-                        size="md"
-                        isOpen={isOpen} 
-                        onClose={onClose}
-                        closeButton={
-                            <button style={{ right: '-100px' }} className='hidden'></button>
-                        }
-                        className="bg-gradient-to-b from-blueish-gray via-[#3f577c] to-blueish-gray overflow-x-hidden"
-                    >
-                        <ModalContent>
-                        {(onClose) => (
-                            <>
-                                <ModalHeader className="flex flex-col gap-1 text-xl">{t('filter')}</ModalHeader>
-                                <ModalBody>
-                                    <Select
-                                        key="sort"
-                                        color="default"
-                                        label={t('sortBy')}
-                                        placeholder={sort.label}
-                                        className="w-full"
-                                        onChange={handleChangeSort}
-                                    >
-                                        {sortByOptions.map((option) => (
-                                        <SelectItem key={option.key}>
-                                            {t(`${option.label}`)}
-                                        </SelectItem>
-                                        ))}
-                                    </Select>
-                                    <Select
-                                        key="order"
-                                        color="default"
-                                        label={t('orderBy')}
-                                        placeholder={sort.order_label}
-                                        className="w-full"
-                                        onChange={handleChangeOrder}
-                                    >
-                                        {orderOptions.map((option) => (
-                                        <SelectItem key={option.key}>
-                                            {t(`${option.label}`)}
-                                        </SelectItem>
-                                        ))}
-                                    </Select>
-                                </ModalBody>
-                                <ModalFooter>
-                                    <Button color="success" onPress={handleSetFilters}>
-                                        {t('apply')}
-                                    </Button>
-                                    <Button color="danger" onPress={onClose}>
-                                        {t('close')}
-                                    </Button>
-                                </ModalFooter>
-                            </>
-                        )}
-                        </ModalContent>
-                    </Modal>
-                :
-                    <Modal 
-                        size="md"
-                        isOpen={isOpen} 
-                        onClose={onClose}
-                        placement="top-center"
-                        closeButton={
-                            <button style={{ right: '-100px' }} className='hidden'></button>
-                        }
-                        className="bg-gradient-to-b from-blueish-gray via-[#3f577c] to-blueish-gray overflow-x-hidden"
-                    >
-                        <ModalContent>
-                        {(onClose) => (
-                            <>
-                                <ModalHeader className="flex flex-col gap-1 text-xl">{t('filter')}</ModalHeader>
-                                <ModalBody>
-                                    <Select
-                                        key="sort"
-                                        color="default"
-                                        label={t('sortBy')}
-                                        placeholder={sort.label}
-                                        className="sm:w-1/12"
-                                        onChange={handleChangeSort}
-                                    >
-                                        {sortByOptions.map((option) => (
-                                        <SelectItem key={option.key}>
-                                            {t(`${option.label}`)}
-                                        </SelectItem>
-                                        ))}
-                                    </Select>
-                                    <Select
-                                        key="order"
-                                        color="default"
-                                        label={t('orderBy')}
-                                        placeholder={sort.order_label}
-                                        className="sm:w-1/12"
-                                        onChange={handleChangeOrder}
-                                    >
-                                        {orderOptions.map((option) => (
-                                        <SelectItem key={option.key}>
-                                            {t(`${option.label}`)}
-                                        </SelectItem>
-                                        ))}
-                                    </Select>
-                                </ModalBody>
-                                <ModalFooter>
-                                    <Button color="success" onPress={handleSetFilters}>
-                                        {t('apply')}
-                                    </Button>
-                                    <Button color="danger" onPress={onClose}>
-                                        {t('close')}
-                                    </Button>
-                                </ModalFooter>
-                            </>
-                        )}
-                        </ModalContent>
-                    </Modal>
-            }
+            <Modal size="md" isOpen={isOpen} onClose={onClose} classNames={cinemaModalClassNames}>
+                <ModalContent>
+                {(closeModal) => (
+                    <>
+                        <ModalHeader className="flex flex-col gap-1">
+                            <span className="text-xl font-bold text-white">{t('filter')}</span>
+                            <span className="text-sm font-normal text-slate-400">{t('filterDescription')}</span>
+                        </ModalHeader>
+                        <ModalBody className="gap-4">
+                            <Select key="sort" variant="bordered" label={t('sortBy')} placeholder={sort.label} className="w-full" onChange={handleChangeSort}>
+                                {sortByOptions.map((option) => <SelectItem key={option.key}>{t(`${option.label}`)}</SelectItem>)}
+                            </Select>
+                            <Select key="order" variant="bordered" label={t('orderBy')} placeholder={sort.order_label} className="w-full" onChange={handleChangeOrder}>
+                                {orderOptions.map((option) => <SelectItem key={option.key}>{t(`${option.label}`)}</SelectItem>)}
+                            </Select>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button variant="light" onPress={closeModal} className="font-semibold text-slate-300">{t('close')}</Button>
+                            <Button onPress={handleSetFilters} className="bg-aero-blue font-bold text-white">{t('apply')}</Button>
+                        </ModalFooter>
+                    </>
+                )}
+                </ModalContent>
+            </Modal>
         </>
         </MediaContext.Provider>
     );

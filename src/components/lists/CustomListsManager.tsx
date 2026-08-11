@@ -13,6 +13,8 @@ type CustomListRow = {
   id: string;
   name: string;
   is_public: boolean;
+  background_color: string;
+  cover_url: string | null;
   updated_at: string;
   custom_list_items: { poster_path: string | null }[];
 };
@@ -34,7 +36,7 @@ export default function CustomListsManager({ locale, userId, username }: Props) 
   const loadLists = useCallback(async () => {
     const { data, error } = await createClient()
       .from('custom_lists')
-      .select('id, name, is_public, updated_at, custom_list_items(poster_path)')
+      .select('id, name, is_public, background_color, cover_url, updated_at, custom_list_items(poster_path)')
       .eq('user_id', userId)
       .order('updated_at', { ascending: false });
 
@@ -138,12 +140,15 @@ export default function CustomListsManager({ locale, userId, username }: Props) 
       ) : lists.length ? (
         <ul className="mt-5 grid gap-3 sm:grid-cols-2">
           {lists.map((list) => (
-            <li key={list.id} className="rounded-lg bg-slate-700 p-3 text-white transition hover:bg-slate-600/90">
-              <div className="flex min-w-0 gap-4">
+            <li key={list.id} style={{ backgroundColor: list.background_color }} className="relative overflow-hidden rounded-lg p-3 text-white shadow-md transition hover:-translate-y-0.5">
+              <div className="pointer-events-none absolute inset-0 bg-slate-950/45" />
+              <div className="relative flex min-w-0 gap-4">
                 <Link href={`/${locale}/lists/${list.id}`} aria-label={list.name}>
                   <ListCoverMosaic
                     posterPaths={list.custom_list_items.map((item) => item.poster_path)}
                     label={t('coverPreview', { name: list.name })}
+                    coverUrl={list.cover_url}
+                    backgroundColor={list.background_color}
                     className="h-24 w-24"
                   />
                 </Link>

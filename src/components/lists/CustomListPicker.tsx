@@ -3,10 +3,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
-import { ListPlus } from 'lucide-react';
+import { Check, Eye, ListPlus, Lock, Plus } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
+import { cinemaModalClassNames } from '@/components/ui/modalStyles';
 
 type CustomList = {
   id: string;
@@ -16,12 +17,16 @@ type CustomList = {
 
 type Props = {
   userId: string;
-  movieId: number;
+  mediaId: number;
+  mediaType: 'movie' | 'tv';
   title: string;
   posterPath: string | null;
+  releaseYear: number | null;
+  popularity: number;
+  voteAverage: number;
 };
 
-export default function CustomListPicker({ userId, movieId, title, posterPath }: Props) {
+export default function CustomListPicker({ userId, mediaId, mediaType, title, posterPath, releaseYear, popularity, voteAverage }: Props) {
   const t = useTranslations('CustomLists');
   const locale = useLocale();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -54,13 +59,14 @@ export default function CustomListPicker({ userId, movieId, title, posterPath }:
 
     const { data: memberships, error: membershipsError } = await supabase.from('custom_list_items')
       .select('list_id')
-      .eq('media_id', movieId)
+      .eq('media_id', mediaId)
+      .eq('media_type', mediaType)
       .in('list_id', ownLists.map((list) => list.id));
 
     setIsLoading(false);
     if (membershipsError) return toast.error(t('loadMembershipsError'));
     setSelectedListIds(new Set((memberships ?? []).map((item: { list_id: string }) => item.list_id)));
-  }, [movieId, t, userId]);
+  }, [mediaId, mediaType, t, userId]);
 
   useEffect(() => {
     loadLists();
@@ -70,14 +76,41 @@ export default function CustomListPicker({ userId, movieId, title, posterPath }:
     const isSelected = selectedListIds.has(list.id);
     setPendingListId(list.id);
     const supabase = createClient();
-    const { error } = isSelected
-      ? await supabase.from('custom_list_items').delete().eq('list_id', list.id).eq('media_id', movieId)
-      : await supabase.from('custom_list_items').upsert({
+    let error: { message: string } | null = null;
+
+    if (isSelected) {
+      const result = await supabase.from('custom_list_items')
+        .delete()
+        .eq('list_id', list.id)
+        .eq('media_type', mediaType)
+        .eq('media_id', mediaId);
+      error = result.error;
+    } else {
+      const { data: lastItem, error: positionError } = await supabase.from('custom_list_items')
+        .select('position')
+        .eq('list_id', list.id)
+        .order('position', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (positionError) {
+        setPendingListId(null);
+        return toast.error(t('membershipError'));
+      }
+
+      const result = await supabase.from('custom_list_items').upsert({
           list_id: list.id,
-          media_id: movieId,
+          media_id: mediaId,
+          media_type: mediaType,
           title,
-          poster_path: posterPath
-        }, { onConflict: 'list_id,media_id' });
+          poster_path: posterPath,
+          release_year: releaseYear,
+          popularity,
+          vote_average: voteAverage,
+          position: Number(lastItem?.position ?? -1) + 1
+        }, { onConflict: 'list_id,media_type,media_id' });
+      error = result.error;
+    }
     setPendingListId(null);
 
     if (error) return toast.error(t('membershipError'));
@@ -104,9 +137,15 @@ export default function CustomListPicker({ userId, movieId, title, posterPath }:
         </span>
       </div>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={onClose} classNames={cinemaModalClassNames}>
         <ModalContent>
-          <ModalHeader>{t('chooseLists')}</ModalHeader>
+          <ModalHeader className="flex items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-aero-blue/20 text-nyanza"><ListPlus className="h-5 w-5" /></span>
+            <span>
+              <span className="block text-xl font-bold text-white">{t('chooseLists')}</span>
+              <span className="mt-0.5 block text-sm font-normal text-slate-400">{t('chooseListsSubtitle')}</span>
+            </span>
+          </ModalHeader>
           <ModalBody>
             {isLoading ? (
               <p>{t('loading')}</p>
@@ -120,10 +159,11 @@ export default function CustomListPicker({ userId, movieId, title, posterPath }:
                         fullWidth
                         isLoading={pendingListId === list.id}
                         onPress={() => toggleMembership(list)}
-                        className={`justify-between ${isSelected ? 'bg-lapis-lazuli text-white' : 'bg-slate-200 text-slate-900'}`}
+                        startContent={isSelected ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                        className={`h-12 justify-start border font-semibold ${isSelected ? 'border-aero-blue bg-aero-blue text-white' : 'border-white/10 bg-white/5 text-slate-100 hover:bg-white/10'}`}
                       >
-                        <span className="truncate">{list.name}</span>
-                        <span className="text-xs">{isSelected ? t('included') : t('notIncluded')}</span>
+                        <span className="min-w-0 flex-1 truncate text-left">{list.name}</span>
+                        <span className="ml-auto flex items-center gap-1 text-xs font-normal opacity-75">{list.is_public ? <Eye className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}{list.is_public ? t('public') : t('private')}</span>
                       </Button>
                     </li>
                   );
@@ -131,15 +171,15 @@ export default function CustomListPicker({ userId, movieId, title, posterPath }:
               </ul>
             ) : (
               <div className="space-y-3">
-                <p>{t('noListsForPicker')}</p>
-                <Link className="font-semibold text-lapis-lazuli hover:underline" href={`/${locale}/profile#custom-lists`} onClick={onClose}>
+                <p className="text-slate-300">{t('noListsForPicker')}</p>
+                <Link className="font-semibold text-nyanza hover:underline" href={`/${locale}/profile#custom-lists`} onClick={onClose}>
                   {t('createFirstList')}
                 </Link>
               </div>
             )}
           </ModalBody>
           <ModalFooter>
-            <Button onPress={onClose}>{t('close')}</Button>
+            <Button variant="light" onPress={onClose} className="font-semibold text-slate-300">{t('close')}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
