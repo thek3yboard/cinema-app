@@ -297,11 +297,11 @@ export default function MovieListItems({ initialItems, listId, canEdit }: Props)
                   metadata={metadataParts.join(' · ')}
                   onClick={() => router.push(`/${locale}/${item.media_type === 'movie' ? 'movies' : 'shows'}/${item.media_id}`)}
                   action={(
-                    <>
+                    <div className="pointer-events-none absolute inset-x-2 top-2 flex min-w-0 items-start gap-1">
                       {item.isWatched && (
-                        <span className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-emerald-500 px-2 py-1 text-xs font-bold text-white shadow-lg" title={t('watched')}>
-                          <CircleCheck className="h-3.5 w-3.5" />
-                          {t('watched')}
+                        <span className="pointer-events-auto flex min-w-0 items-center gap-1 rounded-full bg-emerald-500 px-2 py-1 text-xs font-bold text-white shadow-lg" title={t('watched')}>
+                          <CircleCheck className="h-3.5 w-3.5 shrink-0" />
+                          <span className="truncate">{t('watched')}</span>
                         </span>
                       )}
                       {canEdit && (
@@ -311,12 +311,12 @@ export default function MovieListItems({ initialItems, listId, canEdit }: Props)
                           disabled={removingKey === itemKey}
                           onClick={() => removeItem(item)}
                           aria-label={t('removeMovie', { title: item.title ?? t('titleUnavailable') })}
-                          className="absolute right-2 top-2 rounded-full bg-slate-950/80 p-2 text-red-300 transition hover:bg-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-nyanza disabled:opacity-50"
+                          className="pointer-events-auto ml-auto shrink-0 rounded-full bg-slate-950/80 p-2 text-red-300 transition hover:bg-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-nyanza disabled:opacity-50"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
                       )}
-                    </>
+                    </div>
                   )}
                   footer={canReorder ? (
                     <div className="flex h-9 items-center justify-center gap-1 rounded-lg border border-white/5 bg-slate-900/55 text-slate-300">

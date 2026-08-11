@@ -175,10 +175,11 @@ export default function ListCustomizationEditor({ list, userId, onUpdated }: Pro
                 <p className="mt-1 text-xs text-slate-400">{t('coverHelp')}</p>
                 {shownCover && <div role="img" aria-label={t('coverPreview', { name })} style={{ backgroundImage: `url(${JSON.stringify(shownCover)})` }} className="mt-3 aspect-[16/7] w-full rounded-lg bg-slate-900 bg-cover bg-center shadow-inner" />}
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <Button as="label" startContent={<ImagePlus className="h-4 w-4" />} className="cursor-pointer border border-white/10 bg-white/10 font-semibold text-white hover:bg-white/15">
+                  <label className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/10 px-4 text-sm font-semibold text-white transition hover:bg-white/15 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-nyanza">
+                    <ImagePlus className="h-4 w-4" aria-hidden="true" />
                     {t('chooseCover')}
                     <input className="sr-only" type="file" accept="image/png,image/jpeg,image/webp" onChange={selectCover} />
-                  </Button>
+                  </label>
                   {shownCover && (
                     <Button type="button" color="danger" variant="bordered" onPress={() => { setCoverFile(null); setRemoveCover(true); }}>
                       {t('removeCover')}
