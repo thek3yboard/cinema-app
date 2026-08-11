@@ -1,4 +1,5 @@
-const CACHE_NAME = 'cinema-static-v2';
+const CACHE_NAME = 'cinema-static-v3';
+const IS_DEVELOPMENT = ['localhost', '127.0.0.1', '::1'].includes(self.location.hostname);
 const STATIC_ASSETS = [
   '/favicon.ico',
   '/manifest.json',
@@ -20,7 +21,12 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
   const isStaticAsset = url.origin === self.location.origin
-    && (STATIC_ASSETS.includes(url.pathname) || url.pathname.startsWith('/_next/static/'));
+    && (
+      STATIC_ASSETS.includes(url.pathname)
+      // Next development chunks change between hot reloads. Caching them can
+      // combine old client code with fresh server HTML and break hydration.
+      || (!IS_DEVELOPMENT && url.pathname.startsWith('/_next/static/'))
+    );
 
   // Never cache navigations, auth callbacks, RSC payloads or API responses.
   if (!isStaticAsset) return;
