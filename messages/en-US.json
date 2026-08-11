@@ -159,6 +159,8 @@
         "createdBy": "Created by",
         "emptyCustomList": "This list doesn't contain any titles yet.",
         "removeMovie": "Remove {title} from the list",
+        "itemActions": "Actions for {title}",
+        "removeFromList": "Remove from list",
         "removeMovieError": "We couldn't remove the title.",
         "movieRemoved": "Title removed from the list.",
         "posterAlt": "Title without a poster",
