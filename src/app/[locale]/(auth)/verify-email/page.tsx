@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
@@ -8,7 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import logo from '@/assets/cinema.png';
 import { createClient } from '@/lib/supabase/client';
-import { isSupabaseConfigured } from '@/lib/supabase/config';
+import { isEmailAuthEnabled, isSupabaseConfigured } from '@/lib/supabase/config';
 
 export default function VerifyEmail() {
   const locale = useLocale();
@@ -19,8 +19,13 @@ export default function VerifyEmail() {
   const [code, setCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (!isEmailAuthEnabled) router.replace(`/${locale}/signin`);
+  }, [locale, router]);
+
   const verify = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!isEmailAuthEnabled) return;
     if (!isSupabaseConfigured) return toast.error(t('supabaseVerificationConfigurationError'));
     if (!/^\d{6,10}$/.test(code)) return toast.error(t('completeVerificationCode'));
 
@@ -35,6 +40,7 @@ export default function VerifyEmail() {
   };
 
   const resend = async () => {
+    if (!isEmailAuthEnabled) return;
     if (!isSupabaseConfigured || !email) return;
     const { error } = await createClient().auth.resend({
       type: 'signup',
@@ -44,6 +50,8 @@ export default function VerifyEmail() {
     if (error) return toast.error(t('resendError'));
     toast.success(t('codeResent'));
   };
+
+  if (!isEmailAuthEnabled) return null;
 
   return (
     <main className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-b from-aero-blue to-blueish-gray p-6">

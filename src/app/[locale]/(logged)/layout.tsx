@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/components/auth/AuthProvider';
 import GlobalSearchInput from '@/app/[locale]/components/GlobalSearchInput';
 import { useGlobalSearch } from '@/hooks/useGlobalSearch';
+import { isEmailAuthEnabled } from '@/lib/supabase/config';
 
 type NavbarItems = {
     key: string,
@@ -293,7 +294,7 @@ export default function LoggedLayout({
                             )}
                             {!isAuthLoading && !user && (
                                 <NavbarMenuItem className="mt-2 border-t border-slate-500 pt-4">
-                                    <div className="grid grid-cols-2 gap-3">
+                                    <div className={`grid gap-3 ${isEmailAuthEnabled ? 'grid-cols-2' : 'grid-cols-1'}`}>
                                         <Link
                                             className="flex h-11 items-center justify-center rounded-md border border-nyanza/70 px-4 font-semibold text-nyanza"
                                             href={`/${locale}/signin`}
@@ -301,13 +302,15 @@ export default function LoggedLayout({
                                         >
                                             {tAuth('signIn')}
                                         </Link>
-                                        <Link
-                                            className="flex h-11 items-center justify-center rounded-md bg-orange-400 px-4 font-bold text-slate-950"
-                                            href={`/${locale}/signup`}
-                                            onPress={() => setIsMenuOpen(false)}
-                                        >
-                                            {tAuth('createAccount')}
-                                        </Link>
+                                        {isEmailAuthEnabled && (
+                                            <Link
+                                                className="flex h-11 items-center justify-center rounded-md bg-orange-400 px-4 font-bold text-slate-950"
+                                                href={`/${locale}/signup`}
+                                                onPress={() => setIsMenuOpen(false)}
+                                            >
+                                                {tAuth('createAccount')}
+                                            </Link>
+                                        )}
                                     </div>
                                 </NavbarMenuItem>
                             )}
@@ -360,12 +363,14 @@ export default function LoggedLayout({
                                         >
                                             {tAuth('signIn')}
                                         </Link>
-                                        <Link
-                                            className="rounded-md bg-orange-400 px-3 py-2 text-sm font-bold text-slate-950 transition hover:bg-orange-300"
-                                            href={`/${locale}/signup`}
-                                        >
-                                            {tAuth('createAccount')}
-                                        </Link>
+                                        {isEmailAuthEnabled && (
+                                            <Link
+                                                className="rounded-md bg-orange-400 px-3 py-2 text-sm font-bold text-slate-950 transition hover:bg-orange-300"
+                                                href={`/${locale}/signup`}
+                                            >
+                                                {tAuth('createAccount')}
+                                            </Link>
+                                        )}
                                     </div>
                                 </NavbarItem>
                             )}

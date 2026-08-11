@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import logo from '@/assets/cinema.png';
 import { createClient } from '@/lib/supabase/client';
-import { isSupabaseConfigured } from '@/lib/supabase/config';
+import { isEmailAuthEnabled, isSupabaseConfigured } from '@/lib/supabase/config';
 
 const usernamePattern = /^[a-zA-Z0-9_]{3,30}$/;
 
@@ -21,8 +21,13 @@ export default function SignUp() {
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (!isEmailAuthEnabled) router.replace(`/${locale}/signin`);
+  }, [locale, router]);
+
   const signUp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!isEmailAuthEnabled) return;
     if (!isSupabaseConfigured) return toast.error(t('supabaseSignUpConfigurationError'));
     if (!usernamePattern.test(username)) return toast.error(t('usernameFormatError'));
     if (password.length < 8) return toast.error(t('passwordLengthError'));
@@ -45,6 +50,8 @@ export default function SignUp() {
 
     router.push(`/${locale}/verify-email?email=${encodeURIComponent(email)}`);
   };
+
+  if (!isEmailAuthEnabled) return null;
 
   return (
     <main className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-b from-aero-blue to-blueish-gray p-6">

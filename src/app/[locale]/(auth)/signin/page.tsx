@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import logo from '@/assets/cinema.png';
 import { createClient } from '@/lib/supabase/client';
-import { isSupabaseConfigured } from '@/lib/supabase/config';
+import { isEmailAuthEnabled, isSupabaseConfigured } from '@/lib/supabase/config';
 
 export default function SignIn() {
   const locale = useLocale();
@@ -24,6 +24,7 @@ export default function SignIn() {
 
   const signInWithPassword = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!isEmailAuthEnabled) return;
     if (!isSupabaseConfigured) return toast.error(t('supabaseSignInConfigurationError'));
 
     setIsSubmitting(true);
@@ -56,19 +57,23 @@ export default function SignIn() {
           <FontAwesomeIcon icon={faGoogle} className="h-5 w-5 text-[#4285f4]" aria-hidden="true" />
           {t('continueWithGoogle')}
         </button>
-        <div className="my-5 flex items-center gap-3 text-sm text-slate-600"><span className="h-px grow bg-slate-400" />{t('or')}<span className="h-px grow bg-slate-400" /></div>
-        <form className="flex flex-col gap-4" onSubmit={signInWithPassword}>
-          <label className="font-semibold text-slate-700">{t('email')}
-            <input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-1 h-10 w-full rounded-md border-2 border-aero-blue bg-blueish-gray px-3 text-white" />
-          </label>
-          <label className="font-semibold text-slate-700">{t('password')}
-            <input required type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="mt-1 h-10 w-full rounded-md border-2 border-aero-blue bg-blueish-gray px-3 text-white" />
-          </label>
-          <button disabled={isSubmitting} className="h-11 rounded-md border-2 border-gray-500 bg-blueish-gray font-bold text-white disabled:opacity-60">
-            {isSubmitting ? t('signingIn') : t('signIn')}
-          </button>
-        </form>
-        <p className="mt-5 text-center text-sm text-slate-700">{t('noAccount')} <Link className="font-bold text-lapis-lazuli underline" href={`/${locale}/signup`}>{t('createAccount')}</Link></p>
+        {isEmailAuthEnabled && (
+          <>
+            <div className="my-5 flex items-center gap-3 text-sm text-slate-600"><span className="h-px grow bg-slate-400" />{t('or')}<span className="h-px grow bg-slate-400" /></div>
+            <form className="flex flex-col gap-4" onSubmit={signInWithPassword}>
+              <label className="font-semibold text-slate-700">{t('email')}
+                <input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-1 h-10 w-full rounded-md border-2 border-aero-blue bg-blueish-gray px-3 text-white" />
+              </label>
+              <label className="font-semibold text-slate-700">{t('password')}
+                <input required type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="mt-1 h-10 w-full rounded-md border-2 border-aero-blue bg-blueish-gray px-3 text-white" />
+              </label>
+              <button disabled={isSubmitting} className="h-11 rounded-md border-2 border-gray-500 bg-blueish-gray font-bold text-white disabled:opacity-60">
+                {isSubmitting ? t('signingIn') : t('signIn')}
+              </button>
+            </form>
+            <p className="mt-5 text-center text-sm text-slate-700">{t('noAccount')} <Link className="font-bold text-lapis-lazuli underline" href={`/${locale}/signup`}>{t('createAccount')}</Link></p>
+          </>
+        )}
       </section>
     </main>
   );
