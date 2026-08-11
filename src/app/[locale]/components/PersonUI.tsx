@@ -6,6 +6,8 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { CalendarDays, ChevronDown, ChevronUp, MapPin, Star } from 'lucide-react';
 import { PersonCredit, PersonData } from '@/types/types';
+import MediaQuickActions from '@/components/media/MediaQuickActions';
+import { MediaQuickActionItem, useUserMediaStates } from '@/hooks/useUserMediaStates';
 
 type Props = {
     personData: PersonData;
@@ -28,6 +30,16 @@ const getPopularityScore = (credit: PersonCredit) => {
     if (credit.media_type === 'tv' && (credit.episode_count ?? 0) <= 1) return baseScore * 0.2;
     return baseScore;
 };
+
+const getCreditActionItem = (credit: PersonCredit): MediaQuickActionItem => ({
+    mediaId: credit.id,
+    mediaType: credit.media_type,
+    title: getCreditTitle(credit),
+    posterPath: credit.poster_path,
+    releaseYear: Number(getCreditDate(credit)?.slice(0, 4)) || null,
+    popularity: Number(credit.popularity ?? 0),
+    voteAverage: Number(credit.vote_average ?? 0)
+});
 
 const calculateAge = (birthday: string, deathday: string | null) => {
     const birthDate = new Date(`${birthday}T00:00:00`);
@@ -88,6 +100,15 @@ export default function PersonUI({ personData, personWork }: Props) {
             return getPopularityScore(second) - getPopularityScore(first);
         });
     }, [mediaFilter, personWork, sortMode]);
+    const displayedCredits = useMemo(
+        () => filteredCredits.slice(0, visibleCredits),
+        [filteredCredits, visibleCredits]
+    );
+    const actionItems = useMemo(
+        () => displayedCredits.map(getCreditActionItem),
+        [displayedCredits]
+    );
+    const userMedia = useUserMediaStates(actionItems);
 
     useEffect(() => setVisibleCredits(initialVisibleCredits), [mediaFilter, sortMode]);
 
@@ -224,13 +245,14 @@ export default function PersonUI({ personData, personWork }: Props) {
                 {filteredCredits.length ? (
                     <>
                         <ul className="mt-7 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-                            {filteredCredits.slice(0, visibleCredits).map((credit) => {
+                            {displayedCredits.map((credit) => {
                                 const title = getCreditTitle(credit);
                                 const date = getCreditDate(credit);
                                 const role = credit.character || credit.job;
+                                const actionItem = getCreditActionItem(credit);
 
                                 return (
-                                    <li className="min-w-0" key={`${credit.media_type}-${credit.id}`}>
+                                    <li className="group relative min-w-0" key={`${credit.media_type}-${credit.id}`}>
                                         <button
                                             type="button"
                                             onClick={() => router.push(`/${locale}/${credit.media_type === 'movie' ? 'movies' : 'shows'}/${credit.id}`)}
@@ -260,6 +282,15 @@ export default function PersonUI({ personData, personWork }: Props) {
                                                 {role && <span className="mt-auto line-clamp-2 pt-2 text-xs text-slate-400">{role}</span>}
                                             </span>
                                         </button>
+                                        {userMedia.user && (
+                                            <MediaQuickActions
+                                                item={actionItem}
+                                                state={userMedia.getState(actionItem)}
+                                                userId={userMedia.user.id}
+                                                disabled={userMedia.isLoading || userMedia.isPending(actionItem)}
+                                                onToggle={(field) => userMedia.toggle(actionItem, field)}
+                                            />
+                                        )}
                                     </li>
                                 );
                             })}

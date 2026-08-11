@@ -12,6 +12,7 @@ export type GlobalSearchResult = {
   known_for_department?: string;
   overview?: string;
   popularity?: number;
+  vote_average?: number;
   username?: string;
   avatar_url?: string | null;
 };

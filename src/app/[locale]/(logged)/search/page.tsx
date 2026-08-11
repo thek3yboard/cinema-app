@@ -1,9 +1,11 @@
 "use client";
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import PosterCard from '@/components/media/PosterCard';
+import MediaQuickActions from '@/components/media/MediaQuickActions';
+import { MediaQuickActionItem, useUserMediaStates } from '@/hooks/useUserMediaStates';
 import { searchAll } from '@/lib/tmdb/search';
 import { searchProfiles } from '@/lib/supabase/search';
 import {
@@ -12,6 +14,21 @@ import {
   getSearchResultTitle,
   GlobalSearchResult
 } from '@/types/search';
+
+const getMediaActionItem = (result: GlobalSearchResult): MediaQuickActionItem | null => {
+  if (result.media_type !== 'movie' && result.media_type !== 'tv') return null;
+  const date = result.media_type === 'movie' ? result.release_date : result.first_air_date;
+
+  return {
+    mediaId: Number(result.id),
+    mediaType: result.media_type,
+    title: getSearchResultTitle(result),
+    posterPath: result.poster_path ?? null,
+    releaseYear: Number(date?.slice(0, 4)) || null,
+    popularity: Number(result.popularity ?? 0),
+    voteAverage: Number(result.vote_average ?? 0)
+  };
+};
 
 function SearchResults() {
   const locale = useLocale();
@@ -25,6 +42,11 @@ function SearchResults() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const actionItems = useMemo(
+    () => results.map(getMediaActionItem).filter((item): item is MediaQuickActionItem => item !== null),
+    [results]
+  );
+  const userMedia = useUserMediaStates(actionItems);
 
   useEffect(() => {
     if (query.length < 2) {
@@ -128,6 +150,7 @@ function SearchResults() {
               const title = getSearchResultTitle(result);
               const imagePath = getSearchResultImage(result);
               const metadata = getMetadata(result);
+              const actionItem = getMediaActionItem(result);
 
               return (
                 <li className="min-w-0" key={`${result.media_type}-${result.id}`}>
@@ -136,6 +159,15 @@ function SearchResults() {
                     imageSrc={imagePath ? (result.media_type === 'user' ? imagePath : `https://image.tmdb.org/t/p/w342${imagePath}`) : '/fallback-portrait.svg'}
                     metadata={`${getTypeLabel(result)}${metadata ? ` · ${metadata}` : ''}`}
                     onClick={() => router.push(getSearchResultHref(locale, result))}
+                    action={actionItem && userMedia.user ? (
+                      <MediaQuickActions
+                        item={actionItem}
+                        state={userMedia.getState(actionItem)}
+                        userId={userMedia.user.id}
+                        disabled={userMedia.isLoading || userMedia.isPending(actionItem)}
+                        onToggle={(field) => userMedia.toggle(actionItem, field)}
+                      />
+                    ) : undefined}
                   />
                 </li>
               );

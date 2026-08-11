@@ -242,6 +242,9 @@
         "markAsUnwatched": "Mark as unwatched",
         "addToFavorites": "Add to favorites",
         "removeFromFavorites": "Remove from favorites",
+        "quickActions": "Quick actions for {title}",
+        "openQuickActions": "Open quick actions for {title}",
+        "closeQuickActions": "Close quick actions",
         "saveError": "We couldn't save this change.",
         "trailerUnavailable": "Trailer unavailable."
     },

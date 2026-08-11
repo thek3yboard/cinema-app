@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import Link from 'next/link';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import { Check, Eye, ListPlus, Lock, Plus } from 'lucide-react';
@@ -24,15 +24,16 @@ type Props = {
   releaseYear: number | null;
   popularity: number;
   voteAverage: number;
+  compact?: boolean;
 };
 
-export default function CustomListPicker({ userId, mediaId, mediaType, title, posterPath, releaseYear, popularity, voteAverage }: Props) {
+export default function CustomListPicker({ userId, mediaId, mediaType, title, posterPath, releaseYear, popularity, voteAverage, compact = false }: Props) {
   const t = useTranslations('CustomLists');
   const locale = useLocale();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [lists, setLists] = useState<CustomList[]>([]);
   const [selectedListIds, setSelectedListIds] = useState<Set<string>>(new Set());
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [pendingListId, setPendingListId] = useState<string | null>(null);
 
   const loadLists = useCallback(async () => {
@@ -68,9 +69,10 @@ export default function CustomListPicker({ userId, mediaId, mediaType, title, po
     setSelectedListIds(new Set((memberships ?? []).map((item: { list_id: string }) => item.list_id)));
   }, [mediaId, mediaType, t, userId]);
 
-  useEffect(() => {
-    loadLists();
-  }, [loadLists]);
+  const openPicker = () => {
+    onOpen();
+    void loadLists();
+  };
 
   const toggleMembership = async (list: CustomList) => {
     const isSelected = selectedListIds.has(list.id);
@@ -126,15 +128,15 @@ export default function CustomListPicker({ userId, mediaId, mediaType, title, po
   return (
     <>
       <div className="relative shrink-0 group">
-        <button type="button" onClick={onOpen} className="flex flex-col items-center gap-1 text-white" aria-label={t('addToCustomList')}>
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 text-gray-700">
+        <button type="button" onClick={openPicker} className={`flex items-center text-white ${compact ? 'pointer-events-auto' : 'flex-col gap-1'}`} aria-label={t('addToCustomList')} title={compact ? t('addToCustomList') : undefined}>
+          <span className={`inline-flex items-center justify-center rounded-full bg-gray-200 text-gray-700 shadow-lg transition hover:scale-105 ${compact ? 'h-10 w-10' : 'h-9 w-9'}`}>
             <ListPlus className="h-5 w-5" />
           </span>
-          <span className="text-xs leading-none md:hidden">{t('listsLabel')}</span>
+          {!compact && <span className="text-xs leading-none md:hidden">{t('listsLabel')}</span>}
         </button>
-        <span className="pointer-events-none absolute bottom-[115%] left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:block">
+        {!compact && <span className="pointer-events-none absolute bottom-[115%] left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:block">
           {t('addToCustomList')}
-        </span>
+        </span>}
       </div>
 
       <Modal isOpen={isOpen} onClose={onClose} classNames={cinemaModalClassNames}>
