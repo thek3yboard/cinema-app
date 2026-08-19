@@ -10,8 +10,9 @@
         "sortBy": "Sort by",
         "orderBy": "Order by",
         "popularity": "Popularity",
-        "topRated": "Top Rated",
+        "rating": "Rating",
         "nowPlaying": "Now Playing",
+        "onTheAir": "On the Air",
         "revenue": "Revenue",
         "ascending": "Ascending",
         "descending": "Descending",
@@ -49,6 +50,14 @@
         "person": "Person",
         "user": "User",
         "unknownYear": "Year unavailable"
+    },
+
+    "MediaGrid": {
+        "movie": "Movie",
+        "show": "TV show",
+        "person": "Person",
+        "unknownYear": "Year unavailable",
+        "untitled": "Untitled"
     },
 
     "Auth": {

@@ -10,8 +10,9 @@
         "sortBy": "Filtrar por",
         "orderBy": "Ordenar por",
         "popularity": "Popularidad",
-        "topRated": "Mejor Valoradas",
+        "rating": "Puntuación",
         "nowPlaying": "En Cines",
+        "onTheAir": "Al Aire",
         "revenue": "Éxito en Taquilla",
         "ascending": "Ascendente",
         "descending": "Descendente",
@@ -49,6 +50,14 @@
         "person": "Persona",
         "user": "Usuario",
         "unknownYear": "Año no disponible"
+    },
+
+    "MediaGrid": {
+        "movie": "Película",
+        "show": "Serie",
+        "person": "Persona",
+        "unknownYear": "Año no disponible",
+        "untitled": "Sin título"
     },
 
     "Auth": {

@@ -4,9 +4,7 @@ import { sortByOptions, orderOptions } from "@/assets/filtersData";
 
 type MediaContextType = {
     page: number;
-    setPage: React.Dispatch<React.SetStateAction<number>>;
     currentApiPages: number[];
-    setCurrentApiPages: React.Dispatch<React.SetStateAction<number[]>>
     handleClickPrevPage: () => void
     handleClickNextPage: () => void
     sort: SortType,
@@ -36,9 +34,7 @@ export const initialLanguage = {
 
 export const MediaContext = createContext<MediaContextType>({
     page: initialPage,
-    setPage: () => void {},
     currentApiPages: initialCurrentApiPages,
-    setCurrentApiPages: () => void {},
     handleClickPrevPage: () => void {},
     handleClickNextPage: () => void {},
     sort: initialSort,

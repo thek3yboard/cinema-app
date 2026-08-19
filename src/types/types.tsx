@@ -2,10 +2,12 @@ export type Movie = {
     id: number,
     title: string,
     overview: string,
-    poster_path: string,
+    poster_path: string | null,
+    backdrop_path?: string | null,
+    release_date?: string,
     vote_count: number,
-    profile_path: string,
-    media_type: string
+    profile_path?: string | null,
+    media_type?: string
 }
 
 export type MovieData = {
@@ -24,12 +26,15 @@ export type MovieData = {
 
 export type Show = {
     id: number,
-    title: string,
+    name: string,
+    title?: string,
     overview: string,
-    poster_path: string,
+    poster_path: string | null,
+    backdrop_path?: string | null,
+    first_air_date?: string,
     vote_count: number,
-    profile_path: string,
-    media_type: string
+    profile_path?: string | null,
+    media_type?: string
 }
 
 export type ShowData = {
@@ -48,9 +53,9 @@ export type ShowData = {
 export type Person = {
     id: number,
     name: string,
-    profile_path: string,
-    poster_path: string
-    media_type: string
+    profile_path: string | null,
+    poster_path?: string | null
+    media_type?: string
 }
 
 export type PersonData = {

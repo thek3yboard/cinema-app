@@ -3,7 +3,7 @@
 import { useState, useRef, ChangeEvent, useEffect } from 'react';
 import { MediaContext, initialPage, initialCurrentApiPages, initialSort, initialLanguage } from "../(logged)/MediaContext";
 import { SortType, Movie, Show, Person } from '@/types/types';
-import { orderOptions, sortByOptions } from '@/assets/filtersData';
+import { CatalogType, getOrderOptions, getSortByOptions } from '@/assets/filtersData';
 import { usePathname, useRouter } from 'next/navigation';
 import { Sliders } from 'lucide-react'
 import { Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, 
@@ -26,6 +26,19 @@ type NavbarItems = {
     value: string
 }
 
+type PaginationSection = CatalogType | 'people';
+
+type PaginationState = Record<PaginationSection, {
+    page: number;
+    apiPages: number[];
+}>;
+
+const initialPaginationState = (): PaginationState => ({
+    movies: { page: initialPage, apiPages: [...initialCurrentApiPages] },
+    shows: { page: initialPage, apiPages: [...initialCurrentApiPages] },
+    people: { page: initialPage, apiPages: [...initialCurrentApiPages] },
+});
+
 const persistLanguagePreference = (key: string, label: string) => {
     localStorage.setItem('language_key', key);
     localStorage.setItem('language_label', label);
@@ -40,24 +53,42 @@ export default function LoggedLayout({
     const t = useTranslations('LoggedLayout');
     const tAuth = useTranslations('Auth');
     const locale = useLocale();
-    const [page, setPage] = useState(initialPage);
+    const router = useRouter();
+    const pathname = usePathname();
+    const activeCatalogType: CatalogType = pathname.includes('/shows') ? 'shows' : 'movies';
+    const activePaginationSection: PaginationSection = pathname.includes('/shows')
+        ? 'shows'
+        : pathname.includes('/people')
+            ? 'people'
+            : 'movies';
+    const isCatalogPath = pathname === `/${locale}/${activeCatalogType}`;
+    const [pagination, setPagination] = useState<PaginationState>(initialPaginationState);
+    const { page, apiPages: currentApiPages } = pagination[activePaginationSection];
     const [movies, setMovies] = useState<Movie[]>([]);
     const [shows, setShows] = useState<Show[]>([]);
     const [people, setPeople] = useState<Person[]>([]); 
-    const [currentApiPages, setCurrentApiPages] = useState(initialCurrentApiPages);
-    const [sort, setSort] = useState<SortType>({
-        key: initialSort.key,
-        label: t(`${initialSort.label}`),
-        order_key: initialSort.order_key,
-        order_label: t(`${initialSort.order_label}`)
+    const [sortByType, setSortByType] = useState<Record<CatalogType, SortType>>({
+        movies: {
+            key: initialSort.key,
+            label: t(`${initialSort.label}`),
+            order_key: initialSort.order_key,
+            order_label: t(`${initialSort.order_label}`),
+        },
+        shows: {
+            key: initialSort.key,
+            label: t(`${initialSort.label}`),
+            order_key: initialSort.order_key,
+            order_label: t(`${initialSort.order_label}`),
+        },
     });
+    const sort = sortByType[activeCatalogType];
+    const availableSortOptions = getSortByOptions(activeCatalogType);
     const [language, setLanguage] = useState(initialLanguage);
     const [loading, setLoading] = useState<boolean>(true);
-    const sortRef = useRef(sort.key);
-    const orderRef = useRef(sort.order_key);
+    const [draftSortKey, setDraftSortKey] = useState(sort.key);
+    const [draftOrderKey, setDraftOrderKey] = useState(sort.order_key);
+    const availableOrderOptions = getOrderOptions(activeCatalogType, draftSortKey);
     const screenRef = useRef<HTMLDivElement>(null);
-    const router = useRouter();
-    const pathname = usePathname();
     const {isOpen, onOpen, onClose} = useDisclosure();
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const globalSearch = useGlobalSearch(() => setIsMenuOpen(false));
@@ -88,20 +119,33 @@ export default function LoggedLayout({
     ];
 
     const handleClickPrevPage = () => {
-        setMovies([]);
-        setShows([]);
         if(currentApiPages[0] === 1) {
             return;
         }
-        setCurrentApiPages([currentApiPages[0]-2, currentApiPages[1]-2]);
-        setPage(p => p - 1);
+
+        if (activePaginationSection === 'shows') setShows([]);
+        else setMovies([]);
+
+        setPagination((current) => ({
+            ...current,
+            [activePaginationSection]: {
+                page: current[activePaginationSection].page - 1,
+                apiPages: current[activePaginationSection].apiPages.map((apiPage) => apiPage - 2),
+            },
+        }));
     }
 
     const handleClickNextPage = () => {
-        setMovies([]);
-        setShows([]);
-        setCurrentApiPages([currentApiPages[0]+2, currentApiPages[1]+2]);
-        setPage(p => p + 1);
+        if (activePaginationSection === 'shows') setShows([]);
+        else setMovies([]);
+
+        setPagination((current) => ({
+            ...current,
+            [activePaginationSection]: {
+                page: current[activePaginationSection].page + 1,
+                apiPages: current[activePaginationSection].apiPages.map((apiPage) => apiPage + 2),
+            },
+        }));
     }
 
     const handleChangeLanguage = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -119,35 +163,54 @@ export default function LoggedLayout({
     }
 
     const handleChangeSort = (e: ChangeEvent<HTMLSelectElement>) => {
-        sortRef.current = e.target.value;
+        const nextSortKey = e.target.value;
+        const nextOrderOptions = getOrderOptions(activeCatalogType, nextSortKey);
+        setDraftSortKey(nextSortKey);
+
+        if (!nextOrderOptions.some((option) => option.key === draftOrderKey)) {
+            setDraftOrderKey(nextOrderOptions[0].key);
+        }
     }
 
     const handleChangeOrder = (e: ChangeEvent<HTMLSelectElement>) => {
-        orderRef.current = e.target.value;
+        setDraftOrderKey(e.target.value);
     }
 
     const handleSetFilters = () => {
         setIsMenuOpen(false);
 
-        const selectedOrder = orderOptions.find((option) => option.key === orderRef.current)!;
-        const selectedSort = sortByOptions.find((option) => option.key === sortRef.current)!;
-        setSort({ ...sort, key: selectedSort.key, label: t(`${selectedSort.label}`),
-            order_key: selectedOrder.key, order_label: t(`${selectedOrder.label}`)
-        });
-        setCurrentApiPages(initialCurrentApiPages);
-        setPage(initialPage);
+        const selectedOrder = availableOrderOptions.find((option) => option.key === draftOrderKey);
+        const selectedSort = availableSortOptions.find((option) => option.key === draftSortKey);
+        if (!selectedOrder || !selectedSort) return;
+
+        setSortByType((current) => ({
+            ...current,
+            [activeCatalogType]: {
+                key: selectedSort.key,
+                label: t(`${selectedSort.label}`),
+                order_key: selectedOrder.key,
+                order_label: t(`${selectedOrder.label}`),
+            },
+        }));
+        setPagination((current) => ({
+            ...current,
+            [activeCatalogType]: {
+                page: initialPage,
+                apiPages: [...initialCurrentApiPages],
+            },
+        }));
         onClose();
 
-        if(pathname.includes('/movies')) {
+        if(activeCatalogType === 'movies') {
             setMovies([]);
-            router.push(`/${pathname.split('/')[1]}/movies`);
         } else {
             setShows([]);
-            router.push(`/${pathname.split('/')[1]}/shows`);
         }
     }
 
     const handleOpen = () => {
+        setDraftSortKey(sort.key);
+        setDraftOrderKey(sort.order_key);
         onOpen();
     }
 
@@ -168,7 +231,7 @@ export default function LoggedLayout({
     }
 
     return (
-        <MediaContext.Provider value={{ page, setPage, currentApiPages, setCurrentApiPages, handleClickPrevPage, handleClickNextPage, sort, movies, setMovies, shows, setShows, people, setPeople, language, setLanguage }}>
+        <MediaContext.Provider value={{ page, currentApiPages, handleClickPrevPage, handleClickNextPage, sort, movies, setMovies, shows, setShows, people, setPeople, language, setLanguage }}>
         <>
             <div ref={screenRef} className="h-screen flex flex-col overflow-y-auto bg-gradient-to-r from-[#192a49] from-1% via-[#3f577c] via-50% to-[#192a49] to-99%">
                 <div className="z-20 sticky top-0 border-b-2 border-slate-700">
@@ -240,7 +303,7 @@ export default function LoggedLayout({
                                     <GlobalSearchInput controller={globalSearch} className="min-w-0 flex-1" />
                                     <Button
                                         isIconOnly
-                                        disabled={!pathname.includes('/movies') && !pathname.includes('/shows')}
+                                        disabled={!isCatalogPath}
                                         className="h-10 w-10 min-w-10 shrink-0 rounded-sm bg-lapis-lazuli disabled:opacity-50"
                                         key="full"
                                         onPress={handleOpen}
@@ -324,7 +387,7 @@ export default function LoggedLayout({
                                 <button
                                     type="button"
                                     aria-label={t('filter')}
-                                    disabled={!pathname.includes('/movies') && !pathname.includes('/shows')}
+                                    disabled={!isCatalogPath}
                                     className="flex h-10 w-10 items-center justify-center rounded-md text-nyanza hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
                                     onClick={handleOpen}
                                 >
@@ -407,11 +470,11 @@ export default function LoggedLayout({
                             <span className="text-sm font-normal text-slate-400">{t('filterDescription')}</span>
                         </ModalHeader>
                         <ModalBody className="gap-4">
-                            <Select key="sort" variant="bordered" label={t('sortBy')} placeholder={sort.label} className="w-full" onChange={handleChangeSort}>
-                                {sortByOptions.map((option) => <SelectItem key={option.key}>{t(`${option.label}`)}</SelectItem>)}
+                            <Select key="sort" variant="bordered" label={t('sortBy')} selectedKeys={[draftSortKey]} className="w-full" onChange={handleChangeSort}>
+                                {availableSortOptions.map((option) => <SelectItem key={option.key}>{t(`${option.label}`)}</SelectItem>)}
                             </Select>
-                            <Select key="order" variant="bordered" label={t('orderBy')} placeholder={sort.order_label} className="w-full" onChange={handleChangeOrder}>
-                                {orderOptions.map((option) => <SelectItem key={option.key}>{t(`${option.label}`)}</SelectItem>)}
+                            <Select key="order" variant="bordered" label={t('orderBy')} selectedKeys={[draftOrderKey]} isDisabled={availableOrderOptions.length === 1} className="w-full" onChange={handleChangeOrder}>
+                                {availableOrderOptions.map((option) => <SelectItem key={option.key}>{t(`${option.label}`)}</SelectItem>)}
                             </Select>
                         </ModalBody>
                         <ModalFooter>
